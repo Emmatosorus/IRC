@@ -6,7 +6,7 @@ CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -O2 -g3
 OBJS_DIR = .obj/
 SRC_DIR = srcs/
 # HEADERS = include/AMateria.hpp include/Character.hpp include/Cure.hpp include/Ice.hpp include/MateriaSource.hpp include/ICharacter.hpp include/IMateriaSource.hpp
-SRCS = main.cpp
+SRCS = bot.cpp
 
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o)) 
 
