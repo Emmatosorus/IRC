@@ -105,6 +105,10 @@
 	close(new_fd);
 	exit(0);
 	}
+	int nb_bytes = recv(new_fd, s, INET6_ADDRSTRLEN - 1, 0);
+	s[nb_bytes] = '\0';
+	if (s[0] != '\0')
+		printf("%s\n", s);
 	close(new_fd); // parent doesn't need this
 	}
 		return 0;

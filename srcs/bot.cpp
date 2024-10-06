@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/06 16:29:40 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/06 16:57:09 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	if (getaddrinfo(argv[1], MYPORT, &hints, &servinfo) != 0)
-		return (2);
+		return (1);
 	for (tmp = servinfo; tmp != NULL; tmp = tmp->ai_next)
 	{
 		socket_fd = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
@@ -55,7 +55,10 @@ int	main(int argc, char **argv)
 		break ;
 	}
 	if (tmp == NULL)
+	{
+		freeaddrinfo(servinfo);
 		return (2);
+	}
 	char s[INET6_ADDRSTRLEN];
 	inet_ntop(tmp->ai_family, get_in_addr((struct sockaddr *)tmp->ai_addr),s, sizeof(s));
 	freeaddrinfo(servinfo);
@@ -69,9 +72,9 @@ int	main(int argc, char **argv)
 	std::string	test;
 	test = buf;
 	size_t	pos;
-	pos = test.find("Hello", 0);
+	pos = test.find("hello", 0);
 	if (pos != std::string::npos)
-		std::cout << "WTF" << std::endl;
+		send(socket_fd, "oui", 3, 0);
 	close(socket_fd);
 	return (0);
 }
