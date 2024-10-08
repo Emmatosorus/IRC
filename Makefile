@@ -29,9 +29,6 @@ $(NAME) : $(OBJS)
 $(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-# $(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS)
-# 	$(CXX) $(CPPFLAGS) -c $< -o $@
-
 clean :
 	@rm -rf $(OBJS_DIR)
 
