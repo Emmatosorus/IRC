@@ -1,7 +1,8 @@
 NAME = ircserv 
 
 CXX = c++
-CPPFLAGS = -Wall -Wextra -Werror -g3
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
+DEBUGFLAGS = -g3 -fsanitize=address
 
 OBJS_DIR = .obj/
 SRC_DIR = src/
@@ -23,11 +24,11 @@ obj :
 $(NAME) : $(OBJS)
 	@echo -n "$(Red)Compiling ft_irc ..${NC}" && sleep 0.2
 	@echo -n "$(Red)\rCompiling ft_irc.. ${NC}"
-	$(CXX) $^ $(CPPFLAGS) -o $(NAME) && sleep 0.1
+	$(CXX) $^ $(CPPFLAGS) $(DEBUGFLAGS) -o $(NAME) && sleep 0.1
 	@echo "$(Green)\r------COMPILATION COMPLETE-------${NC}"
 
 $(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) -c $< -o $@
 
 clean :
 	@rm -rf $(OBJS_DIR)
