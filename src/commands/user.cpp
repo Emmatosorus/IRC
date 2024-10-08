@@ -1,7 +1,8 @@
 #include "../../include/Server.hpp"
 
-void Server::_user(const std::vector<std::string>& args)
+void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 {
 	(void)args;
+	(void)it;
 	// implementation
 }
