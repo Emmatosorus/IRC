@@ -1,0 +1,4 @@
+*.o
+ircserv
+.direnv
+.envrc
