@@ -1,21 +1,25 @@
 NAME = ircserv 
 
-CXX = g++
+CXX = c++
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
-DEBUGFLAGS = -g3 -fsanitize=address
+DEBUGFLAGS =
 
 OBJS_DIR = .obj/
 SRC_DIR = src/
 
-HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp
+HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp
 
-SRCS_COMMANDS = $(addprefix commands/, join.cpp names.cpp nick.cpp notice.cpp pass.cpp ping.cpp privmsg.cpp quit.cpp user.cpp invite.cpp)
+SRCS_COMMANDS = $(addprefix commands/, join.cpp names.cpp nick.cpp notice.cpp pass.cpp ping.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp $(SRCS_COMMANDS)
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o)) 
 
 .SILENT:
 
 all : obj $(NAME)
+
+debug : CXX=g++
+debug : DEBUGFLAGS = -g3 -fsanitize=address
+debug : obj $(NAME)
 
 obj :
 	@mkdir -p $(OBJS_DIR)
