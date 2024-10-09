@@ -3,9 +3,12 @@
 //
 
 #include "../include/client_msg_parse.hpp"
+#include <algorithm>
+
 static void	split_client_msg(std::string & input, std::vector<std::string> & vec);
 static std::string	get_msg(std::string & input);
 static void	shrink_space(std::string & input);
+static char char_lower(char& c);
 
 std::vector<std::string>	parse_client_msg(std::string input)
 {
@@ -14,7 +17,8 @@ std::vector<std::string>	parse_client_msg(std::string input)
 
 	msg = get_msg(input);
 	split_client_msg(input, vec);
-	vec.push_back(msg);
+	vec.push_back(msg); 
+	std::for_each(vec[0].begin(), vec[0].end(), char_lower); 
 	return (vec);
 }
 
@@ -36,7 +40,7 @@ static void	split_client_msg(std::string & input, std::vector<std::string> & vec
 	while (!input.empty())
 	{
 		i = 0;
-		while (input[i] != ' ')
+		while (input[i] && input[i] != ' ')
 			i++;
 		vec.push_back(input.substr(0, i));
 		input.erase(0, i + 1);
@@ -62,4 +66,10 @@ static void	shrink_space(std::string & input)
 				input.insert(i++, " ");
 		}
 	}
+}
+
+static char char_lower(char& c)
+{
+	c = std::tolower(c);
+	return c;
 }
