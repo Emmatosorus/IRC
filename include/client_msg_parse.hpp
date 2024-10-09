@@ -12,8 +12,5 @@
 #define END "\x1B[0m"
 
 std::vector<std::string>	parse_client_msg(std::string input);
-void	split_client_msg(std::string & input, std::vector<std::string> & vec);
-std::string	get_msg(std::string & input);
-void	shrink_space(std::string & input);
 
 #endif
