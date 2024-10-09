@@ -28,6 +28,10 @@ Server::Server(const char* password, const char* port) : m_password(password), m
 	m_commands.insert(make_pair("privmsg", &Server::_privmsg));
 	m_commands.insert(make_pair("quit", &Server::_quit));
 	m_commands.insert(make_pair("user", &Server::_user));
+	m_commands.insert(make_pair("invite", &Server::_invite));
+	m_commands.insert(make_pair("topic", &Server::_topic));
+
+	// TODO: add the invite command as well
 }
 
 Server::~Server()

@@ -36,6 +36,8 @@ class Server
 	void _notice(PollfdIterator it, const std::vector<std::string>& args);
 	void _quit(PollfdIterator it, const std::vector<std::string>& args);
 	void _ping(PollfdIterator it, const std::vector<std::string>& args);
+	void _invite(PollfdIterator it, const std::vector<std::string>& args);
+	void _topic(PollfdIterator it, const std::vector<std::string>& args);
 
 	const std::string m_password;
 	const std::string m_port;
