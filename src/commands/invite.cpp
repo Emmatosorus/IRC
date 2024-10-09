@@ -20,17 +20,16 @@ void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
 	std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
 	if (target_channel != m_channels.end())
 	{
-		// TODO: do channel creation, the user which created the channel joins it, becomes it creator, operator etc
+		// ERR_NOSUCHCHANNEL (403)
+		return;
 	}
-	else
-	{
-		// TODO: do channel joining logic, a lot of stuff should be checked, like:
-		// 1. does user exist
-		// 2. is inviting user present on the channel
-		// 3. is invited user present on the channel
-		// 4. is channel invite only
-		//    - if it is, check if the inviter is an operator
-	}
+	// TODO: do channel joining logic, a lot of stuff should be checked, like:
+	// 1. does user exist
+	// 2. is inviting user present on the channel
+	// 3. is invited user present on the channel
+	// 4. is channel invite only
+	//    - if it is, check if the inviter is an operator
+
 	// TODO: send appropriate numeric replies
     /* ERRORS:
 	 * ERR_NEEDMOREPARAMS (461)

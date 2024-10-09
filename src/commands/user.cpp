@@ -16,8 +16,19 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 	std::cout << '\n';
 	// TODO: validate and parse arguments
 	// =====
+	// NOTE: PASS and USER both handle registration
+	// there are is_registered and enetered_password fields on the client
+
 	// TODO: validate username according to the spec
-	// TODO: check if the user is registered already or not
+	// check if the user is registered already or not
+	std::map<int, Client>::iterator client = m_clients.find(it->fd);
+	if (client->second.is_registered)
+	{
+		// ERR_ALREADYREGISTERED (462)
+		return;
+	}
+	// TODO: handle registration
+
 	/* ERRORS:
      * ERR_NEEDMOREPARAMS (461)
      * ERR_ALREADYREGISTERED (462) */

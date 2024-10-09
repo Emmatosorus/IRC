@@ -21,17 +21,19 @@ void Server::_pass(PollfdIterator it, const std::vector<std::string>& args)
 	const std::string& password = args[1];
 	(void)password;
 
+	// NOTE: PASS and USER both handle registration
+	// there are is_registered and enetered_password fields on the client
+
 	// this is how we can find client in the map and check if he is registered
 	std::map<int, Client>::iterator connected_client = m_clients.find(it->fd);
 	if (connected_client->second.is_registered)
 	{
 		// ERR_ALREADYREGISTERED (462)
+		return;
 	}
-	else
-	{
-		// if password is correct, bla bla bla
-		// else ERR_PASSWDMISMATCH (464) 
-	}
+	// TODO: if password is correct, handle registration
+	// else ERR_PASSWDMISMATCH (464) 
+
 	// TODO: send appropriate numeric replies
     /* ERRORS: 
 	 * ERR_NEEDMOREPARAMS (461)

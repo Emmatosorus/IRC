@@ -9,7 +9,7 @@ SRC_DIR = src/
 
 HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp
 
-SRCS_COMMANDS = $(addprefix commands/, join.cpp names.cpp nick.cpp notice.cpp pass.cpp ping.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
+SRCS_COMMANDS = $(addprefix commands/, join.cpp names.cpp nick.cpp notice.cpp pass.cpp ping.cpp pong.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp $(SRCS_COMMANDS)
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o)) 
 

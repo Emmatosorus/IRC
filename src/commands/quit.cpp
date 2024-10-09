@@ -21,6 +21,6 @@ void Server::_quit(PollfdIterator it, const std::vector<std::string>& args)
 		// distribute quit message
 	}
 	// this is how to remove client
-	_remove_client(it->fd);
+	_remove_client(&it);
 	// no numeric replies
 }

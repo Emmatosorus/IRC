@@ -20,12 +20,11 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 	std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
 	if (target_channel != m_channels.end())
 	{
-		// TODO: do channel creation
+		// TODO: do channel creation, the user which created the channel joins it, becomes it creator, operator etc
+		return;
 	}
-	else
-	{
-		// TODO: do channel joining logic
-	}
+	// TODO: do channel joining logic
+
 	// TODO: send appropriate numeric replies
     /* ERRORS:
 	 * ERR_NEEDMOREPARAMS (461)

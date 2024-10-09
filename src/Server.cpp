@@ -26,6 +26,7 @@ Server::Server(const char* password, const char* port) : m_password(password), m
 	m_commands.insert(make_pair("notice", &Server::_notice));
 	m_commands.insert(make_pair("pass", &Server::_pass));
 	m_commands.insert(make_pair("ping", &Server::_ping));
+	m_commands.insert(make_pair("pong", &Server::_pong));
 	m_commands.insert(make_pair("privmsg", &Server::_privmsg));
 	m_commands.insert(make_pair("quit", &Server::_quit));
 	m_commands.insert(make_pair("user", &Server::_user));
@@ -195,4 +196,17 @@ void Server::_add_client(int fd)
 	Client new_client (fd);
 	m_clients.insert(std::make_pair(fd, new_client));
 	m_pfds.push_back(new_pollfd);
+}
+
+Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
+{
+	ClientIterator it;
+	for (it = m_clients.begin(); it != m_clients.end(); it++)
+	{
+		if (it->second.nickname == nickname)
+		{
+			return it;
+		}
+	}
+	return it;
 }

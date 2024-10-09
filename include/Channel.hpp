@@ -2,6 +2,7 @@
 #define CHANNEL_HPP
 #include <string>
 #include <vector>
+#include <ctime>
 class Channel
 {
 	public:

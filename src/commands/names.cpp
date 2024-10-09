@@ -21,11 +21,10 @@ void Server::_names(PollfdIterator it, const std::vector<std::string>& args)
 	if (target_channel != m_channels.end())
 	{
 		// TODO: not sure tbh. send back empty list ???
+		return;
 	}
-	else
-	{
-		// TODO: do listing of the nicknames on the network
-	}
+	// TODO: do listing of the nicknames on the specified channels
+
 	// TODO: send appropriate numeric replies
     /* REPLIES: 
 	 * RPL_NAMREPLY (353) 

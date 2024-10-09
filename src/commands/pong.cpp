@@ -1,9 +1,9 @@
 #include "../../include/Server.hpp"
 #include <iostream>
 
-/* https://modern.ircdocs.horse/#ping-message
- * Parameters: <token> */
-void Server::_ping(PollfdIterator it, const std::vector<std::string>& args)
+/* https://modern.ircdocs.horse/#pong-message
+ * Parameters: [<server>] <token> */
+void Server::_pong(PollfdIterator it, const std::vector<std::string>& args)
 {
 	(void)args;
 	(void)it;
@@ -32,9 +32,5 @@ void Server::_ping(PollfdIterator it, const std::vector<std::string>& args)
 	// use this to remove client if needed
 	_remove_client(&it);
 
-	// TODO: send appropriate numeric replies
-    /* ERRORS: 
-     * ERR_NEEDMOREPARAMS (461)
-     * ERR_NOORIGIN (409)
-	 * */
+	// no numeric replies
 }

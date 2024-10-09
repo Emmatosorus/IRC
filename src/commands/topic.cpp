@@ -22,26 +22,21 @@ void Server::_topic(PollfdIterator it, const std::vector<std::string>& args)
 	if (target_channel != m_channels.end())
 	{
 		// ERR_NOSUCHCHANNEL (403)
+		return;
 	}
-	else
+	if (target_channel->second.is_const_topic_mode)
 	{
-		if (target_channel->second.is_const_topic_mode)
+		// find user who tries to change topic, check his privilege
+		if (!topic_starter->second.is_operator)
 		{
-			// find user who tries to change topic, check his privilege
-			if (topic_starter->second.is_operator)
-			{
-				// ...
-			}
-			else
-			{
-				// ERR_CHANOPRIVSNEEDED (482)
-			}
+			// ERR_CHANOPRIVSNEEDED (482)
+			return;
 		}
-		else
-		{
-			// ...
-		}
+		// user is operator,handle changing of topic
+		return;
 	}
+	// not in const topic mode, handle changing of topic
+
 	/* ERRORS:
 	 * ERR_NEEDMOREPARAMS (461)
 	 * ERR_NOSUCHCHANNEL (403)

@@ -18,16 +18,14 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 	// =====
 	// TODO: validate nickname
 	const std::string& nickname = args[1];
-	int fd_of_client_with_this_nickname = _find_client_by_nickname(nickname);
-	std::map<int, Client>::iterator potential_nickname_holder = m_clients.find(fd_of_client_with_this_nickname);
-	if (potential_nickname_holder == m_clients.end())
+	ClientIterator potential_nickname_holder = _find_client_by_nickname(nickname);
+	if (potential_nickname_holder != m_clients.end())
 	{
-		// TODO: set a new nickname
+		// TODO: nickname is free, handle changing of the nickname
+		return;
 	}
-	else
-	{
-		// TODO: ERR_NICKNAMEINUSE
-	}
+	// TODO: ERR_NICKNAMEINUSE (433)
+
 	// TODO: send appropriate numeric replies
     /* ERRORS: 
 	 * ERR_NONICKNAMEGIVEN (431)

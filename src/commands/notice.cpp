@@ -29,8 +29,7 @@ void Server::_notice(PollfdIterator it, const std::vector<std::string>& args)
 	}
 
 	// how to find if the user exists
-	int fd_of_client_with_this_nickname = _find_client_by_nickname(target);
-	std::map<int, Client>::iterator target_user = m_clients.find(fd_of_client_with_this_nickname);
+	ClientIterator target_user = _find_client_by_nickname(target);
 	if (target_user != m_clients.end())
 	{
 		// ...
