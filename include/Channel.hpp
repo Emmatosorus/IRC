@@ -5,9 +5,7 @@
 class Channel
 {
 	public:
-	Channel(std::string name);
-	Channel(const Channel& c);
-	Channel& operator=(const Channel& c);
+	Channel(int creator_fd, std::string name);
 	~Channel();
 
 	typedef struct s_topic
@@ -26,5 +24,10 @@ class Channel
 	std::pair<bool, size_t> user_limit_mode;
 	bool is_invite_only_mode;
 	bool is_const_topic_mode;
+
+	private:
+	Channel(const Channel& c);
+	Channel& operator=(const Channel& c);
+
 };
 #endif
