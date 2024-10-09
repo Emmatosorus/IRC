@@ -7,8 +7,6 @@ void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
 {
 	(void)args;
 	(void)it;
-	(void)args;
-	(void)it;
 	for (size_t i = 0; i < args.size(); i++)
 	{
 		std::cout << args[i];
@@ -16,17 +14,22 @@ void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
 			std::cout << ' ';
 	}
 	std::cout << '\n';
-	// TODO: validated arguments
+	// TODO: validate and parse arguments
 	// =====
-	const std::string& channel_name = args[1];
+	const std::string& channel_name = args[2];
 	std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
 	if (target_channel != m_channels.end())
 	{
-		// TODO: do channel creation
+		// TODO: do channel creation, the user which created the channel joins it, becomes it creator, operator etc
 	}
 	else
 	{
-		// TODO: do channel joining logic
+		// TODO: do channel joining logic, a lot of stuff should be checked, like:
+		// 1. does user exist
+		// 2. is inviting user present on the channel
+		// 3. is invited user present on the channel
+		// 4. is channel invite only
+		//    - if it is, check if the inviter is an operator
 	}
 	// TODO: send appropriate numeric replies
     /* ERRORS:

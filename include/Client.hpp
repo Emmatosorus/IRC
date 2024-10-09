@@ -10,6 +10,7 @@ class Client
           Client &operator=(const Client &c);
           ~Client();
           int fd;
+		  bool is_registered;
           bool is_operator;
           std::string buf;
           std::string nickname;

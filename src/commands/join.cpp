@@ -14,7 +14,7 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 			std::cout << ' ';
 	}
 	std::cout << '\n';
-	// TODO: validated arguments
+	// TODO: validate and parse arguments
 	// =====
 	const std::string& channel_name = args[1];
 	std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);

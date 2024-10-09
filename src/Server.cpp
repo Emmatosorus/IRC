@@ -118,6 +118,7 @@ void Server::_handle_client_message(PollfdIterator it)
 
 	std::vector<std::string> parsed_command = parse_client_msg(raw_message);
 	const std::string& command = parsed_command[0];
+	// TODO: check if the client is registered, forbid everything except PASS
 	if (m_commands.find(command) != m_commands.end())
 	{
 		(this->*m_commands[command])(it, parsed_command);

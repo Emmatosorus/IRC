@@ -1,8 +1,37 @@
 #include "../../include/Server.hpp"
+#include <iostream>
 
+/* https://modern.ircdocs.horse/#nick-message
+ * Parameters: <nickname> */
 void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 {
 	(void)args;
 	(void)it;
-	// implementation
+	for (size_t i = 0; i < args.size(); i++)
+	{
+		std::cout << args[i];
+		if (i != args.size() - 1)
+			std::cout << ' ';
+	}
+	std::cout << '\n';
+	// TODO: validate arguments
+	// =====
+	// TODO: validate nickname
+	const std::string& nickname = args[1];
+	int fd_of_client_with_this_nickname = _find_client_by_nickname(nickname);
+	std::map<int, Client>::iterator potential_nickname_holder = m_clients.find(fd_of_client_with_this_nickname);
+	if (potential_nickname_holder == m_clients.end())
+	{
+		// TODO: set a new nickname
+	}
+	else
+	{
+		// TODO: ERR_NICKNAMEINUSE
+	}
+	// TODO: send appropriate numeric replies
+    /* ERRORS: 
+	 * ERR_NONICKNAMEGIVEN (431)
+	 * ERR_ERRONEUSNICKNAME (432)
+	 * ERR_NICKNAMEINUSE (433)
+	 * */
 }
