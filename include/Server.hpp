@@ -22,9 +22,12 @@ class Server
 	private:
 	typedef std::vector<struct pollfd>::iterator PollfdIterator;
 	void _init_listening_socket();
+	void _handle_client_message(PollfdIterator it);
+	void _handle_client_connection();
 	void _remove_client(int fd);
 	void _remove_client(PollfdIterator* it);
 	void _add_client(int fd);
+	int _find_client_by_nickname(const std::string& nickname);
 
 	void _user(PollfdIterator it, const std::vector<std::string>& args);
 	void _pass(PollfdIterator it, const std::vector<std::string>& args);

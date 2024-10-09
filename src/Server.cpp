@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include "../include/client_msg_parse.hpp"
 #include <cstring>
 #include <iostream>
 #include <sys/socket.h>
@@ -45,87 +46,87 @@ Server::~Server()
 
 void Server::start()
 {
-	char buf[MESSAGE_SIZE + 1];
 	while (1)
 	{
 		int poll_res = poll(m_pfds.data(), m_pfds.size(), POLL_TIMEOUT);
 		if (poll_res == -1)
-		{
 			throw std::runtime_error("Critical error: poll failed");
-		}
 		
 		for (PollfdIterator it = m_pfds.begin(); it != m_pfds.end(); it++)
 		{
-			// if it's server's fd
 			if ((it->revents & POLLIN) && it->fd == m_sockfd)
-			{
-				struct sockaddr_storage client_addr;
-				socklen_t addrlen = sizeof(struct sockaddr_storage);
-				int new_fd = accept(m_sockfd,
-						(struct sockaddr *)&client_addr, &addrlen);
-
-				if (new_fd == -1)
-				{
-					std::cerr << "Server: new connection failed\n";
-					continue;
-				}
-
-				_add_client(new_fd);
-				std::cout << "Connection accepted: " << new_fd << "\n";
-			}
-			// if it's client's fd
+				_handle_client_connection();
 			else if ((it->revents & POLLIN) && it->fd != m_sockfd)
-			{
-				int bytes_received = recv(it->fd, buf, MESSAGE_SIZE, 0);
-				if (bytes_received < 0)
-				{
-					std::cerr << "Error: recv failed\n";
-					continue;
-				}
-				// the client is disconnected
-				else if (bytes_received == 0)
-				{
-					std::cout << "Connection closed: " << it->fd << "\n";
-					_remove_client(&it);
-					continue;
-				}
-				// TODO: do the proper parsing of the buffer
-				buf[bytes_received] = '\0';
-				std::cout << "Message received\n" << buf;
-				Client& client = m_clients[it->fd];
-				client.buf += buf;
-				if (client.buf.length() > MESSAGE_SIZE)
-				{
-					// TODO: send numeric reply ERR_INPUTTOOLONG (417)
-					continue;
-				}
-
-				size_t end_of_msg = client.buf.find("\n");
-				std::string parsed_string;
-				if (end_of_msg != std::string::npos)
-				{
-					parsed_string = client.buf.substr(0, end_of_msg);
-					std::cout << "parsed_string: " << parsed_string << "\n";
-					client.buf = client.buf.substr(end_of_msg + 1, std::string::npos);
-					std::cout << "new client buf: " << client.buf << "\n";
-				}
-				else
-				{
-					continue;
-				}
-
-				if (m_commands.find(client.buf) != m_commands.end())
-				{
-					std::vector<std::string> dummy_args(3, "");
-					(this->*m_commands[client.buf])(it, dummy_args);
-				}
-				else
-				{
-					// TODO: send numeric reply ERR_UNKNOWNCOMMAND (421)
-				}
-			}
+				_handle_client_message(it);
 		}
 	}
+}
+
+void Server::_handle_client_connection()
+{
+	struct sockaddr_storage client_addr;
+	socklen_t addrlen = sizeof(struct sockaddr_storage);
+	int new_fd = accept(m_sockfd,
+			(struct sockaddr *)&client_addr, &addrlen);
+
+	if (new_fd == -1)
+	{
+		std::cerr << "Error: new connection failed\n";
+		return;
+	}
+
+	_add_client(new_fd);
+	std::cout << "Connection accepted: " << new_fd << "\n";
+}
+
+void Server::_handle_client_message(PollfdIterator it)
+{
+	char buf[MESSAGE_SIZE + 1];
+	int bytes_received = recv(it->fd, buf, MESSAGE_SIZE, 0);
+	if (bytes_received < 0)
+	{
+		std::cerr << "Error: recv failed\n";
+		return;
+	}
+	// the client is disconnected
+	else if (bytes_received == 0)
+	{
+		std::cout << "Connection closed: " << it->fd << "\n";
+		_remove_client(&it);
+		return;
+	}
+	buf[bytes_received] = '\0';
+	Client& client = m_clients[it->fd];
+	client.buf += buf;
+	if (client.buf.length() > MESSAGE_SIZE)
+	{
+		// TODO: send numeric reply ERR_INPUTTOOLONG (417)
+		return;
+	}
+
+	size_t end_of_msg = client.buf.find("\r\n");
+	std::string raw_message;
+	if (end_of_msg != std::string::npos)
+	{
+		raw_message = client.buf.substr(0, end_of_msg);
+		client.buf.clear();
+	}
+	else
+	{
+		return;
+	}
+
+	std::vector<std::string> parsed_command = parse_client_msg(raw_message);
+	const std::string& command = parsed_command[0];
+	if (m_commands.find(command) != m_commands.end())
+	{
+		(this->*m_commands[command])(it, parsed_command);
+	}
+	else
+	{
+		// TODO: send numeric reply ERR_UNKNOWNCOMMAND (421)
+	}
+
 }
 
 void Server::_init_listening_socket()
@@ -172,7 +173,7 @@ void Server::_init_listening_socket()
 	if (listen(m_sockfd, MAX_CONNECTIONS) != 0)
 	{
 		close(m_sockfd);
-		throw std::runtime_error("Server: listen failed");
+		throw std::runtime_error("Critical error: listen failed");
 	}
 }
 
@@ -190,6 +191,7 @@ void Server::_add_client(int fd)
 	struct pollfd new_pollfd;
 	new_pollfd.fd = fd;
 	new_pollfd.events = POLLIN;
-	m_clients.insert(std::make_pair(fd, Client(fd)));
+	Client new_client (fd);
+	m_clients.insert(std::make_pair(fd, new_client));
 	m_pfds.push_back(new_pollfd);
 }
