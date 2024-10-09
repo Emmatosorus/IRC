@@ -9,7 +9,7 @@
 #define END "\x1B[0m"
 
 std::vector<std::string>	parse_msg(std::string input);
-void	shrink_spaces(std::string & input);
+void	refactor_input(std::string & input);
 int	find_cmd(std::string & input, std::vector<std::string> & vec);
 void	find_targets(std::string & input, std::vector<std::string> & vec);
 void	find_message(std::string & input, std::vector<std::string> & vec);
@@ -57,7 +57,7 @@ int main(int ac, char **av)
 std::vector<std::string>	parse_msg(std::string input)
 {
 	std::vector<std::string>	vec;
-	shrink_spaces(input);
+	refactor_input(input);
 	if (find_cmd(input, vec) != 0)
 		return (vec);
 	find_targets(input, vec);
@@ -69,7 +69,7 @@ std::vector<std::string>	parse_msg(std::string input)
  * @brief shrinks multiple spaces into single spaces inside a string
  * @param input is the string
  */
-void	shrink_spaces(std::string & input)
+void	refactor_input(std::string & input)
 {
 	size_t	i = 0;
 	size_t	j;
@@ -84,6 +84,13 @@ void	shrink_spaces(std::string & input)
 			if (i != 0)
 				input.insert(i++, " ");
 			i--;
+		}
+		else if (input[i] == ',' || input[i] == ':')
+		{
+			if (i > 0 && input[i - 1] != ' ')
+				input.insert(i - 1, " ");
+			if (input[i + 1] && input[i + 1] != ' ')
+				input.insert(i + 1, " ");
 		}
 		i++;
 	}
