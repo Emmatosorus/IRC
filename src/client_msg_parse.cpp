@@ -9,6 +9,7 @@ static void	split_client_msg(std::string & input, std::vector<std::string> & vec
 static std::string	get_msg(std::string & input);
 static void	shrink_space(std::string & input);
 static char char_lower(char& c);
+static std::string remove_commas(std::string & s);
 
 std::vector<std::string>	parse_client_msg(std::string input)
 {
@@ -18,7 +19,8 @@ std::vector<std::string>	parse_client_msg(std::string input)
 	msg = get_msg(input);
 	split_client_msg(input, vec);
 	vec.push_back(msg); 
-	std::for_each(vec[0].begin(), vec[0].end(), char_lower); 
+	std::for_each(vec[0].begin(), vec[0].end(), char_lower);
+	std::for_each(vec.begin(), vec.end(), remove_commas);
 	return (vec);
 }
 
@@ -72,4 +74,14 @@ static char char_lower(char& c)
 {
 	c = std::tolower(c);
 	return c;
+}
+
+static std::string remove_commas(std::string & s)
+{
+	size_t pos = s.find(',');
+	if (pos == std::string::npos)
+		return s;
+	if (pos == 0 || pos == s.size() - 1)
+		s.erase(pos, 1);
+	return s;
 }
