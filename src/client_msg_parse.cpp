@@ -21,6 +21,9 @@ std::vector<std::string>	parse_client_msg(std::string input)
 	vec.push_back(msg); 
 	std::for_each(vec[0].begin(), vec[0].end(), char_lower);
 	std::for_each(vec.begin(), vec.end(), remove_commas);
+	for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); it++)
+		if (it->empty())
+			vec.erase(it--);
 	return (vec);
 }
 
@@ -81,7 +84,9 @@ static std::string remove_commas(std::string & s)
 	size_t pos = s.find(',');
 	if (pos == std::string::npos)
 		return s;
-	if (pos == 0 || pos == s.size() - 1)
+	if (s == ",")
+		s.clear();
+	else if (pos == 0 || pos == s.size() - 1)
 		s.erase(pos, 1);
 	return s;
 }
