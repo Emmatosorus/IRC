@@ -4,28 +4,46 @@ C++ = c++
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -O2 -g3
 
 OBJS_DIR = .obj/
+OBJS_AI_DIR = $(OBJS_DIR)ai/
+OBJS_BOT_DIR = $(OBJS_DIR)bot/
 SRC_DIR = srcs/
-# HEADERS = include/AMateria.hpp include/Character.hpp include/Cure.hpp include/Ice.hpp include/MateriaSource.hpp include/ICharacter.hpp include/IMateriaSource.hpp
-SRCS = bot.cpp
+SRC_AI_DIR = $(SRC_DIR)ai/
+SRC_BOT_DIR = $(SRC_DIR)bot/
+HEADERS = include/bot.hpp
+#include/Character.hpp include/Cure.hpp include/Ice.hpp include/MateriaSource.hpp include/ICharacter.hpp include/IMateriaSource.hpp
+SRCS_BOT = bot.cpp
+SRCS_AI = ai.cpp
 
-OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o)) 
+OBJS_BOT = $(addprefix $(OBJS_BOT_DIR), $(SRCS_BOT:.cpp=.o)) 
+OBJS_AI = $(addprefix $(OBJS_AI_DIR), $(SRCS_AI:.cpp=.o)) 
 
 .SILENT:
 
-all : obj $(NAME)
+bot : obj launch_bot
+
+ai : obj launch_ai
 
 obj :
 	@mkdir -p $(OBJS_DIR)
+	@mkdir -p $(OBJS_AI_DIR)
+	@mkdir -p $(OBJS_BOT_DIR)
 
-$(NAME) : $(OBJS)
+launch_bot : $(OBJS_BOT)
 	@echo -n "$(Red)Compilation de ircserv ..${NC}" && sleep 0.2
 	@echo -n "$(Red)\rCompilation de ircserv ...${NC}"
-	$(C++) $^ $(CPPFLAGS) -o $(NAME) && sleep 0.1
+	$(C++) $^ $(CPPFLAGS) -o guardian && sleep 0.1
 	@echo "$(Green)\r------Compilation de ircserv finie !-------${NC}"
 
-# $(HEADERS)
+launch_ai : $(OBJS_AI)
+	@echo -n "$(Red)Compilation de ircserv ..${NC}" && sleep 0.2
+	@echo -n "$(Red)\rCompilation de ircserv ...${NC}"
+	$(C++) $^ $(CPPFLAGS) -o ai && sleep 0.1
+	@echo "$(Green)\r------Compilation de ircserv finie !-------${NC}"
 
-$(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile 
+$(OBJS_AI_DIR)%.o : $(SRC_AI_DIR)%.cpp Makefile $(HEADERS)
+	$(C++) $(CPPFLAGS) -c $< -o $@
+
+$(OBJS_BOT_DIR)%.o : $(SRC_BOT_DIR)%.cpp Makefile $(HEADERS)
 	$(C++) $(CPPFLAGS) -c $< -o $@
 
 clean :
@@ -36,7 +54,7 @@ clean :
 fclean :
 	@echo -n "$(Red)\r executable et .o en cours de suppression ..${NC}" && sleep 0.1
 	@echo -n "$(Red)\r executable et .o en cours de suppression ...${NC}"
-	@rm -rf $(OBJS_DIR) $(NAME) && sleep 0.2
+	@rm -rf $(OBJS_DIR) $(NAME) guardian ai && sleep 0.2
 	@echo "$(Green)\r---------executable et .o supprime !----------${NC}"
 
 re : fclean
