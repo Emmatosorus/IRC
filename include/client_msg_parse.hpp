@@ -11,6 +11,6 @@
 #define BOLD "\x1B[1m"
 #define END "\x1B[0m"
 
-std::vector<std::string>	parse_client_msg(std::string input);
+std::vector<std::string> parse_client_msg(std::string input);
 
 #endif
