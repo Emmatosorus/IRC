@@ -21,6 +21,11 @@ debug : CXX=g++
 debug : DEBUGFLAGS = -g3 -fsanitize=address
 debug : obj $(NAME)
 
+valgrind : CXX=g++
+valgrind : DEBUGFLAGS = -g3
+valgrind : obj $(NAME)
+	valgrind  --track-fds=yes ./$(NAME) 123
+
 obj :
 	@mkdir -p $(OBJS_DIR)
 	@mkdir -p $(OBJS_DIR)/commands
@@ -68,7 +73,7 @@ sus:
 	@echo "$(White)         ░▀▀█░█░█░▀▀█$(NC)"
 	@echo "$(White)         ░▀▀▀░▀▀▀░▀▀▀$(NC)"
 
-.PHONY : all clean fclean re obj libft print-% sus
+.PHONY : all clean fclean re obj debug valgrind print-% sus
 
 # COLORS =======================================================================
 
