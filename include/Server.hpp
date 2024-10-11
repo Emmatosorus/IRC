@@ -49,7 +49,7 @@ class Server
 	/* All functions for PRIVMSG cmd */
 	void _privmsg(PollfdIterator it, const std::vector<std::string>& args);
 	int  _check_privmsg_args(PollfdIterator it, const std::vector<std::string>& args);
-	void _parse_privmsg_args(const std::vector<std::string>& args, std::vector<std::string> targets);
+	void _parse_privmsg_args(std::vector<std::string>& args, std::vector<std::string> & targets);
 
 	/* All functions for LIST cmd */
 	void _list(PollfdIterator it, const std::vector<std::string>& args);
