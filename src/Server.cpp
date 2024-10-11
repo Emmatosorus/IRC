@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/client_msg_parse.hpp"
+#include <csignal>
 #include <cstring>
 #include <iostream>
 #include <sys/socket.h>
@@ -9,6 +10,8 @@
 #include <unistd.h>
 #include <stdexcept>
 
+bool Server::s_should_run = true;
+
 Server::Server(const char* password, const char* port) : m_password(password), m_port(port), m_pfds(), m_sockfd(-1)
 {
 	_init_listening_socket();
@@ -17,6 +20,7 @@ Server::Server(const char* password, const char* port) : m_password(password), m
 	struct pollfd serv_pfd;
 	serv_pfd.fd = m_sockfd;
 	serv_pfd.events = POLLIN;
+	serv_pfd.revents = 0;
 	m_pfds.push_back(serv_pfd);
 
 	/* Commands are case insensitive, hence they are lower case. */
@@ -33,6 +37,8 @@ Server::Server(const char* password, const char* port) : m_password(password), m
 	m_commands.insert(make_pair("invite", &Server::_invite));
 	m_commands.insert(make_pair("topic", &Server::_topic));
 
+	signal(SIGINT, Server::_handle_signal);
+
 	// TODO: add the invite command as well
 }
 
@@ -47,7 +53,7 @@ Server::~Server()
 
 void Server::start()
 {
-	while (1)
+	while (Server::s_should_run)
 	{
 		int poll_res = poll(m_pfds.data(), m_pfds.size(), POLL_TIMEOUT);
 		if (poll_res == -1)
@@ -194,6 +200,7 @@ void Server::_add_client(int fd)
 	struct pollfd new_pollfd;
 	new_pollfd.fd = fd;
 	new_pollfd.events = POLLIN;
+	new_pollfd.revents = 0;
 	Client new_client (fd);
 	m_clients.insert(std::make_pair(fd, new_client));
 	m_pfds.push_back(new_pollfd);
@@ -220,4 +227,12 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
 		}
 	}
 	return it;
+}
+
+void Server::_handle_signal(int signum)
+{
+	if (signum == SIGINT)
+	{
+		Server::s_should_run = false;
+	}
 }
