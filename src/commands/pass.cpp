@@ -5,39 +5,17 @@
  * Parameters: <password> */
 void Server::_pass(PollfdIterator it, const std::vector<std::string>& args)
 {
-	(void)args;
-	(void)it;
-	for (size_t i = 0; i < args.size(); i++)
+	if (args.size() != 2)
 	{
-		std::cout << args[i];
-		if (i != args.size() - 1)
-			std::cout << ' ';
+		Server::_send_to_client(it, "461", "Invalid number of parameters :\nPASS <password>");
+		return ;
 	}
-	std::cout << '\n';
-	// TODO: validate arguments
-	// =====
-	// TODO: check if the client is already registered
-	// TODO: validate password
-	const std::string& password = args[1];
-	(void)password;
-
-	// NOTE: PASS and USER both handle registration
-	// there are is_registered and enetered_password fields on the client
-
-	// this is how we can find client in the map and check if he is registered
 	std::map<int, Client>::iterator connected_client = m_clients.find(it->fd);
 	if (connected_client->second.is_registered)
 	{
-		// ERR_ALREADYREGISTERED (462)
+		_send_to_client(it, "462", "You are already registered");
 		return;
 	}
-	// TODO: if password is correct, handle registration
-	// else ERR_PASSWDMISMATCH (464) 
-
-	// TODO: send appropriate numeric replies
-    /* ERRORS: 
-	 * ERR_NEEDMOREPARAMS (461)
-	 * ERR_ALREADYREGISTERED (462)
-	 * ERR_PASSWDMISMATCH (464)
-	 * */
+	connected_client->second.password = args[1];
+	connected_client->second.entered_password = true;
 }

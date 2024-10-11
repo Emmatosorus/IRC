@@ -198,6 +198,16 @@ void Server::_add_client(int fd)
 	m_pfds.push_back(new_pollfd);
 }
 
+void Server::_send_to_client(std::vector<struct pollfd>::iterator it, std::string error_code, std::string msg)
+{
+	std::string	total = ":42Chan ";
+	std::map<int, Client>::iterator client = m_clients.find(it->fd);
+
+	total += error_code + " " + client->second.nickname + " :" + msg + "\n";
+	send(it->fd, total.c_str(), total.size(), MSG_CONFIRM);
+}
+
+
 Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
 {
 	ClientIterator it;

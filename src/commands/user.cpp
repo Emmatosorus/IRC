@@ -1,60 +1,67 @@
 #include "../../include/Server.hpp"
 #include <iostream>
 
-static int check_user_args(std::vector<struct pollfd>::iterator it, const std::vector<std::string>& args);
-
 /* https://modern.ircdocs.horse/#user-message
- * Parameters: <username> 0 * <realname> */
+ * Parameters: <username> : <realname> */
 void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 {
-	for (size_t i = 0; i < args.size(); i++)
-	{
-		std::cout << args[i];
-		if (i != args.size() - 1)
-			std::cout << ' ';
-	}
-	std::cout << '\n';
-	// TODO: validate and parse arguments
-	// =====
-	// NOTE: PASS and USER both handle registration
-	// there are is_registered and enetered_password fields on the client
-
-	if (check_user_args(it, args) != 0)
+	if (_check_user_args(it, args) != 0)
 		return ;
-	// TODO: validate username according to the spec
-	// check if the user is registered already or not
 	std::map<int, Client>::iterator client = m_clients.find(it->fd);
-	if (client->second.is_registered)
-	{
-		// TODO: handle registration
-		// ERR_ALREADYREGISTERED (462)
-		return;
-	}
 	if (!client->second.entered_password)
 	{
-		// TODO: Send message to client
-		// User must enter password first
+		_send_to_client(it, "1003", "You must first enter password");
 		return;
 	}
-	Client	new_client(it->fd);
-	new_client.username = args[1];
-	new_client.fullname = args[2];
-	m_clients.insert(std::make_pair(it->fd, new_client));
+	if (client->second.username != "")
+	{
+		_send_to_client(it, "1004", "Username already set");
+		return ;
+	}
+	if (!client->second.is_registered)
+	{
+		client->second.username = args[1];
+		client->second.fullname = args[2];
+		if (client->second.nickname != "")
+		{
+			if (client->second.password != this->m_password)
+			{
+				_send_to_client(it, "464", "Incorrect password");
+				return ;
+			}
+			client->second.is_registered = true;
+			_send_to_client(it, "001", "Welcome to 42Chan Network!");
+		}
+		return ;
+	}
+	else
+	{
+		_send_to_client(it, "462", "You are already registered");
+		return;
+	}
 }
 
-static int check_user_args(std::vector<struct pollfd>::iterator it, const std::vector<std::string>& args)
+int Server::_check_user_args(PollfdIterator it, const std::vector<std::string>& args)
 {
-	if (args.size() != 3)
+	if (args.size() < 3)
 	{
-		// TODO: handle registration
-		// ERR_NEEDMOREPARAMS (461)
+		Server::_send_to_client(it, "461", "Not enough parameters :\nUSER <username> : <realname>");
 		return (1);
 	}
-	size_t pos = args[1].find("#:,");
+	if (args.size() > 3)
+	{
+		Server::_send_to_client(it, "461", "Too many parameters :\nUSER <username> : <realname>");
+		return (1);
+	}
+	if (args[1].size() > USERLEN)
+	{
+		Server::_send_to_client(it, "1001", "Username has more than 18 characters");
+		return (1);
+	}
+	size_t pos = args[1].find_first_of("#:,*?!@.\t\r\n ");
 	if (pos != std::string::npos)
 	{
-		// TODO: send message to client
-		// bad arguments for user
+		Server::_send_to_client(it, "1002", "Username contains invalid characters : #:,*?!@.\\t\\r\\n ");
 		return (1);
 	}
 	return (0);

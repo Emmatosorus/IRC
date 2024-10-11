@@ -16,6 +16,7 @@ class Client
 		  bool is_registered;
           bool is_operator;
           std::string buf;
+		  std::string password;
           std::string nickname;
           std::string username;
           std::string fullname;
