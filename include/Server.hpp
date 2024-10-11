@@ -29,7 +29,7 @@ class Server
 	void _handle_client_connection();
 	void _remove_client(PollfdIterator* it);
 	void _add_client(int fd);
-	void _send_to_client(PollfdIterator it, std::string error_code, std::string msg);
+	void _send_to_client(int fd, std::string error_code, std::string msg);
 	ClientIterator _find_client_by_nickname(const std::string& nickname);
 
 	/* All functions for USER cmd */
@@ -48,7 +48,8 @@ class Server
 
 	/* All functions for PRIVMSG cmd */
 	void _privmsg(PollfdIterator it, const std::vector<std::string>& args);
-	int _check_privmsg_args(PollfdIterator it, const std::vector<std::string>& args);
+	int  _check_privmsg_args(PollfdIterator it, const std::vector<std::string>& args);
+	void _parse_privmsg_args(const std::vector<std::string>& args, std::vector<std::string> targets);
 
 	/* All functions for LIST cmd */
 	void _list(PollfdIterator it, const std::vector<std::string>& args);

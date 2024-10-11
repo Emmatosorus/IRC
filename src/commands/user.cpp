@@ -10,12 +10,12 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 	std::map<int, Client>::iterator client = m_clients.find(it->fd);
 	if (!client->second.entered_password)
 	{
-		_send_to_client(it, "1003", "You must first enter password");
+		_send_to_client(it->fd, "1003", "You must first enter password");
 		return;
 	}
 	if (client->second.username != "")
 	{
-		_send_to_client(it, "1004", "Username already set");
+		_send_to_client(it->fd, "1004", "Username already set");
 		return ;
 	}
 	if (!client->second.is_registered)
@@ -26,17 +26,17 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 		{
 			if (client->second.password != this->m_password)
 			{
-				_send_to_client(it, "464", "Incorrect password");
+				_send_to_client(it->fd, "464", "Incorrect password");
 				return ;
 			}
 			client->second.is_registered = true;
-			_send_to_client(it, "001", "Welcome to 42Chan Network!");
+			_send_to_client(it->fd, "001", "Welcome to 42Chan Network!");
 		}
 		return ;
 	}
 	else
 	{
-		_send_to_client(it, "462", "You are already registered");
+		_send_to_client(it->fd, "462", "You are already registered");
 		return;
 	}
 }
@@ -45,23 +45,23 @@ int Server::_check_user_args(PollfdIterator it, const std::vector<std::string>& 
 {
 	if (args.size() < 3)
 	{
-		Server::_send_to_client(it, "461", "Not enough parameters :\nUSER <username> : <realname>");
+		Server::_send_to_client(it->fd, "461", "Not enough parameters :\nUSER <username> : <realname>");
 		return (1);
 	}
 	if (args.size() > 3)
 	{
-		Server::_send_to_client(it, "461", "Too many parameters :\nUSER <username> : <realname>");
+		Server::_send_to_client(it->fd, "461", "Too many parameters :\nUSER <username> : <realname>");
 		return (1);
 	}
 	if (args[1].size() > USERLEN)
 	{
-		Server::_send_to_client(it, "1001", "Username has more than 18 characters");
+		Server::_send_to_client(it->fd, "1001", "Username has more than 18 characters");
 		return (1);
 	}
 	size_t pos = args[1].find_first_of("#:,*?!@.\t\r\n ");
 	if (pos != std::string::npos)
 	{
-		Server::_send_to_client(it, "1002", "Username contains invalid characters : #:,*?!@.\\t\\r\\n ");
+		Server::_send_to_client(it->fd, "1002", "Username contains invalid characters : #:,*?!@.\\t\\r\\n ");
 		return (1);
 	}
 	return (0);

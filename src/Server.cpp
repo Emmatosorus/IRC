@@ -78,6 +78,7 @@ void Server::_handle_client_connection()
 
 	_add_client(new_fd);
 	std::cout << "Connection accepted: " << new_fd << "\n";
+	_send_to_client(new_fd, "", "You are connected");
 }
 
 void Server::_handle_client_message(PollfdIterator it)
@@ -198,13 +199,13 @@ void Server::_add_client(int fd)
 	m_pfds.push_back(new_pollfd);
 }
 
-void Server::_send_to_client(std::vector<struct pollfd>::iterator it, std::string error_code, std::string msg)
+void Server::_send_to_client(int fd, std::string error_code, std::string msg)
 {
 	std::string	total = ":42Chan ";
-	std::map<int, Client>::iterator client = m_clients.find(it->fd);
+	std::map<int, Client>::iterator client = m_clients.find(fd);
 
 	total += error_code + " " + client->second.nickname + " :" + msg + "\n";
-	send(it->fd, total.c_str(), total.size(), MSG_CONFIRM);
+	send(fd, total.c_str(), total.size(), MSG_CONFIRM);
 }
 
 

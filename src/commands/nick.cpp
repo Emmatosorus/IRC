@@ -17,7 +17,7 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 	std::map<int, Client>::iterator client = m_clients.find(it->fd);
 	if (!client->second.entered_password)
 	{
-		_send_to_client(it, "1003", "You must first enter password");
+		_send_to_client(it->fd, "1003", "You must first enter password");
 		return;
 	}
 	client->second.nickname = nickname;
@@ -25,45 +25,44 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 	{
 		if (client->second.password != this->m_password)
 		{
-			_send_to_client(it, "464", "Incorrect password");
+			_send_to_client(it->fd, "464", "Incorrect password");
 			return ;
 		}
 		if (!client->second.is_registered)
 		{
 			client->second.is_registered = true;
-			_send_to_client(it, "001", "Welcome to 42Chan Network!");
+			_send_to_client(it->fd, "001", "Welcome to 42Chan Network!");
 		}
 	}
 }
 
 int Server::_check_nick_args(PollfdIterator it, const std::vector<std::string>& args)
 {
-	(void)it;
 	if (args.size() < 2)
 	{
-		Server::_send_to_client(it, "431", "No nickname was given :\nNICK <nickname>");
+		Server::_send_to_client(it->fd, "431", "No nickname was given :\nNICK <nickname>");
 		return (1);
 	}
 	if (args.size() > 2)
 	{
-		Server::_send_to_client(it, "461", "Too many parameters :\nNICK <nickname>");
+		Server::_send_to_client(it->fd, "461", "Too many parameters :\nNICK <nickname>");
 		return (1);
 	}
 	if (std::isalpha(args[1][0]) == 0)
 	{
-		Server::_send_to_client(it, "1002", "First character of nickname must be a-z or A-Z");
+		Server::_send_to_client(it->fd, "1002", "First character of nickname must be a-z or A-Z");
 		return (1);
 	}
 	size_t pos = args[1].find_first_of("#:,*?!@.\t\r\n ");
 	if (pos != std::string::npos)
 	{
-		Server::_send_to_client(it, "1002", "Nickname contains invalid characters : #:,*?!@.\\t\\r\\n ");
+		Server::_send_to_client(it->fd, "1002", "Nickname contains invalid characters : #:,*?!@.\\t\\r\\n ");
 		return (1);
 	}
 	Server::ClientIterator client_it = _find_client_by_nickname(args[1]);
 	if (client_it != m_clients.end() && client_it->second.fd != it->fd)
 	{
-		Server::_send_to_client(it, "433", "Nickname is already taken");
+		Server::_send_to_client(it->fd, "433", "Nickname is already taken");
 		return (1);
 	}
 	return (0);
