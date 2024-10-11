@@ -26,6 +26,7 @@ class Server
     static void _handle_signal(int signum);
 
     typedef std::vector<struct pollfd>::iterator PollfdIterator;
+	typedef std::map<std::string, Channel>::iterator ChannelIterator;
     typedef std::map<int, Client>::iterator ClientIterator;
     void _init_listening_socket();
     void _handle_client_message(PollfdIterator it);

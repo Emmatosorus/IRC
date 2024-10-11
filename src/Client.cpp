@@ -7,7 +7,7 @@ Client::Client()
       is_registered(false),
       is_operator(false),
       buf(""),
-	  password(""),
+      password(""),
       nickname(""),
       username(""),
       fullname("")
@@ -21,7 +21,7 @@ Client::Client(int fd)
       is_registered(false),
       is_operator(false),
       buf(""),
-	  password(""),
+      password(""),
       nickname(""),
       username(""),
       fullname("")
@@ -35,7 +35,7 @@ Client::Client(const Client& c)
       is_registered(c.is_registered),
       is_operator(c.is_operator),
       buf(c.buf),
-	  password(""),
+      password(""),
       nickname(c.nickname),
       username(c.username),
       fullname(c.fullname)
@@ -45,9 +45,11 @@ Client::Client(const Client& c)
 
 Client& Client::operator=(const Client& c)
 {
+	if (this == &c)
+		return *this;
     fd = c.fd;
-	entered_password = c.entered_password;
-	is_registered = c.is_registered;
+    entered_password = c.entered_password;
+    is_registered = c.is_registered;
     is_operator = c.is_operator;
     buf = c.buf;
     password = c.password;
