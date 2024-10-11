@@ -74,7 +74,7 @@ void Server::_parse_privmsg_args(std::vector<std::string>& args, std::vector<std
 			targets.push_back(args[1]);
 			return ;
 		}
-		targets.push_back(args[1].substr(0, pos - 1));
-		args[1].erase(0, pos);
+		targets.push_back(args[1].substr(0, pos));
+		args[1].erase(0, pos + 1);
 	}
 }
