@@ -9,11 +9,16 @@ void Server::_privmsg(PollfdIterator it, const std::vector<std::string>& args)
 	if (_check_privmsg_args(it, args) != 0)
 		return ;
 	std::vector<std::string> targets;
-	std::vector<std::string> arg_copy = args;
+	std::string target_copy = args[1];
 
-	_parse_privmsg_args(arg_copy, targets);
+	_parse_comma_args(target_copy, targets);
 
 	std::map<int, Client>::iterator client = m_clients.find(it->fd);
+	if (!client->second.is_registered)
+	{
+		Server::_send_to_client(it->fd, "451", "You are not registered");
+		return ;
+	}
 
 	std::vector<std::string>::iterator t_it = targets.begin();
 	t_it--;
@@ -60,21 +65,10 @@ int Server::_check_privmsg_args(PollfdIterator it, const std::vector<std::string
 		Server::_send_to_client(it->fd, "407", "Too many parameters :\nPRIVMSG <target>{,<target>} : <message>");
 		return (1);
 	}
-	return (0);
-}
-
-void Server::_parse_privmsg_args(std::vector<std::string>& args, std::vector<std::string> & targets)
-{
-	size_t	pos = 0;
-	while (args[1][pos])
+	if (args[2].size() > 512)
 	{
-		pos = args[1].find(',');
-		if (pos == std::string::npos)
-		{
-			targets.push_back(args[1]);
-			return ;
-		}
-		targets.push_back(args[1].substr(0, pos));
-		args[1].erase(0, pos + 1);
+		Server::_send_to_client(it->fd, "417", "Message is over 512 characters");
+		return (1);
 	}
+	return (0);
 }

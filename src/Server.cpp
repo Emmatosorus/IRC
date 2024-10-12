@@ -213,6 +213,22 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
     return it;
 }
 
+void Server::_parse_comma_args(std::string & args, std::vector<std::string> & targets)
+{
+	size_t	pos = 0;
+	while (args[pos])
+	{
+		pos = args.find(',');
+		if (pos == std::string::npos)
+		{
+			targets.push_back(args);
+			return ;
+		}
+		targets.push_back(args.substr(0, pos));
+		args.erase(0, pos + 1);
+	}
+}
+
 void Server::_handle_signal(int signum)
 {
     if (signum == SIGINT)

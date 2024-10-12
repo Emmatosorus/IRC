@@ -22,7 +22,7 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 	{
 		// TODO: do channel creation, the user which created the channel joins it, becomes it creator, operator etc
 		Channel new_channel (it->fd, channel_name);
-		m_channels.insert(make_pair(channel_name, new_channel));
+		m_channels.insert(std::make_pair(channel_name, new_channel));
 		return;
 	}
 	Channel& channel = target_channel->second;

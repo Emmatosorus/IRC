@@ -7,6 +7,7 @@ class Channel
 {
   public:
     Channel(int creator_fd, std::string name);
+	Channel(const Channel& c);
     ~Channel();
 
     typedef struct s_topic
@@ -27,7 +28,6 @@ class Channel
     bool is_const_topic_mode;
 
   private:
-    Channel(const Channel& c);
     Channel& operator=(const Channel& c);
 };
 #endif
