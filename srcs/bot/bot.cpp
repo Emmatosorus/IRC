@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/10 20:50:19 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/11 16:14:25 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	get_channel_from_pm(std::string arg, std::string *channel)
 		command = &arg[pos + 1];
 		pos = command.find("!botjoin ", 0);
 		if (pos != 0)
-			return (-1);
+			return (1);
 		*channel = &command[9];
 	}
 	else
@@ -193,14 +193,26 @@ int	main(int argc, char **argv)
 	std::string	msg;
 	std::string	channel;
 	msg = buf;
+	if (msg.find(":42Chan   :You are connected") == std::string::npos)
+		return (close(socket_fd), -1);
+
 	if (pm_is_in_channel(msg) == false)
 	{
-		if (get_channel_from_pm(msg, &channel) == -1)
-		{
-			close(socket_fd);
-			return (-1);
-		}
+		int i = get_channel_from_pm(msg, &channel);
+		if (i == -1)
+			return (close(socket_fd), -1);
+		else if (i == 1)
+			return (close(socket_fd), 0);
 		std::cout << channel << std::endl;
+		if (channel.find_first_of(" :,", 0) != std::string::npos || channel.find(7, 0) != std::string::npos)
+		{
+			msg = "PRIVMSG TMP: Error \"";
+			msg.append(channel);
+			msg.append("\" can't be created because channel name contains invalid characters:\":, \"");
+			send(socket_fd, msg.c_str(), msg.length(), 0);
+			close(socket_fd);
+			return (1);
+		}
 		msg = "JOIN ";
 		msg.append(channel);
 		msg.append("\r\n");

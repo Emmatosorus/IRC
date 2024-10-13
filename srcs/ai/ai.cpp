@@ -6,13 +6,14 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/10 21:32:44 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/12 22:00:48 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/bot.hpp"
 #include <fstream>
 #include <cstdlib>
+#include <stdio.h>
 #define MAXDATASIZE 500
 
 void *get_in_addr(struct sockaddr *sa)
@@ -91,21 +92,19 @@ bool	str_is_space(std::string *str)
 	return (rv);
 }
 
-int	fill_slurs_vector(std::vector<std::string>	*slurs)
-{
-	std::ifstream	infile("slurs.txt");
-	std::string		test;
-	if (!infile)
-		return (1);
-	if (infile.is_open())
-		while (std::getline(infile, test))
-			if (str_is_space(&test) == false)
-				slurs->push_back(test);
-	return (0);
-}
+// int	fill_slurs_vector(std::vector<std::string>	*slurs)
+// {
+// 	std::ifstream	infile("slurs.txt");
+// 	std::string		test;
+// 	if (!infile)
+// 		return (1);
+// 	if (infile.is_open())
+// 		while (std::getline(infile, test))
+// 			if (str_is_space(&test) == false)
+// 				slurs->push_back(test);
+// 	return (0);
+// }
 
-//
-//guardian
 bool	pm_is_in_channel(std::string msg)
 {
 	size_t	pos = 0;
@@ -202,26 +201,42 @@ int	main(int argc, char **argv)
 		close(socket_fd);
 		return (1);
 	}
-	pos3 = msg.find("'", 0);
+	// pos3 = pos2;
+	// while (pos3 != std::string::npos)
+	// {
+	// 	pos2 = curl_cmd.find("\"", pos3 + 1);
+	// 	pos3 = curl_cmd.find("\"", pos2 + 1);
+	// }
+	// curl_cmd[pos2] = '\0';
+	pos3 = msg.find("\'", 0);
 	while (pos3 != std::string::npos)
 	{
-		msg.insert(pos3, "\'\\\'");
-		// std::cout << msg << std::endl;
-		pos3 = msg.find("'", pos3 + 4);
+		msg.erase(pos3, 1);
+		msg.insert(pos3, " ");
+		pos3 = msg.find("\'", pos3 + 1);
 	}
 	curl_cmd.erase(pos, pos2 - pos);
 	curl_cmd.insert(pos, msg);
-	std::cout << curl_cmd << std::endl;
-	if (std::system(curl_cmd.c_str()) != 0)
-		return (1);
-	std::ifstream	infile("Chatgpt_reply.txt");
+	std::cout << "bot cmd:"<< curl_cmd << std::endl;
+	FILE *fp = popen(curl_cmd.c_str(), "r");
+	if (fp == NULL)
+		return (close(socket_fd), -1);
+	char	buff[1024];
 	std::string		get;
-	while (std::getline(infile, get))
+	while (fgets(buff, 1024, fp) != NULL)
 	{
+		get = buff;
 		pos = get.find("content", 0);
 		if (pos != std::string::npos)
 			break ;
 	}
+	int status = pclose(fp);
+	if (pos == std::string::npos)
+	{
+		close(socket_fd);
+		return (status);
+	}
+	// close(socket_fd);
 	pos += 11;
 	pos2 = get.find("\"", pos);
 	pos3 = pos2;
@@ -237,9 +252,10 @@ int	main(int argc, char **argv)
 	}
 	get[pos2] = '\0';
 	get = &get[pos];
-	msg = "JOIN ";
+	msg = "PRIVMSG ";
 	msg.append(get);
 	msg.append("\r\n");
+	std::cout << msg << std::endl;
 	send(socket_fd, msg.c_str(), msg.length(), 0);
 	close(socket_fd);
 	// close(socket_fd);
