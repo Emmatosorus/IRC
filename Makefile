@@ -1,21 +1,35 @@
-NAME = ircserv 
+NAME = ircserv
+GUARDIAN = bot
+AI = ai
 
 CXX = c++
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 DEBUGFLAGS =
 
 OBJS_DIR = .obj/
+OBJS_AI_DIR = $(OBJS_DIR)bots/ai/
+OBJS_BOT_DIR = $(OBJS_DIR)bots/guardian/
 SRC_DIR = src/
+SRC_AI_DIR = $(SRC_DIR)bots/ai/
+SRC_BOT_DIR = $(SRC_DIR)bots/guardian/
 
-HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp
+HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp include/bot.hpp
 
+SRCS_BOT = guardian_bot.cpp
+SRCS_AI = ai.cpp
 SRCS_COMMANDS = $(addprefix commands/, join.cpp names.cpp nick.cpp notice.cpp pass.cpp ping.cpp pong.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp $(SRCS_COMMANDS)
-OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o)) 
+OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
+OBJS_AI = $(addprefix $(OBJS_AI_DIR), $(SRCS_AI:.cpp=.o))
+OBJS_BOT = $(addprefix $(OBJS_BOT_DIR), $(SRCS_BOT:.cpp=.o))
 
 .SILENT:
 
 all : obj $(NAME)
+
+guardian_launch : obj $(GUARDIAN)
+
+ai_launch: obj $(AI)
 
 debug : CXX=g++
 debug : DEBUGFLAGS = -g3 -fsanitize=address
@@ -29,21 +43,41 @@ valgrind : obj $(NAME)
 obj :
 	@mkdir -p $(OBJS_DIR)
 	@mkdir -p $(OBJS_DIR)/commands
+	@mkdir -p $(OBJS_AI_DIR)
+	@mkdir -p $(OBJS_BOT_DIR)
 
 $(NAME) : $(OBJS)
 	@echo -n "$(Red)Compiling ft_irc ..${NC}" && sleep 0.2
-	@echo -n "$(Red)\rCompiling ft_irc.. ${NC}"
+	@echo -n "$(Red)\rCompiling ft_irc ...${NC}"
 	$(CXX) $^ $(CPPFLAGS) $(DEBUGFLAGS) -o $(NAME) && sleep 0.1
 	@echo "$(Green)\r------COMPILATION COMPLETE-------${NC}"
 
+$(GUARDIAN) : $(OBJS_BOT)
+	@echo -n "$(Red)Compiling guardian bot ..${NC}" && sleep 0.2
+	@echo -n "$(Red)\rCompiling guardian bot ...${NC}"
+	$(CXX) $^ $(CPPFLAGS) -o $(GUARDIAN) && sleep 0.1
+	@echo "$(Green)\r------Compiling COMPLETE!-------${NC}"
+
+$(AI) : $(OBJS_AI)
+	@echo -n "$(Red)Compiling ai bot ..${NC}" && sleep 0.2
+	@echo -n "$(Red)\rCompiling ai bot ...${NC}"
+	$(CXX) $^ $(CPPFLAGS) -o $(AI) && sleep 0.1
+	@echo "$(Green)\r------COMPILATION COMPLETE!-------${NC}"
+
 $(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS)
 	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) -c $< -o $@
+
+$(OBJS_AI_DIR)%.o : $(SRC_AI_DIR)%.cpp Makefile $(HEADERS)
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+$(OBJS_BOT_DIR)%.o : $(SRC_BOT_DIR)%.cpp Makefile $(HEADERS)
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 clean :
 	@rm -rf $(OBJS_DIR)
 
 fclean :
-	@rm -rf $(OBJS_DIR) $(NAME)
+	@rm -rf $(OBJS_DIR) $(NAME) guardian ai
 
 re : fclean
 	$(MAKE) all
