@@ -31,11 +31,7 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 		{
 			Channel new_channel(client.fd, channel_name);
 			m_channels.insert(std::make_pair(channel_name, new_channel));
-			new_channel.send_msg(_join_message(client, new_channel));
-			std::vector<std::string> names_args;
-			names_args.push_back("NAMES");
-			names_args.push_back(channel_name);
-			_names(it, names_args);
+			_join_channel(it, new_channel, client, false);
 			continue;
 		}
 
@@ -56,20 +52,26 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 			continue;
 		}
 
-		channel.subscribed_users_fd.push_back(it->fd);
-		channel.send_msg(_join_message(client, channel));
-		if (channel.topic != "")
-		{
-			std::vector<std::string> topic_args;
-			topic_args.push_back("TOPIC");
-			topic_args.push_back(channel_name);
-			_topic(it, topic_args);
-		}
-		std::vector<std::string> names_args;
-		names_args.push_back("NAMES");
-		names_args.push_back(channel_name);
-		_names(it, names_args);
+		_join_channel(it, channel, client, true);
 	}
+}
+
+void Server::_join_channel(PollfdIterator it, Channel& channel, const Client& client, bool should_add)
+{
+	if (should_add)
+		channel.subscribed_users_fd.push_back(client.fd);
+	channel.send_msg(_join_message(client, channel));
+	if (channel.topic != "")
+	{
+		std::vector<std::string> topic_args;
+		topic_args.push_back("TOPIC");
+		topic_args.push_back(channel.name);
+		_topic(it, topic_args);
+	}
+	std::vector<std::string> names_args;
+	names_args.push_back("NAMES");
+	names_args.push_back(channel.name);
+	_names(it, names_args);
 }
 
 static std::string _join_message(const Client& client, const Channel& channel)

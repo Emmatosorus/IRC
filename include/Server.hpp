@@ -51,6 +51,7 @@ class Server
 
     /* All functions for JOIN cmd */
     void _join(PollfdIterator it, const std::vector<std::string>& args);
+	void _join_channel(PollfdIterator it, Channel& channel, const Client& client, bool should_add);
 
     /* All functions for PRIVMSG cmd */
     void _privmsg(PollfdIterator it, const std::vector<std::string>& args);
