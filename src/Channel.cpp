@@ -67,7 +67,7 @@ bool Channel::is_subscribed(int fd)
 
 bool Channel::is_operator(int fd)
 {
-	return std::find(channel_operators_fd.begin(), channel_operators_fd.end(), fd) == channel_operators_fd.end();
+	return std::find(channel_operators_fd.begin(), channel_operators_fd.end(), fd) != channel_operators_fd.end();
 }
 
 void Channel::send_msg(const std::string& msg)

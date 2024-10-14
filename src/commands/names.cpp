@@ -26,7 +26,7 @@ void Server::_names(PollfdIterator it, const std::vector<std::string>& args)
 		for (std::vector<int>::iterator it = channel.subscribed_users_fd.begin(); it != channel.subscribed_users_fd.end(); it++)
 		{
 			const Client& client = m_clients.find(*it)->second;
-			if (client.is_operator)
+			if (channel.is_operator(client.fd))
 				list_of_clients += "@";
 			list_of_clients += client.nickname;
 			if (it + 1 != channel.subscribed_users_fd.end())
