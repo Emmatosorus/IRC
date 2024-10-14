@@ -26,6 +26,7 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 		if (client->second.password != this->m_password)
 		{
 			_send_to_client(it->fd, "464", "Incorrect password");
+			m_clients.erase(client);
 			return ;
 		}
 		if (!client->second.is_registered)
