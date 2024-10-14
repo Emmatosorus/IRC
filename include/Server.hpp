@@ -11,12 +11,11 @@
 #define USERLEN 18
 #define MESSAGE_SIZE 512
 #define POLL_TIMEOUT 10000
+#define SERVER_NAME ":42Chan "
 class Server
 {
   public:
     Server(const char* password, const char* port);
-    // Server(const Server&);
-    // Server& operator=(const Server&);
     ~Server();
 
     void start();
@@ -34,6 +33,8 @@ class Server
     void _remove_client(PollfdIterator* it);
     void _add_client(int fd);
     void _send_to_client(int fd, std::string error_code, std::string msg);
+	void _send_to_fd(int fd, const std::string& msg);
+	void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 	void _parse_comma_args(std::string & args, std::vector<std::string> & targets);
 

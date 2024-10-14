@@ -202,6 +202,22 @@ void Server::_send_to_client(int fd, std::string error_code, std::string msg)
     send(fd, total.c_str(), total.size(), MSG_CONFIRM);
 }
 
+void Server::_send_to_fd(int fd, const std::string& msg)
+{
+	std::string total = msg + "\r\n";
+    send(fd, total.c_str(), total.size(), MSG_CONFIRM);
+}
+
+void Server::_send_to_channel_subscribers(const Channel& channel, const std::string& msg)
+{
+	std::string total = msg + "\r\n";
+	for (std::vector<int>::const_iterator it = channel.subscribed_users_fd.begin();
+		it != channel.subscribed_users_fd.end(); it++)
+	{
+		send(*it, total.c_str(), total.size(), MSG_CONFIRM);
+	}
+}
+
 Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
 {
     ClientIterator it;

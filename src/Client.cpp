@@ -1,5 +1,5 @@
 #include "../include/Client.hpp"
-#include <unistd.h>
+#include <sys/socket.h>
 
 Client::Client()
     : fd(-1),
@@ -60,3 +60,9 @@ Client& Client::operator=(const Client& c)
 }
 
 Client::~Client() { return; }
+
+void Client::send_msg(const std::string& msg)
+{
+	std::string total = msg + "\r\n";
+	send(fd, total.c_str(), total.size(), MSG_CONFIRM);
+}

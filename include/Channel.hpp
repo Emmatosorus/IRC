@@ -8,27 +8,27 @@ class Channel
   public:
     Channel(int creator_fd, std::string name);
     Channel(const Channel& c);
+    Channel& operator=(const Channel& c);
     ~Channel();
-
-    typedef struct s_topic
-    {
-        std::string topic;
-        std::string topic_start_nickname;
-        time_t timestampt;
-    } t_topic;
 
     int creator_fd;
     std::string name;
-    t_topic topic;
+	std::string topic;
+	std::string topic_starter_nickname;
+	std::string topic_timestampt;
     std::vector<int> subscribed_users_fd;
     std::vector<int> channel_operators_fd;
-    std::pair<bool, std::string> password_mode;
-    std::pair<bool, size_t> user_limit_mode;
+	std::string password;
+	size_t user_limit;
+	bool is_password_mode;
+	bool is_user_limit_mode;
     bool is_invite_only_mode;
     bool is_const_topic_mode;
 
-  private:
-    Channel& operator=(const Channel& c);
+	bool is_subscribed(int fd);
+	bool is_operator(int fd);
+	void send_msg(const std::string& msg);
+	void send_msg_except(int fd, const std::string& msg);
 };
 
 #endif
