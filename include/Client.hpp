@@ -15,7 +15,6 @@ class Client
 		time_t since_last_ping;
 		bool entered_password;
 		bool is_registered;
-		bool is_operator;
 		std::string buf;
 		std::string password;
 		std::string nickname;

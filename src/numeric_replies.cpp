@@ -22,7 +22,7 @@ void Client::send_333(const Channel& channel)
 
 void Client::send_353(const Channel& channel, const std::string& list_of_clients)
 {
-	std::string reply = ":42chan 353 " + nickname + " " + channel.name + " : " + list_of_clients;
+	std::string reply = ":42chan 353 " + nickname + " " + channel.name + " :" + list_of_clients;
 	send_msg(reply);
 }
 

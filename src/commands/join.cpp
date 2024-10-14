@@ -27,11 +27,15 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 		}
 
 		std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
-		if (target_channel != m_channels.end())
+		if (target_channel == m_channels.end())
 		{
 			Channel new_channel(client.fd, channel_name);
 			m_channels.insert(std::make_pair(channel_name, new_channel));
 			new_channel.send_msg(_join_message(client, new_channel));
+			std::vector<std::string> names_args;
+			names_args.push_back("NAMES");
+			names_args.push_back(channel_name);
+			_names(it, names_args);
 			continue;
 		}
 
