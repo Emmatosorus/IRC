@@ -36,7 +36,9 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 		}
 
 		Channel& channel = target_channel->second;
-		if (channel.is_invite_only_mode)
+		if (channel.is_subscribed(client.fd))
+			continue;
+		else if (channel.is_invite_only_mode)
 		{
 			client.send_473(channel);
 			continue;
