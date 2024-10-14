@@ -5,40 +5,70 @@
  * Parameters: <nickname> <channel> */
 void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
 {
-	(void)args;
-	(void)it;
-	for (size_t i = 0; i < args.size(); i++)
-	{
-		std::cout << args[i];
-		if (i != args.size() - 1)
-			std::cout << ' ';
-	}
-	std::cout << '\n';
-	// TODO: validate and parse arguments
-	// =====
-	const std::string& channel_name = args[2];
-	std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
-	if (target_channel != m_channels.end())
-	{
-		// ERR_NOSUCHCHANNEL (403)
-		return;
-	}
-	// TODO: do channel joining logic, a lot of stuff should be checked, like:
-	// 1. does user exist
-	// 2. is inviting user present on the channel
-	// 3. is invited user present on the channel
-	// 4. is channel invite only
-	//    - if it is, check if the inviter is an operator
+    if (_check_invite_args(it, args) != 0)
+        return;
 
-	// TODO: send appropriate numeric replies
-    /* ERRORS:
-	 * ERR_NEEDMOREPARAMS (461)
-	 * ERR_NOSUCHCHANNEL (403)
-	 * ERR_NOTONCHANNEL (442)
-	 * ERR_CHANOPRIVSNEEDED (482)
-	 * ERR_USERONCHANNEL (443)
-     *
-	 * REPLIES:
-	 * RPL_INVITING (341)
-	 * */
+    const std::string& target_name = args[1];
+    const std::string& channel_name = args[2];
+    bool is_operator = false;
+
+
+    std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
+    if (target_channel != m_channels.end())
+    	return;
+    std::map<int, Client>::iterator client = m_clients.find(it->fd);
+    std::map<int, Client>::iterator target_client = _find_client_by_nickname(target_name);
+    if (client != m_clients.end())
+        return;
+    if (_check_invite_args(it, args) != 0)
+        return;
+    if (_check_presence(target_channel, client, is_operator) != 0)
+    {
+        _send_to_client(client->second.fd, "442", "You are not on the channel");
+        return;
+    }
+    if (target_channel->second.is_invite_only_mode && !is_operator)
+    {
+        _send_to_client(client->second.fd, "482", "Only operators can invite to this channel");
+        return;
+    }
+    if (_check_presence(target_channel, target_client, is_operator) != 0)
+    {
+        _send_to_client(client->second.fd, "443", "User is already on channel");
+        return;
+    }
+    target_channel->second.subscribed_users_fd.push_back(target_client->second.fd);
+    _send_to_client(client->second.fd, "341", target_name + " has been invited");
+    _send_to_client(target_client->second.fd, "341", "You have been invited to " + channel_name);
+}
+
+int Server::_check_presence(std::map<std::string, Channel>::iterator target_channel,  std::map<int, Client>::iterator client, bool & is_operator)
+{
+    for (std::vector<int>::iterator it = target_channel->second.channel_operators_fd.begin(); it != target_channel->second.channel_operators_fd.end(); it++)
+    {
+        if (*it == client->second.fd)
+        {
+            is_operator = true;
+            return 0;
+        }
+    }
+    for (std::vector<int>::iterator it = target_channel->second.subscribed_users_fd.begin(); it != target_channel->second.subscribed_users_fd.end(); it++)
+        if (*it == client->second.fd)
+            return 0;
+    return (1);
+}
+
+int Server::_check_invite_args(PollfdIterator it, const std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+    {
+        _send_to_client(it->fd, "461", "Not enough parameters :\nINVITE <nickname> <channel>");
+        return (1);
+    }
+    if (args.size() > 3)
+    {
+        _send_to_client(it->fd, "461", "Too many parameters :\nINVITE <nickname> <channel>");
+        return (1);
+    }
+    return (0);
 }

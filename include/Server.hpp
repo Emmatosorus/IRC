@@ -76,6 +76,8 @@ class Server
 
     /* All functions for INVITE cmd */
     void _invite(PollfdIterator it, const std::vector<std::string>& args);
+    int _check_invite_args(PollfdIterator it, const std::vector<std::string>& args);
+    int _check_presence(std::map<std::string, Channel>::iterator target_channel,  std::map<int, Client>::iterator client, bool & is_operator);
 
     /* All functions for TOPIC cmd */
     void _topic(PollfdIterator it, const std::vector<std::string>& args);
