@@ -62,7 +62,7 @@ Channel::~Channel() { return; }
 
 bool Channel::is_subscribed(int fd)
 {
-	return std::find(subscribed_users_fd.begin(), subscribed_users_fd.end(), fd) == subscribed_users_fd.end();
+	return std::find(subscribed_users_fd.begin(), subscribed_users_fd.end(), fd) != subscribed_users_fd.end();
 }
 
 bool Channel::is_operator(int fd)

@@ -9,7 +9,7 @@ void Server::_topic(PollfdIterator it, const std::vector<std::string>& args)
 {
 	Client& client = m_clients.find(it->fd)->second;
 	if (args.size() < 2)
-		return client.send_461("JOIN");
+		return client.send_461("TOPIC");
 
 	const std::string& channel_name = args[1];
 	std::map<std::string, Channel>::iterator target_channel_it = m_channels.find(channel_name);

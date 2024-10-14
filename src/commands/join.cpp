@@ -61,6 +61,7 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 		if (channel.topic != "")
 		{
 			std::vector<std::string> topic_args;
+			topic_args.push_back("TOPIC");
 			topic_args.push_back(channel_name);
 			_topic(it, topic_args);
 		}
