@@ -7,7 +7,7 @@ class Channel
 {
   public:
     Channel(int creator_fd, std::string name);
-	Channel(const Channel& c);
+    Channel(const Channel& c);
     ~Channel();
 
     typedef struct s_topic
@@ -30,4 +30,5 @@ class Channel
   private:
     Channel& operator=(const Channel& c);
 };
+
 #endif
