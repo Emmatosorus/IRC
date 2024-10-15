@@ -30,6 +30,8 @@ void Server::_privmsg(PollfdIterator it, const std::vector<std::string>& args)
 			std::vector<int>::iterator c_it = target_channel->second.subscribed_users_fd.begin();
 			while (c_it != target_channel->second.subscribed_users_fd.end())
 			{
+				if (*c_it == it->fd)
+					continue;
 				std::string	msg = ":" + client->second.nickname + " PRIVMSG " + target_channel->first + " :" + args[2] + "\n";
 				send(*c_it, msg.c_str(), msg.size(), MSG_CONFIRM);
 				c_it++;

@@ -4,7 +4,7 @@
 
 void Client::send_001()
 {
-	std::string reply = ":42Chan 001" + nickname + " : Welcome to the 42Chan Network " + username + "!\r\n";
+	std::string reply = ":42Chan 001 " + nickname + " :Welcome to the 42Chan Network " + username + "!\r\n";
 	send_msg(reply);
 }
 
