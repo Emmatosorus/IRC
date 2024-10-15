@@ -32,7 +32,7 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 		if (!client->second.is_registered)
 		{
 			client->second.is_registered = true;
-			_send_to_client(it->fd, "001", "Welcome to 42Chan Network!");
+			_welcome_client(client->second.fd);
 		}
 	}
 }

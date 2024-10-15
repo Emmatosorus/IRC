@@ -80,7 +80,7 @@ void Server::_handle_client_connection()
 
     _add_client(new_fd);
     std::cout << "Connection accepted: " << new_fd << "\n";
-    _send_to_client(new_fd, "", "You are connected");
+    // _send_to_client(new_fd, "", "You are connected");
 }
 
 void Server::_handle_client_message(PollfdIterator it)
@@ -249,4 +249,13 @@ void Server::_handle_signal(int signum)
 {
     if (signum == SIGINT)
         Server::s_should_run = false;
+}
+
+void Server::_welcome_client(int fd)
+{
+    std::map<int, Client>::iterator client = m_clients.find(fd);
+    if (client == m_clients.end())
+        return;
+    std::string reply = "Welcome to the Internet Relay Network " + client->second.nickname + "!" + client->second.username + "@42Chan\r\n";
+    send(fd, reply.c_str(), reply.size(), MSG_CONFIRM);
 }

@@ -37,6 +37,7 @@ class Server
 	void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 	void _parse_comma_args(std::string & args, std::vector<std::string> & targets);
+	void _welcome_client(int fd);
 
     /* All functions for USER cmd */
     void _user(PollfdIterator it, const std::vector<std::string>& args);

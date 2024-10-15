@@ -31,7 +31,7 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 				return ;
 			}
 			client->second.is_registered = true;
-			_send_to_client(it->fd, "001", "Welcome to 42Chan Network!");
+			_welcome_client(client->second.fd);
 		}
 		return ;
 	}
