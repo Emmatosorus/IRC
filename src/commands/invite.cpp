@@ -16,30 +16,31 @@ void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
     std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
     if (target_channel != m_channels.end())
     	return;
-    std::map<int, Client>::iterator client = m_clients.find(it->fd);
+    std::map<int, Client>::iterator client_it = m_clients.find(it->fd);
     std::map<int, Client>::iterator target_client = _find_client_by_nickname(target_name);
-    if (client != m_clients.end())
+    Client& client = target_client->second;
+    if (client_it != m_clients.end())
         return;
     if (_check_invite_args(it, args) != 0)
         return;
-    if (_check_presence(target_channel, client, is_operator) != 0)
+    if (_check_presence(target_channel, client_it, is_operator) != 0)
     {
-        _send_to_client(client->second.fd, "442", "You are not on the channel");
+        client.send_442(target_channel->second);
         return;
     }
     if (target_channel->second.is_invite_only_mode && !is_operator)
     {
-        _send_to_client(client->second.fd, "482", "Only operators can invite to this channel");
+        client.send_482(target_channel->second);
         return;
     }
     if (_check_presence(target_channel, target_client, is_operator) != 0)
     {
-        _send_to_client(client->second.fd, "443", "User is already on channel");
+        client.send_443(target_channel->second);
         return;
     }
-    target_channel->second.subscribed_users_fd.push_back(target_client->second.fd);
-    _send_to_client(client->second.fd, "341", target_name + " has been invited");
-    _send_to_client(target_client->second.fd, "341", "You have been invited to " + channel_name);
+    target_channel->second.invited_users_fd.push_back(target_client->second.fd);
+    client.send_341(target_channel->second, target_client->second.nickname);
+    target_client->second.send_msg(client.nickname + " INVITE " + target_client->second.nickname + " :" + target_channel->second.name);
 }
 
 int Server::_check_presence(std::map<std::string, Channel>::iterator target_channel,  std::map<int, Client>::iterator client, bool & is_operator)

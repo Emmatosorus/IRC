@@ -20,6 +20,12 @@ void Client::send_333(const Channel& channel)
 	send_msg(reply);
 }
 
+void Client::send_341(const Channel& channel, const std::string & client_nick)
+{
+	std::string reply = ":42chan 341 " + nickname + " " + client_nick + " " + channel.name;
+	send_msg(reply);
+}
+
 void Client::send_353(const Channel& channel, const std::string& list_of_clients)
 {
 	std::string reply = ":42chan 353 " + nickname + " " + channel.name + " :" + list_of_clients;
@@ -42,6 +48,12 @@ void Client::send_403(const std::string& channel_name)
 void Client::send_442(const Channel& channel)
 {
 	std::string reply = ":42chan 442 " + nickname + " " + channel.name + " :You're not on that channel";
+	send_msg(reply);
+}
+
+void Client::send_443(const Channel& channel)
+{
+	std::string reply = ":42chan 443 " + nickname + " " + channel.name + " :User is already on channel";
 	send_msg(reply);
 }
 

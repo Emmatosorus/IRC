@@ -2,7 +2,7 @@
 #include <iostream>
 
 /* https://modern.ircdocs.horse/#user-message
- * Parameters: <username> : <realname> */
+ * Parameters: <username> 0 * : <realname> */
 void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 {
 	if (_check_user_args(it, args) != 0)
@@ -21,7 +21,7 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 	if (!client->second.is_registered)
 	{
 		client->second.username = args[1];
-		client->second.fullname = args[2];
+		client->second.fullname = args[4];
 		if (client->second.nickname != "")
 		{
 			if (client->second.password != this->m_password)
@@ -32,6 +32,7 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 			}
 			client->second.is_registered = true;
 			_welcome_client(client->second.fd);
+			std::cout << "User " << client->second.nickname << " registered\n" << std::endl;
 		}
 		return ;
 	}
@@ -44,14 +45,14 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 
 int Server::_check_user_args(PollfdIterator it, const std::vector<std::string>& args)
 {
-	if (args.size() < 3)
+	if (args.size() < 5)
 	{
-		Server::_send_to_client(it->fd, "461", "Not enough parameters :\nUSER <username> : <realname>");
+		Server::_send_to_client(it->fd, "461", "Not enough parameters :\nUSER <username> 0 * : <realname>");
 		return (1);
 	}
-	if (args.size() > 3)
+	if (args.size() > 5)
 	{
-		Server::_send_to_client(it->fd, "461", "Too many parameters :\nUSER <username> : <realname>");
+		Server::_send_to_client(it->fd, "461", "Too many parameters :\nUSER <username> 0 * : <realname>");
 		return (1);
 	}
 	if (args[1].size() > USERLEN)

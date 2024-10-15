@@ -33,6 +33,7 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 		{
 			client->second.is_registered = true;
 			_welcome_client(client->second.fd);
+			std::cout << "User " << client->second.nickname << " registered\n" << std::endl;
 		}
 	}
 }

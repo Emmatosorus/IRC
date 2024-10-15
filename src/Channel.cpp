@@ -10,6 +10,7 @@ Channel::Channel(int creator_fd, std::string name)
 	  topic_timestampt(),
       subscribed_users_fd(1, creator_fd),
       channel_operators_fd(1, creator_fd),
+	  invited_users_fd(),
 	  password(""),
 	  user_limit(-1), 
 	  is_password_mode(false),
@@ -28,6 +29,7 @@ Channel::Channel(const Channel& c)
 	  topic_timestampt(c.topic_timestampt),
       subscribed_users_fd(c.subscribed_users_fd),
       channel_operators_fd(c.channel_operators_fd),
+	  invited_users_fd(c.invited_users_fd),
 	  password(c.password),
 	  user_limit(c.user_limit), 
 	  is_password_mode(c.is_password_mode),
@@ -49,6 +51,7 @@ Channel& Channel::operator=(const Channel& c)
 	topic_timestampt = c.topic_timestampt,
 	subscribed_users_fd = c.subscribed_users_fd;
 	channel_operators_fd = c.channel_operators_fd;
+	invited_users_fd = c.invited_users_fd;
 	password = c.password;
 	user_limit = c.user_limit; 
 	is_password_mode = c.is_password_mode;

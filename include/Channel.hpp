@@ -18,6 +18,7 @@ class Channel
 	std::string topic_timestampt;
     std::vector<int> subscribed_users_fd;
     std::vector<int> channel_operators_fd;
+    std::vector<int> invited_users_fd;
 	std::string password;
 	size_t user_limit;
 	bool is_password_mode;

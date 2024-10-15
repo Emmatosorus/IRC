@@ -100,6 +100,7 @@ void Server::_handle_client_message(PollfdIterator it)
         return;
     }
     buf[bytes_received] = '\0';
+    std::cout <<  bytes_received << std::endl;
     Client& client = m_clients[it->fd];
     client.buf += buf;
     if (client.buf.length() > MESSAGE_SIZE)
@@ -110,23 +111,23 @@ void Server::_handle_client_message(PollfdIterator it)
 
     size_t end_of_msg = client.buf.find("\r\n");
     std::string raw_message;
-    if (end_of_msg != std::string::npos)
+    while (end_of_msg != std::string::npos)
     {
         raw_message = client.buf.substr(0, end_of_msg);
-        client.buf.clear();
-    }
-    else
-        return;
+        client.buf.erase(0, end_of_msg + 2);
 
-    std::vector<std::string> parsed_command = parse_client_msg(raw_message);
-    const std::string& command = parsed_command[0];
-    // TODO: check if the client is registered, forbid everything except PASS
-    if (m_commands.find(command) != m_commands.end())
-        (this->*m_commands[command])(it, parsed_command);
-    else
-    {
-        // TODO: send numeric reply ERR_UNKNOWNCOMMAND (421)
+        std::vector<std::string> parsed_command = parse_client_msg(raw_message);
+        const std::string& command = parsed_command[0];
+        // TODO: check if the client is registered, forbid everything except PASS
+        if (m_commands.find(command) != m_commands.end())
+            (this->*m_commands[command])(it, parsed_command);
+        else
+        {
+            // TODO: send numeric reply ERR_UNKNOWNCOMMAND (421)
+        }
+        end_of_msg = client.buf.find("\r\n");
     }
+    return;
 }
 
 void Server::_init_listening_socket()
@@ -256,6 +257,6 @@ void Server::_welcome_client(int fd)
     std::map<int, Client>::iterator client = m_clients.find(fd);
     if (client == m_clients.end())
         return;
-    std::string reply = "Welcome to the Internet Relay Network " + client->second.nickname + "!" + client->second.username + "@42Chan\r\n";
+    std::string reply = ":42Chan 001 Welcome to the Internet Relay Network " + client->second.nickname + "!" + client->second.username + "@42Chan\r\n";
     send(fd, reply.c_str(), reply.size(), MSG_CONFIRM);
 }
