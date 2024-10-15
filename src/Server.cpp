@@ -53,11 +53,13 @@ void Server::start()
     while (Server::s_should_run)
     {
         int poll_res = poll(m_pfds.data(), m_pfds.size(), POLL_TIMEOUT);
-        if (poll_res == -1)
+        if (poll_res == -1 && s_should_run)
             throw std::runtime_error("Critical error: poll failed");
 
         for (PollfdIterator it = m_pfds.begin(); it != m_pfds.end(); it++)
         {
+			if (!s_should_run && it.base() == NULL)
+				break;
             if ((it->revents & POLLIN) && it->fd == m_sockfd)
                 _handle_client_connection();
             else if ((it->revents & POLLIN) && it->fd != m_sockfd)
@@ -72,7 +74,7 @@ void Server::_handle_client_connection()
     socklen_t addrlen = sizeof(struct sockaddr_storage);
     int new_fd = accept(m_sockfd, (struct sockaddr*)&client_addr, &addrlen);
 
-    if (new_fd == -1)
+    if (new_fd == -1 && s_should_run)
     {
         std::cerr << "Error: new connection failed\n";
         return;
@@ -87,7 +89,7 @@ void Server::_handle_client_message(PollfdIterator it)
 {
     char buf[MESSAGE_SIZE + 1];
     int bytes_received = recv(it->fd, buf, MESSAGE_SIZE, 0);
-    if (bytes_received < 0)
+    if (bytes_received < 0 && s_should_run)
     {
         std::cerr << "Error: recv failed\n";
         return;
@@ -163,10 +165,10 @@ void Server::_init_listening_socket()
         break;
     }
     freeaddrinfo(ai);
-    if (curr == NULL)
+    if (curr == NULL && s_should_run)
         throw std::runtime_error("Critical error: socket binding failed");
 
-    if (listen(m_sockfd, MAX_CONNECTIONS) != 0)
+    if (listen(m_sockfd, MAX_CONNECTIONS) != 0 && s_should_run)
     {
         close(m_sockfd);
         throw std::runtime_error("Critical error: listen failed");
