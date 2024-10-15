@@ -100,7 +100,6 @@ void Server::_handle_client_message(PollfdIterator it)
         return;
     }
     buf[bytes_received] = '\0';
-    std::cout <<  bytes_received << std::endl;
     Client& client = m_clients[it->fd];
     client.buf += buf;
     if (client.buf.length() > MESSAGE_SIZE)
@@ -250,13 +249,4 @@ void Server::_handle_signal(int signum)
 {
     if (signum == SIGINT)
         Server::s_should_run = false;
-}
-
-void Server::_welcome_client(int fd)
-{
-    std::map<int, Client>::iterator client = m_clients.find(fd);
-    if (client == m_clients.end())
-        return;
-    std::string reply = ":42Chan 001 Welcome to the Internet Relay Network " + client->second.nickname + "!" + client->second.username + "@42Chan\r\n";
-    send(fd, reply.c_str(), reply.size(), MSG_CONFIRM);
 }

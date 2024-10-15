@@ -17,7 +17,7 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 	std::map<int, Client>::iterator client = m_clients.find(it->fd);
 	if (!client->second.entered_password)
 	{
-		_send_to_client(it->fd, "1003", "You must first enter password");
+		_send_to_client(it->fd, "1003", ":You must first enter password");
 		return;
 	}
 	client->second.nickname = nickname;
@@ -32,8 +32,7 @@ void Server::_nick(PollfdIterator it, const std::vector<std::string>& args)
 		if (!client->second.is_registered)
 		{
 			client->second.is_registered = true;
-			_welcome_client(client->second.fd);
-			std::cout << "User " << client->second.nickname << " registered\n" << std::endl;
+			client->second.send_001();
 		}
 	}
 }

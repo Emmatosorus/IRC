@@ -2,6 +2,12 @@
 #include "../include/Channel.hpp"
 #include <string>
 
+void Client::send_001()
+{
+	std::string reply = ":42Chan 001" + nickname + " : Welcome to the 42Chan Network " + username + "!\r\n";
+	send_msg(reply);
+}
+
 void Client::send_331(const Channel& channel)
 {
 	std::string reply = ":42chan 331 " + nickname + " " + channel.name + " :No topic is set";

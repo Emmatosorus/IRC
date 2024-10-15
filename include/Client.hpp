@@ -22,6 +22,7 @@ class Client
 		std::string fullname;
 
 		void send_msg(const std::string& msg);
+		void send_001();
 		void send_331(const Channel& channel);
 		void send_332(const Channel& channel);
 		void send_333(const Channel& channel);

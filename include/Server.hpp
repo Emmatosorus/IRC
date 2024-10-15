@@ -37,7 +37,6 @@ class Server
 	void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 	void _parse_comma_args(std::string & args, std::vector<std::string> & targets);
-	void _welcome_client(int fd);
 
     /* All functions for USER cmd */
     void _user(PollfdIterator it, const std::vector<std::string>& args);
@@ -79,7 +78,7 @@ class Server
 
     /* All functions for INVITE cmd */
     void _invite(PollfdIterator it, const std::vector<std::string>& args);
-    int _check_invite_args(PollfdIterator it, const std::vector<std::string>& args);
+    int _check_invite_args(const std::vector<std::string>& args, Client& client);
     int _check_presence(std::map<std::string, Channel>::iterator target_channel,  std::map<int, Client>::iterator client, bool & is_operator);
 
     /* All functions for TOPIC cmd */

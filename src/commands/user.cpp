@@ -31,8 +31,7 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 				return ;
 			}
 			client->second.is_registered = true;
-			_welcome_client(client->second.fd);
-			std::cout << "User " << client->second.nickname << " registered\n" << std::endl;
+			client->second.send_001();
 		}
 		return ;
 	}
