@@ -84,6 +84,14 @@ class Server
     /* All functions for TOPIC cmd */
     void _topic(PollfdIterator it, const std::vector<std::string>& args);
 
+	/* All functions for MODE cmd */
+	void _mode(PollfdIterator it, const std::vector<std::string>& args);
+  void _mode_i(bool  is_off, Channel & channel, Client & client);
+  void _mode_t(bool  is_off, Channel & channel, Client & client);
+  void _mode_k(bool  is_remove, std::string & args, Channel & channel, Client & client);
+  void _mode_o(bool  is_remove, std::string & args, Channel & channel, Client & client);
+  void _mode_l(bool  is_remove, std::string & args, Channel & channel, Client & client);
+  
     const std::string m_password;
     const std::string m_port;
     std::vector<struct pollfd> m_pfds;
