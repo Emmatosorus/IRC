@@ -73,6 +73,11 @@ bool Channel::is_operator(int fd)
 	return std::find(channel_operators_fd.begin(), channel_operators_fd.end(), fd) != channel_operators_fd.end();
 }
 
+bool Channel::is_invited(int fd)
+{
+	return std::find(invited_users_fd.begin(), invited_users_fd.end(), fd) != invited_users_fd.end();
+}
+
 void Channel::send_msg(const std::string& msg)
 {
 	std::string total = msg + "\r\n";

@@ -1,5 +1,6 @@
 #include "../../include/Server.hpp"
 #include "../../include/utils.hpp"
+#include <algorithm>
 
 static std::string _join_message(const Client& client, const Channel& channel);
 
@@ -38,7 +39,7 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 		Channel& channel = target_channel->second;
 		if (channel.is_subscribed(client.fd))
 			continue;
-		else if (channel.is_invite_only_mode)
+		else if (channel.is_invite_only_mode && !channel.is_invited(client.fd))
 		{
 			client.send_473(channel);
 			continue;
@@ -74,6 +75,11 @@ void Server::_join_channel(PollfdIterator it, Channel& channel, const Client& cl
 	names_args.push_back("NAMES");
 	names_args.push_back(channel.name);
 	_names(it, names_args);
+	if (channel.is_invite_only_mode)
+	{
+		std::vector<int>::iterator it = std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
+		channel.invited_users_fd.erase(it);
+	}
 }
 
 static std::string _join_message(const Client& client, const Channel& channel)
