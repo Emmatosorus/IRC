@@ -46,7 +46,6 @@ class Server
 
     /* All functions for NICK cmd */
     void _nick(PollfdIterator it, const std::vector<std::string>& args);
-    int _check_nick_args(PollfdIterator it, const std::vector<std::string>& args);
 
     /* All functions for JOIN cmd */
     void _join(PollfdIterator it, const std::vector<std::string>& args);
