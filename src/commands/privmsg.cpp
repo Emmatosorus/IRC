@@ -1,75 +1,59 @@
 #include "../../include/Server.hpp"
-#include <iostream>
+#include "../../include/utils.hpp"
 #include <string>
+
+static int _check_privmsg_args(Client& client, const std::vector<std::string>& args);
 
 /* https://modern.ircdocs.horse/#privmsg-message
  * Parameters: <target>{,<target>} <text to be sent> */
 void Server::_privmsg(PollfdIterator it, const std::vector<std::string>& args)
 {
-	if (_check_privmsg_args(it, args) != 0)
+	Client& client = m_clients[it->fd];
+
+	if (_check_privmsg_args(client, args) != 0)
 		return ;
-	std::vector<std::string> targets;
-	std::string target_copy = args[1];
 
-	_parse_comma_args(target_copy, targets);
-
-	std::map<int, Client>::iterator client = m_clients.find(it->fd);
-	if (!client->second.is_registered)
+	std::vector<std::string> targets = parse_comma_arg(args[1]);
+	for (size_t i = 0; i < targets.size(); i++)
 	{
-		Server::_send_to_client(it->fd, "451", "You are not registered");
-		return ;
-	}
-
-	std::vector<std::string>::iterator t_it = targets.begin();
-	t_it--;
-	while (++t_it != targets.end())
-	{
-		std::map<std::string, Channel>::iterator target_channel = m_channels.find(*t_it);
-		if (target_channel != m_channels.end())
+		std::map<std::string, Channel>::iterator target_channel_it = m_channels.find(targets[i]);
+		if (target_channel_it != m_channels.end())
 		{
-			std::vector<int>::iterator c_it = target_channel->second.subscribed_users_fd.begin();
-			while (c_it != target_channel->second.subscribed_users_fd.end())
+			Channel& target_channel = target_channel_it->second;
+			if (!target_channel.is_subscribed(client.fd))
 			{
-				if (*c_it == it->fd)
-					continue;
-				std::string	msg = ":" + client->second.nickname + " PRIVMSG " + target_channel->first + " :" + args[2] + "\n";
-				send(*c_it, msg.c_str(), msg.size(), MSG_CONFIRM);
-				c_it++;
+				client.send_441(target_channel.name);
+				continue;
 			}
+			target_channel.send_msg_except(client.fd, ":" + client.nickname + " PRIVMSG " + target_channel.name + " :" + args[2]);
 			continue;
 		}
-		ClientIterator target_user = _find_client_by_nickname(*t_it);
-		if (target_user != m_clients.end())
+		ClientIterator target_user_it = _find_client_by_nickname(targets[i]);
+		if (target_user_it != m_clients.end())
 		{
-			std::string	msg = ":" + client->second.nickname + " PRIVMSG " + target_user->second.nickname + " :" + args[2] + "\n";
-			send(target_user->second.fd, msg.c_str(), msg.size(), MSG_CONFIRM);
+			Client& target_user = target_user_it->second;
+			target_user.send_msg(":" + client.nickname + " PRIVMSG " + target_user.nickname + " :" + args[2]);
 			continue;
 		}
-		std::string	err_msg = "User/Channel : " + *t_it + " not found\n";
-		_send_to_client(it->fd, "401", err_msg);
+		client.send_401(targets[i]);
 	}
 }
 
-int Server::_check_privmsg_args(PollfdIterator it, const std::vector<std::string>& args)
+static int _check_privmsg_args(Client& client, const std::vector<std::string>& args)
 {
+	if (args.size() > 3)
+	{
+		client.send_407("Too many targets");
+		return (1);
+	}
 	if (args.size() == 1)
 	{
-		Server::_send_to_client(it->fd, "411", "No recipient :\nPRIVMSG <target>{,<target>} : <message>");
+		client.send_411();
 		return (1);
 	}
 	if (args.size() == 2)
 	{
-		Server::_send_to_client(it->fd, "412", "No message to send :\nPRIVMSG <target>{,<target>} : <message>");
-		return (1);
-	}
-	if (args.size() > 3)
-	{
-		Server::_send_to_client(it->fd, "407", "Too many parameters :\nPRIVMSG <target>{,<target>} : <message>");
-		return (1);
-	}
-	if (args[2].size() > 512)
-	{
-		Server::_send_to_client(it->fd, "417", "Message is over 512 characters");
+		client.send_412();
 		return (1);
 	}
 	return (0);

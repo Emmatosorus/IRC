@@ -12,7 +12,6 @@ class Client
 		Client& operator=(const Client& c);
 		~Client();
 		int fd;
-		time_t since_last_ping;
 		bool entered_password;
 		bool is_registered;
 		std::string buf;
@@ -31,10 +30,18 @@ class Client
 		void send_341(const Channel& channel, const std::string & client_nick);
 		void send_353(const Channel& channel, const std::string& list_of_clients);
 		void send_366(const std::string& channel_name);
+		void send_401(const std::string& nonexistent_nickname);
 		void send_403(const std::string& channel_name);
+		void send_407(const std::string& abort_msg);
+		void send_411();
+		void send_412();
+		void send_417();
+		void send_421(const std::string& command);
+		void send_441(const std::string& channel_name);
 		void send_442(const Channel& channel);
 		void send_443(const Channel& channel);
 		void send_448(const std::string& channel_name, const std::string& reason);
+		void send_451();
 		void send_461(const std::string& command);
 		void send_471(const Channel& channel);
         void send_472(char modechar);

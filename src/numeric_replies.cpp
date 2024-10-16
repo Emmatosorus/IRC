@@ -61,10 +61,51 @@ void Client::send_366(const std::string& channel_name)
 	send_msg(reply);
 }
 
+void Client::send_401(const std::string& nonexistent_nickname)
+{
+	std::string reply = ":42chan 401 " + nickname + " " + nonexistent_nickname + " :No such channel/nickname";
+	send_msg(reply);
+}
 
 void Client::send_403(const std::string& channel_name)
 {
 	std::string reply = ":42chan 403 " + nickname + " " + channel_name + " :No such channel";
+	send_msg(reply);
+}
+
+void Client::send_407(const std::string& abort_msg)
+{
+	std::string reply = ":42chan 407 " + nickname + " :" + abort_msg;
+	send_msg(reply);
+}
+
+void Client::send_411()
+{
+	std::string reply = ":42chan 411 " + nickname + ":No recepient";
+	send_msg(reply);
+}
+
+void Client::send_412()
+{
+	std::string reply = ":42chan 412 " + nickname + " :No message to send";
+	send_msg(reply);
+}
+
+void Client::send_417()
+{
+	std::string reply = ":42chan 417 " + nickname + " :Message is too long";
+	send_msg(reply);
+}
+
+void Client::send_421(const std::string& command)
+{
+	std::string reply = ":42chan 421 " + nickname + " " + command + " :Unknown command";
+	send_msg(reply);
+}
+
+void Client::send_441(const std::string& channel_name)
+{
+	std::string reply = ":42chan 441 " + nickname + " " + channel_name + " :You're not on that channel";
 	send_msg(reply);
 }
 
@@ -83,6 +124,12 @@ void Client::send_443(const Channel& channel)
 void Client::send_448(const std::string& channel_name, const std::string& reason)
 {
 	std::string reply = ":42chan 448 " + nickname + " " + channel_name + " Cannot join channel: " + reason;
+	send_msg(reply);
+}
+
+void Client::send_451()
+{
+	std::string reply = ":42chan 451 anon :You are not registered";
 	send_msg(reply);
 }
 
