@@ -91,10 +91,7 @@ static std::string _is_channel_name_valid(const std::string& channel_name)
 		return "Channel name is too short";
 	if (channel_name.length() > MAX_CHANNEL_NAME)
 		return "Channel name is too long";
-	for (size_t i = 1; i < channel_name.size(); i++)
-	{
-		if (channel_name[i] == ' ' || channel_name[i] == '\a' || channel_name[i] == ',')
-			return "Invalid channel character";
-	}
+	if (channel_name.find_first_of(" ,\a") != std::string::npos)
+		return "Invalid channel character: <space>, <comma>, ^G";
 	return "";
 }
