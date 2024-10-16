@@ -36,7 +36,7 @@ class Server
 	void _send_to_fd(int fd, const std::string& msg);
 	void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
-	void _parse_comma_args(std::string & args, std::vector<std::string> & targets);
+	void _parse_comma_args(const std::string & args, std::vector<std::string> & targets);
 
     /* All functions for USER cmd */
     void _user(PollfdIterator it, const std::vector<std::string>& args);
@@ -85,7 +85,11 @@ class Server
     void _mode_k(bool  is_add_mode, const std::string & args, Channel & channel);
     void _mode_o(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
     void _mode_l(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
-  
+ 
+    /* All functions for KICK cmd */ 
+    void _kick(PollfdIterator it, const std::vector<std::string>& args);
+    
+
     const std::string m_password;
     const std::string m_port;
     std::vector<struct pollfd> m_pfds;

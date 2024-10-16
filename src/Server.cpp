@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <utility>
 
 bool Server::s_should_run = true;
 
@@ -36,6 +37,7 @@ Server::Server(const char* password, const char* port)
     m_commands.insert(make_pair("invite", &Server::_invite));
     m_commands.insert(make_pair("topic", &Server::_topic));
     m_commands.insert(make_pair("mode", &Server::_mode));
+    m_commands.insert(make_pair("kick", &Server::_kick));
 
     signal(SIGINT, Server::_handle_signal);
 }
@@ -230,19 +232,20 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
     return it;
 }
 
-void Server::_parse_comma_args(std::string & args, std::vector<std::string> & targets)
+void Server::_parse_comma_args(const std::string & args, std::vector<std::string> & targets)
 {
+    std::string unconst_args = args;
 	size_t	pos = 0;
-	while (args[pos])
+	while (unconst_args[pos])
 	{
-		pos = args.find(',');
+		pos = unconst_args.find(',');
 		if (pos == std::string::npos)
 		{
-			targets.push_back(args);
+			targets.push_back(unconst_args);
 			return ;
 		}
-		targets.push_back(args.substr(0, pos));
-		args.erase(0, pos + 1);
+		targets.push_back(unconst_args.substr(0, pos));
+		unconst_args.erase(0, pos + 1);
 	}
 }
 

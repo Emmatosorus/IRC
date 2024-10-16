@@ -6,20 +6,37 @@
  * Parameters: <target> [<modestring> [<mode arguments>...]] */
 void Server::_mode(PollfdIterator it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients.find(it->fd)->second;
+    Client& client = m_clients.find(it->fd)->second;
 	if (args.size() < 2)
 		return client.send_461("MODE");
 
-	ChannelIterator channel_it = m_channels.find(args[1]);
-	if (channel_it == m_channels.end())
-		return client.send_403(args[1]);
+    const std::string& channel_name = args[1];
+    bool is_operator = false;	
 
-	Channel& channel = channel_it->second;
+	ChannelIterator target_channel = m_channels.find(channel_name);
+	if (target_channel == m_channels.end())
+		return client.send_403(args[1]);
+	Channel& channel = target_channel->second;
+
+    std::map<int, Client>::iterator client_it = m_clients.find(it->fd);
+    if (_check_presence(target_channel, client_it, is_operator) != 0)
+    {
+        client.send_442(target_channel->second);
+        return;
+    }
+    if (!is_operator)
+    {
+        client.send_482(target_channel->second);
+        return;
+    }
+
 	if (args.size() == 2)
 	{
         client.send_324(channel);
         client.send_329(channel);
+        return;
 	}
+    
 	// :dan!~h@localhost MODE #foobar -bl+i *@192.168.0.1
 	size_t j = 3;
 	bool is_add_mode = false;
@@ -88,7 +105,7 @@ void  Server::_mode_i(bool  is_add_mode, Channel & channel)
 }
 
 /* toggles operator priviliges to change topic */
-void  Server::_mode_t(bool  is_add_mode, Channel & channel)
+void Server::_mode_t(bool  is_add_mode, Channel & channel)
 {
     if (!is_add_mode)
     {

@@ -1,4 +1,5 @@
 #include "../include/Channel.hpp"
+#include "../include/Client.hpp"
 #include <algorithm>
 #include <sys/socket.h>
 #include "../include/utils.hpp"
@@ -101,4 +102,14 @@ void Channel::send_msg_except(int fd, const std::string& msg)
 		if (*it != fd)
 			send(*it, total.c_str(), total.size(), MSG_CONFIRM);
 	}
+}
+
+void Channel::remove_client(Client& client)
+{
+    std::vector<int>::iterator subscribed_user_it = std::find(subscribed_users_fd.begin(), subscribed_users_fd.end(), client.fd);
+    std::vector<int>::iterator channel_operator_it = std::find(channel_operators_fd.begin(), channel_operators_fd.end(), client.fd);
+    if (channel_operator_it != channel_operators_fd.end())
+        channel_operators_fd.erase(channel_operator_it);
+
+    subscribed_users_fd.erase(subscribed_user_it);
 }
