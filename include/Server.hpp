@@ -12,6 +12,7 @@
 #define MESSAGE_SIZE 512
 #define POLL_TIMEOUT 10000
 #define SERVER_NAME ":42Chan "
+#define MAX_CHANNEL_NAME 50
 class Server
 {
   public:
@@ -60,7 +61,6 @@ class Server
 
     /* All functions for NAME cmd */
     void _names(PollfdIterator it, const std::vector<std::string>& args);
-	int _check_names_args(PollfdIterator it, const std::vector<std::string>& args);
 
     /* All functions for NOTICE cmd */
     void _notice(PollfdIterator it, const std::vector<std::string>& args);
