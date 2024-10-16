@@ -2,7 +2,6 @@
 #include "../../include/utils.hpp"
 #include <algorithm>
 
-static std::string _join_message(const Client& client, const Channel& channel);
 static std::string _is_channel_name_valid(const std::string& channel_name);
 
 /* https://modern.ircdocs.horse/#join-message
@@ -65,7 +64,7 @@ void Server::_join_channel(PollfdIterator it, Channel& channel, const Client& cl
 {
 	if (should_add)
 		channel.subscribed_users_fd.push_back(client.fd);
-	channel.send_msg(_join_message(client, channel));
+	channel.send_msg(":" + client.nickname + " JOIN :" + channel.name);
 	if (channel.topic != "")
 	{
 		std::vector<std::string> topic_args;
@@ -82,11 +81,6 @@ void Server::_join_channel(PollfdIterator it, Channel& channel, const Client& cl
 		std::vector<int>::iterator it = std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
 		channel.invited_users_fd.erase(it);
 	}
-}
-
-static std::string _join_message(const Client& client, const Channel& channel)
-{
-	return ":" + client.nickname + " JOIN :" + channel.name;
 }
 
 static std::string _is_channel_name_valid(const std::string& channel_name)

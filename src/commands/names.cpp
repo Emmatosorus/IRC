@@ -6,9 +6,10 @@
 void Server::_names(PollfdIterator it, const std::vector<std::string>& args)
 {
 	Client& client = m_clients.find(it->fd)->second;
+
 	if (args.size() < 2) 
 		return client.send_461("NAMES");
-	std::vector<std::string> targets = get_all_targets(args[1]);
+	std::vector<std::string> targets = parse_comma_arg(args[1]);
 
 	for (size_t i = 0; i < targets.size(); i++)
 	{
