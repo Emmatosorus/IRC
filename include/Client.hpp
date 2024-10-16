@@ -43,6 +43,7 @@ class Client
 		void send_448(const std::string& channel_name, const std::string& reason);
 		void send_451();
 		void send_461(const std::string& command);
+		void send_462();
 		void send_471(const Channel& channel);
         void send_472(char modechar);
 		void send_473(const Channel& channel);

@@ -139,6 +139,12 @@ void Client::send_461(const std::string& command)
 	send_msg(reply);
 }
 
+void Client::send_462()
+{
+	std::string reply = ":42chan 462 " + nickname + " :Not enough prameters";
+	send_msg(reply);
+}
+
 void Client::send_471(const Channel& channel)
 {
 	std::string reply = ":42chan 471 " + nickname + " " + channel.name + " :Cannot join channel (+l)";
