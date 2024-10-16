@@ -40,7 +40,6 @@ class Server
 
     /* All functions for USER cmd */
     void _user(PollfdIterator it, const std::vector<std::string>& args);
-    int _check_user_args(PollfdIterator it, const std::vector<std::string>& args);
 
     /* All functions for PASS cmd */
     void _pass(PollfdIterator it, const std::vector<std::string>& args);

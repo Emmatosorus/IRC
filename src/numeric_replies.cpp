@@ -103,6 +103,24 @@ void Client::send_421(const std::string& command)
 	send_msg(reply);
 }
 
+void Client::send_431()
+{
+	std::string reply = ":42chan 431 " + nickname +  + " :No nickname was given";
+	send_msg(reply);
+}
+
+void Client::send_432(const std::string& new_nickname, const std::string& abort_message)
+{
+	std::string reply = ":42chan 432 " + nickname + " " + new_nickname + " :Invalid nickname: " + abort_message;
+	send_msg(reply);
+}
+
+void Client::send_433(const std::string& new_nickname)
+{
+	std::string reply = ":42chan 433 " + nickname + " " + new_nickname + " :Nickname is already taken";
+	send_msg(reply);
+}
+
 void Client::send_441(const std::string& channel_name)
 {
 	std::string reply = ":42chan 441 " + nickname + " " + channel_name + " :You're not on that channel";
@@ -141,7 +159,19 @@ void Client::send_461(const std::string& command)
 
 void Client::send_462()
 {
-	std::string reply = ":42chan 462 " + nickname + " :Not enough prameters";
+	std::string reply = ":42chan 462 " + nickname + " :Already registered";
+	send_msg(reply);
+}
+
+void Client::send_464()
+{
+	std::string reply = ":42chan 464 anon :Password is incorrect or was not provided";
+	send_msg(reply);
+}
+
+void Client::send_468(const std::string& abort_msg)
+{
+	std::string reply = ":42chan 468 anon :Invalid username: " + abort_msg;
 	send_msg(reply);
 }
 
@@ -179,10 +209,4 @@ void Client::send_696(std::string target_name, char modechar, std::string parame
 {
     std::string reply = ":42chan 696 " + nickname + " " + target_name + " " + modechar + " " + parameter + " :" + description;
     send_msg(reply);
-}
-
-void Client::send_1003()
-{
-	std::string reply = ":42chan 1003 anon :You must enter password first";
-	send_msg(reply);
 }

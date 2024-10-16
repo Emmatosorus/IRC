@@ -122,7 +122,7 @@ void Server::_handle_client_message(PollfdIterator it)
         const std::string& command = parsed_command[0];
 		if (!client.entered_password && command != "pass")
 		{
-			client.send_1003();
+			client.send_464();
 		}
 		else if (client.entered_password &&
 				(!client.is_registered && !(command == "nick" || command == "user")))

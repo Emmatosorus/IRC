@@ -37,6 +37,9 @@ class Client
 		void send_412();
 		void send_417();
 		void send_421(const std::string& command);
+		void send_431();
+		void send_432(const std::string& new_nickname, const std::string& abort_message);
+		void send_433(const std::string& new_nickname);
 		void send_441(const std::string& channel_name);
 		void send_442(const Channel& channel);
 		void send_443(const Channel& channel);
@@ -44,12 +47,13 @@ class Client
 		void send_451();
 		void send_461(const std::string& command);
 		void send_462();
+		void send_464();
+		void send_468(const std::string& abort_msg);
 		void send_471(const Channel& channel);
         void send_472(char modechar);
 		void send_473(const Channel& channel);
 		void send_475(const Channel& channel);
 		void send_482(const Channel& channel);
         void send_696(std::string target_name, char modechar, std::string parameter, std::string description);
-		void send_1003();
 };
 #endif
