@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/16 17:56:38 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/16 19:00:44 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,13 +163,16 @@ int	main(int argc, char **argv)
 	socket_fd = get_socket_fd(argv);
 	if (socket_fd == -1)
 		return (1);
+	
+	//the mess begins here
+
 	int	num_bytes;
 	pollfds[0].fd = socket_fd;
 	pollfds[0].events = POLLIN;
 	std::string	msg;
-	int		step = 0;
+	// int		step = 0;
 	char	buf[MAXDATASIZE];
-	std::string password = argv[2];
+	std::string password = argv[3];
 	msg = "PASS " + password + "\r\n";
 	std::cout << "bot send1: " << msg << std::endl;
 	usleep(100);
@@ -181,39 +184,45 @@ int	main(int argc, char **argv)
 	msg.clear();
 	msg = "NICK Celiastral\r\n";
 	std::cout << "bot send3: " << msg << std::endl;
+	usleep(100);
+	send(socket_fd, msg.c_str(), msg.length(), 0);
 	if (poll(pollfds, 1, -1) == -1)
 		return (1);
 	num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
 	if (num_bytes == -1)
 		return (close(socket_fd), 1);
+	msg = buf;
+	if (msg != ":42Chan   :You are connected\n")
+		return (-1);
+	msg.clear();
 	buf[num_bytes] = '\0';
 	std::cout << "bot received 1: " << buf << std::endl;
 	buf[0] ='\0';
-	usleep(100);
-	send(socket_fd, msg.c_str(), msg.length(), 0);
 	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 	while (42)
 	{
 		std::string	channel;
 		if (poll(pollfds, 1, -1) == -1)
 			return (1);
-		switch (step)
-		{
-			case 0:
-				break ;
-			case 1:
-				break ;
-			case 2:
-				break ;
-		}
+		// switch (step)
+		// {
+		// 	case 0:
+		// 		break ;
+		// 	case 1:
+		// 		break ;
+		// 	case 2:
+		// 		break ;
+		// }
 		num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
 		if (num_bytes == -1)
 			return (close(socket_fd), 1);
 		if (num_bytes == 0)
 			return (close(socket_fd), 1);
 		buf[num_bytes] = '\0';
-		std::cout << "bot received: " << buf << std::endl;
+		std::cout << "bot received: " << buf;
 		msg = buf;
+		if (msg == ":42Chan 464 Celiastral :Incorrect password\n")
+			return (-1);
 		std::string	curl_cmd(CURL_CMD);
 		size_t	pos = 0;
 		size_t	pos2 = 0;
