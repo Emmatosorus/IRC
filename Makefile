@@ -1,5 +1,5 @@
 NAME = ircserv
-GUARDIAN = bot
+GUARDIAN = guardian
 AI = ai
 
 CXX = c++
