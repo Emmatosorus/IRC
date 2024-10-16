@@ -1,4 +1,5 @@
 #include "../../include/Server.hpp"
+#include "../../include/utils.hpp"
 #include <string>
 
 /* https://modern.ircdocs.horse/#kick-message
@@ -30,21 +31,21 @@ void Server::_kick(PollfdIterator it, const std::vector<std::string>& args)
         return;
     } 
 
-    std::vector<std::string>  targets;
-    _parse_comma_args(args[2], targets);
+    std::vector<std::string> targets = parse_comma_arg(args[2]);
     
     std::string message = "You have been kicked";
     if (args.size() > 3)
         message = args[3];
 
-    for (std::vector<std::string>::iterator it = targets.begin(); it != targets.end(); it++)
+    for (size_t i = 0; i < targets.size(); i++)
     {
-        ClientIterator target_it = _find_client_by_nickname(*it); 
+        ClientIterator target_it = _find_client_by_nickname(targets[0]); 
         if (target_it == m_clients.end())
-        {
-            client.send_msg("Fuck you!");
+		{
+			// TODO: handle the response if the client does not exist
             continue;
-        }
+		}
+
         Client& target = target_it->second;
         if (!channel.is_subscribed(target.fd))
         {
