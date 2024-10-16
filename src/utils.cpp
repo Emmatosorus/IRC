@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -21,4 +22,11 @@ std::vector<std::string> parse_comma_arg(std::string comma_arg)
     }
     targets.push_back(comma_arg);
 	return targets;
+}
+
+void make_unique(std::vector<std::string>& vec)
+{
+	std::sort(vec.begin(), vec.end());
+	std::vector<std::string>::iterator last = std::unique(vec.begin(), vec.end());
+	vec.erase(last, vec.end());
 }

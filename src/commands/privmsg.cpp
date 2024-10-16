@@ -15,6 +15,7 @@ void Server::_privmsg(PollfdIterator it, const std::vector<std::string>& args)
 		return client.send_412();
 
 	std::vector<std::string> targets = parse_comma_arg(args[1]);
+	make_unique(targets);
 	for (size_t i = 0; i < targets.size(); i++)
 	{
 		std::map<std::string, Channel>::iterator target_channel_it = m_channels.find(targets[i]);
