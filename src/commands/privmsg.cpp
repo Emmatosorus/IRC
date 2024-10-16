@@ -1,6 +1,5 @@
 #include "../../include/Server.hpp"
 #include "../../include/utils.hpp"
-#include <string>
 
 /* https://modern.ircdocs.horse/#privmsg-message
  * Parameters: <target>{,<target>} <text to be sent> */
