@@ -2,16 +2,18 @@
 #include "../../include/utils.hpp"
 #include <string>
 
-static int _check_privmsg_args(Client& client, const std::vector<std::string>& args);
-
 /* https://modern.ircdocs.horse/#privmsg-message
  * Parameters: <target>{,<target>} <text to be sent> */
 void Server::_privmsg(PollfdIterator it, const std::vector<std::string>& args)
 {
 	Client& client = m_clients[it->fd];
 
-	if (_check_privmsg_args(client, args) != 0)
-		return ;
+	if (args.size() > 3)
+		return client.send_407("Too many targets");
+	if (args.size() == 1)
+		return client.send_411();
+	if (args.size() == 2)
+		return client.send_412();
 
 	std::vector<std::string> targets = parse_comma_arg(args[1]);
 	for (size_t i = 0; i < targets.size(); i++)
@@ -37,24 +39,4 @@ void Server::_privmsg(PollfdIterator it, const std::vector<std::string>& args)
 		}
 		client.send_401(targets[i]);
 	}
-}
-
-static int _check_privmsg_args(Client& client, const std::vector<std::string>& args)
-{
-	if (args.size() > 3)
-	{
-		client.send_407("Too many targets");
-		return (1);
-	}
-	if (args.size() == 1)
-	{
-		client.send_411();
-		return (1);
-	}
-	if (args.size() == 2)
-	{
-		client.send_412();
-		return (1);
-	}
-	return (0);
 }

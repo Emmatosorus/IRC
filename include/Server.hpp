@@ -36,7 +36,6 @@ class Server
 	void _send_to_fd(int fd, const std::string& msg);
 	void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
-	void _parse_comma_args(const std::string & args, std::vector<std::string> & targets);
 
     /* All functions for USER cmd */
     void _user(PollfdIterator it, const std::vector<std::string>& args);
@@ -55,7 +54,6 @@ class Server
 
     /* All functions for PRIVMSG cmd */
     void _privmsg(PollfdIterator it, const std::vector<std::string>& args);
-    int _check_privmsg_args(PollfdIterator it, const std::vector<std::string>& args);
 
     /* All functions for LIST cmd */
     void _list(PollfdIterator it, const std::vector<std::string>& args);
