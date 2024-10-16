@@ -174,3 +174,9 @@ void Client::send_696(std::string target_name, char modechar, std::string parame
     std::string reply = ":42chan 696 " + nickname + " " + target_name + " " + modechar + " " + parameter + " :" + description;
     send_msg(reply);
 }
+
+void Client::send_1003()
+{
+	std::string reply = ":42chan 1003 anon :You must enter password first";
+	send_msg(reply);
+}

@@ -9,16 +9,16 @@ std::string long_to_str(long nbr)
 	return ss.str();
 }
 
-std::vector<std::string> get_all_targets(std::string targets_str)
+std::vector<std::string> parse_comma_arg(std::string comma_arg)
 {
     std::vector<std::string> targets;
     size_t pos = 0;
     std::string target;
-    while ((pos = targets_str.find(',')) != std::string::npos) {
-        target = targets_str.substr(0, pos);
+    while ((pos = comma_arg.find(',')) != std::string::npos) {
+        target = comma_arg.substr(0, pos);
         targets.push_back(target);
-        targets_str.erase(0, pos + 1);
+        comma_arg.erase(0, pos + 1);
     }
-    targets.push_back(targets_str);
+    targets.push_back(comma_arg);
 	return targets;
 }

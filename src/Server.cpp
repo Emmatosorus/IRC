@@ -83,7 +83,6 @@ void Server::_handle_client_connection()
 
     _add_client(new_fd);
     std::cout << "Connection accepted: " << new_fd << "\n";
-    // _send_to_client(new_fd, "", "You are connected");
 }
 
 void Server::_handle_client_message(PollfdIterator it)
@@ -107,7 +106,7 @@ void Server::_handle_client_message(PollfdIterator it)
     client.buf += buf;
     if (client.buf.length() > MESSAGE_SIZE)
     {
-        // TODO: send numeric reply ERR_INPUTTOOLONG (417)
+		client.send_417();
         return;
     }
 
@@ -116,16 +115,27 @@ void Server::_handle_client_message(PollfdIterator it)
     while (end_of_msg != std::string::npos)
     {
         raw_message = client.buf.substr(0, end_of_msg);
+		std::cout << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
 
         std::vector<std::string> parsed_command = parse_client_msg(raw_message);
         const std::string& command = parsed_command[0];
-        // TODO: check if the client is registered, forbid everything except PASS
-        if (m_commands.find(command) != m_commands.end())
-            (this->*m_commands[command])(it, parsed_command);
-        else
+		if (!client.entered_password && command != "pass")
+		{
+			client.send_1003();
+		}
+		else if (client.entered_password &&
+				(!client.is_registered && !(command == "nick" || command == "user")))
+		{
+			client.send_451();
+		}
+		else if (m_commands.find(command) != m_commands.end())
+		{
+			(this->*m_commands[command])(it, parsed_command);
+		}
+		else
         {
-            // TODO: send numeric reply ERR_UNKNOWNCOMMAND (421)
+			client.send_421(command);
         }
         end_of_msg = client.buf.find("\r\n");
     }
@@ -230,23 +240,6 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
             return it;
     }
     return it;
-}
-
-void Server::_parse_comma_args(const std::string & args, std::vector<std::string> & targets)
-{
-    std::string unconst_args = args;
-	size_t	pos = 0;
-	while (unconst_args[pos])
-	{
-		pos = unconst_args.find(',');
-		if (pos == std::string::npos)
-		{
-			targets.push_back(unconst_args);
-			return ;
-		}
-		targets.push_back(unconst_args.substr(0, pos));
-		unconst_args.erase(0, pos + 1);
-	}
 }
 
 void Server::_handle_signal(int signum)
