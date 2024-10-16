@@ -6,6 +6,9 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 {
 	Client& client = m_clients[it->fd];
 
+	if (client.is_registered || client.username == "")
+		return client.send_462();
+
 	if (args.size() < 5)
 		return client.send_461("USER");
 
@@ -15,9 +18,6 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 	size_t pos = args[1].find_first_of("#:,*?!@.\t\r\n ");
 	if (pos != std::string::npos)
 		return client.send_468("username contains invalid characters: #:,*?!@.\\t\\r\\n ");
-
-	if (client.is_registered)
-		return client.send_462();
 
 	client.username = args[1];
 	client.fullname = args[4];
