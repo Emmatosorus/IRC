@@ -3,6 +3,7 @@
 #include <algorithm>
 
 static std::string _join_message(const Client& client, const Channel& channel);
+static std::string _is_channel_name_valid(const std::string& channel_name);
 
 /* https://modern.ircdocs.horse/#join-message
  * Parameters: <channel>{,<channel>} [<key>{,<key>}] */
@@ -12,8 +13,8 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 	if (args.size() < 2)
 		return client.send_461("JOIN");
 
-	std::vector<std::string> channels_to_join = get_all_targets(args[1]);
-	std::vector<std::string> password_to_channels = get_all_targets(args[2]);
+	std::vector<std::string> channels_to_join = parse_comma_arg(args[1]);
+	std::vector<std::string> password_to_channels = parse_comma_arg(args[2]);
 	password_to_channels.reserve(channels_to_join.size());
 	while (password_to_channels.size() < channels_to_join.size())
 		password_to_channels.push_back("");
@@ -21,9 +22,10 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 	for (size_t i = 0; i < channels_to_join.size(); i++)
 	{
 		const std::string& channel_name = channels_to_join[i];
-		if (channel_name[0] != '#')
+		const std::string channel_name_error = _is_channel_name_valid(channels_to_join[i]);
+		if (channel_name_error != "")
 		{
-			client.send_448(channel_name, "Channel name must start with a hash mark");
+			client.send_448(channel_name, channel_name_error);
 			continue;
 		}
 
@@ -85,4 +87,20 @@ void Server::_join_channel(PollfdIterator it, Channel& channel, const Client& cl
 static std::string _join_message(const Client& client, const Channel& channel)
 {
 	return ":" + client.nickname + " JOIN :" + channel.name;
+}
+
+static std::string _is_channel_name_valid(const std::string& channel_name)
+{
+	if (channel_name[0] != '#')
+		return "Channel name must start with a hash mark";
+	if (channel_name.length() < 2)
+		return "Channel name is too short";
+	if (channel_name.length() > MAX_CHANNEL_NAME)
+		return "Channel name is too long";
+	for (size_t i = 1; i < channel_name.size(); i++)
+	{
+		if (channel_name[i] == ' ' || channel_name[i] == '\a' || channel_name[i] == ',')
+			return "Invalid channel character";
+	}
+	return "";
 }
