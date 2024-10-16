@@ -6,7 +6,7 @@ void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
 {
 	Client& client = m_clients[it->fd];
 
-	if (client.is_registered || client.username == "")
+	if (client.is_registered || (!client.is_registered && client.username != ""))
 		return client.send_462();
 
 	if (args.size() < 5)

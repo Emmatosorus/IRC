@@ -62,3 +62,12 @@ void Client::send_msg(const std::string& msg)
 	std::string total = msg + "\r\n";
 	send(fd, total.c_str(), total.size(), MSG_CONFIRM);
 }
+
+std::string Client::_resolve_nickname()
+{
+	if (nickname == "" && username == "")
+		return "guest";
+	else if (nickname == "")
+		return username;
+	return nickname;
+}
