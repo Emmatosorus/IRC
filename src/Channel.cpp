@@ -1,6 +1,7 @@
 #include "../include/Channel.hpp"
 #include <algorithm>
 #include <sys/socket.h>
+#include "../include/utils.hpp"
 
 Channel::Channel(int creator_fd, std::string name)
     : creator_fd(creator_fd),
@@ -18,11 +19,13 @@ Channel::Channel(int creator_fd, std::string name)
       is_invite_only_mode(false),
       is_const_topic_mode(false)
 {
+	this->created_timestamp = long_to_str(time(NULL));
     return;
 }
 
 Channel::Channel(const Channel& c)
     : creator_fd(c.creator_fd),
+      created_timestamp(c.created_timestamp),
       name(c.name),
       topic(c.topic),
 	  topic_starter_nickname(c.topic_starter_nickname),
@@ -37,7 +40,7 @@ Channel::Channel(const Channel& c)
       is_invite_only_mode(c.is_invite_only_mode),
       is_const_topic_mode(c.is_invite_only_mode)
 {
-	return;
+    return;
 }
 
 Channel& Channel::operator=(const Channel& c)
@@ -45,6 +48,7 @@ Channel& Channel::operator=(const Channel& c)
 	if (this == &c)
 		return *this;
 	creator_fd = c.creator_fd;
+    created_timestamp = c.created_timestamp;
 	name = c.name;
 	topic = c.topic;
 	topic_starter_nickname = c.topic_starter_nickname;

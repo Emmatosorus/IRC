@@ -70,12 +70,6 @@ class Server
     /* All functions for QUIT cmd */
     void _quit(PollfdIterator it, const std::vector<std::string>& args);
 
-    /* All functions for PING cmd */
-    void _ping(PollfdIterator it, const std::vector<std::string>& args);
-
-    /* All functions for PONG cmd */
-    void _pong(PollfdIterator it, const std::vector<std::string>& args);
-
     /* All functions for INVITE cmd */
     void _invite(PollfdIterator it, const std::vector<std::string>& args);
     int _check_invite_args(const std::vector<std::string>& args, Client& client);
@@ -86,11 +80,11 @@ class Server
 
 	/* All functions for MODE cmd */
 	void _mode(PollfdIterator it, const std::vector<std::string>& args);
-  void _mode_i(bool  is_off, Channel & channel, Client & client);
-  void _mode_t(bool  is_off, Channel & channel, Client & client);
-  void _mode_k(bool  is_remove, std::string & args, Channel & channel, Client & client);
-  void _mode_o(bool  is_remove, std::string & args, Channel & channel, Client & client);
-  void _mode_l(bool  is_remove, std::string & args, Channel & channel, Client & client);
+    void _mode_i(bool  is_add_mode, Channel & channel);
+    void _mode_t(bool  is_add_mode, Channel & channel);
+    void _mode_k(bool  is_add_mode, const std::string & args, Channel & channel);
+    void _mode_o(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
+    void _mode_l(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
   
     const std::string m_password;
     const std::string m_port;

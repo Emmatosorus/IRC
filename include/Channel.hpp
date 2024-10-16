@@ -12,6 +12,7 @@ class Channel
     ~Channel();
 
     int creator_fd;
+    std::string created_timestamp;
     std::string name;
 	std::string topic;
 	std::string topic_starter_nickname;

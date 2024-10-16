@@ -1,11 +1,28 @@
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
+#include "../include/utils.hpp"
 #include <string>
 
 void Client::send_001()
 {
-	std::string reply = ":42Chan 001 " + nickname + " :Welcome to the 42Chan Network " + username + "!\r\n";
+	std::string reply = ":42Chan 001 " + nickname + " :Welcome to the 42Chan Network " + username + "!";
 	send_msg(reply);
+}
+
+void Client::send_324(const Channel& channel)
+{
+    std::string reply = "42Chan 324 " + nickname + " " + channel.name;
+    channel.is_invite_only_mode ? reply += " +i" : reply += " -i";
+    channel.is_const_topic_mode ? reply += " +t" : reply += " -t";
+    channel.is_password_mode ? reply += " +k " + channel.password : reply += " -k";
+    channel.is_user_limit_mode ? reply += " +l " + long_to_str(channel.user_limit) : reply += " -l";
+    send_msg(reply);
+}
+
+void Client::send_329(const Channel& channel)
+{
+     std::string reply = "42Chan 329 " + nickname + " " + channel.name + " " + channel.created_timestamp;
+    send_msg(reply);
 }
 
 void Client::send_331(const Channel& channel)
@@ -81,6 +98,12 @@ void Client::send_471(const Channel& channel)
 	send_msg(reply);
 }
 
+void Client::send_472(char modechar)
+{
+    std::string reply = "42Chan 472 " + nickname + " " + modechar + " :is unknown mode char to me";
+    send_msg(reply);
+}
+
 void Client::send_473(const Channel& channel)
 {
 	std::string reply = ":42chan 473 " + nickname + " " + channel.name + " :Cannot join channel (+i)";
@@ -95,6 +118,12 @@ void Client::send_475(const Channel& channel)
 
 void Client::send_482(const Channel& channel)
 {
-	std::string reply = ":42chan 482 " + channel.name + " :You're not channel operator";
+	std::string reply = ":42chan 482 " + nickname + " " + channel.name + " :You're not channel operator";
 	send_msg(reply);
+}
+
+void Client::send_696(std::string target_name, char modechar, std::string parameter, std::string description)
+{
+    std::string reply = ":42chan 696 " + nickname + " " + target_name + " " + modechar + " " + parameter + " :" + description;
+    send_msg(reply);
 }

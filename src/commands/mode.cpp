@@ -1,4 +1,5 @@
 #include "../../include/Server.hpp"
+#include <algorithm>
 
 
 /* https://modern.ircdocs.horse/#mode-message
@@ -9,8 +10,6 @@ void Server::_mode(PollfdIterator it, const std::vector<std::string>& args)
 	if (args.size() < 2)
 		return client.send_461("MODE");
 
-	// TODO: validate channel name
-
 	ChannelIterator channel_it = m_channels.find(args[1]);
 	if (channel_it == m_channels.end())
 		return client.send_403(args[1]);
@@ -18,11 +17,11 @@ void Server::_mode(PollfdIterator it, const std::vector<std::string>& args)
 	Channel& channel = channel_it->second;
 	if (args.size() == 2)
 	{
-		// RPL_CHANNELMODEIS (324)  
-		// RPL_CREATIONTIME (329)
+        client.send_324(channel);
+        client.send_329(channel);
 	}
 	// :dan!~h@localhost MODE #foobar -bl+i *@192.168.0.1
-	int j = 3;
+	size_t j = 3;
 	bool is_add_mode = false;
 	for (size_t i = 0; i < args[2].size(); i++)
 	{
@@ -35,34 +34,52 @@ void Server::_mode(PollfdIterator it, const std::vector<std::string>& args)
 				is_add_mode = true;
 				break;
 			case 'i':
-				_mode_i(is_add_mode, channel, client);
+				_mode_i(is_add_mode, channel);
 				break;
 			case 't':
-				_mode_t(is_add_mode, channel, client);
+				_mode_t(is_add_mode, channel);
 				break;
 			case 'k':
-				_mode_k(is_add_mode, channel, client);
-				break;
+                if (j > args.size())
+                {
+                    client.send_696(channel.name, 'k', "", "No argument given");
+                    return ;
+                }
+				_mode_k(is_add_mode, args[j], channel);
+                if (is_add_mode)
+                    j++;
+                break;
 			case 'o':
-				_mode_o(is_add_mode, channel, client);
+                if (j > args.size())
+                {
+                    client.send_696(channel.name, 'o', "", "No argument given");
+                    return ;
+                }
+				_mode_o(is_add_mode, args[j], channel, client);
+                if (is_add_mode)
+                    j++;
 				break;
 			case 'l':
-				_mode_l(is_add_mode, channel, client);
-				break;
+                if (j > args.size())
+                {
+                    client.send_696(channel.name, 'l', "", "No argument given");
+                    return ;
+                }
+				_mode_l(is_add_mode, args[j], channel, client);
+				if (is_add_mode)
+                    j++;
+                break;
 			default:
-				// TODO: handle default case
-				// ERR_UNKNOWNMODE (472)
+				client.send_472(args[2][i]);
 				return;
 		}
 	}
-	// handle modstring and the arguments
-	// ERR_INVALIDMODEPARAM (696)
 }
 
 /* toggles invite only */
-void  Server::_mode_i(bool  is_off, Channel & channel, Client & client)
+void  Server::_mode_i(bool  is_add_mode, Channel & channel)
 {
-    if (is_off)
+    if (!is_add_mode)
     {
         channel.is_invite_only_mode = false;
         return;
@@ -71,9 +88,9 @@ void  Server::_mode_i(bool  is_off, Channel & channel, Client & client)
 }
 
 /* toggles operator priviliges to change topic */
-void  Server::_mode_t(bool  is_off, Channel & channel, Client & client)
+void  Server::_mode_t(bool  is_add_mode, Channel & channel)
 {
-    if (is_off)
+    if (!is_add_mode)
     {
         channel.is_const_topic_mode = false;
         return;
@@ -82,9 +99,9 @@ void  Server::_mode_t(bool  is_off, Channel & channel, Client & client)
 }
 
 /* Set/removes channel password */
-void  Server::_mode_k(bool  is_off, std::string & password, Channel & channel, Client & client)
+void  Server::_mode_k(bool  is_add_mode, const std::string & password, Channel & channel)
 {
-    if (is_off)
+    if (!is_add_mode)
     {
         channel.is_password_mode = false;
         channel.password.clear();
@@ -95,27 +112,43 @@ void  Server::_mode_k(bool  is_off, std::string & password, Channel & channel, C
 }
 
 /* Give/remove operator priviliges */
-void  Server::_mode_o(bool  is_off, std::string & nickname, Channel & channel, Client & client)
+void  Server::_mode_o(bool  is_add_mode, const std::string & nickname, Channel & channel, Client & client)
 {
     ClientIterator target_it = _find_client_by_nickname(nickname);
     if (target_it == m_clients.end())
     {
-        // TODO send bad argument
+        client.send_696(channel.name, 'o', nickname, "Unknown user");
     }
 
 	Client& target = target_it->second;
     if (!channel.is_subscribed(target.fd))
     {
-        // TODO send target not subscribed
+        client.send_696(channel.name, 'o', nickname, "User is not subscribed to channel");
     }
-    if (is_off)
+    if (is_add_mode)
     {
         channel.channel_operators_fd.push_back(target.fd);
+        return;
     }
+    std::vector<int>::iterator it = std::find(channel.channel_operators_fd.begin(), channel.channel_operators_fd.end(), target.fd);
+    channel.channel_operators_fd.erase(it);
 }
 
 /* set/removes user limit on channel */
-void  Server::_mode_l(bool  is_off, std::string & args, Channel & channel, Client & client)
+void  Server::_mode_l(bool  is_add_mode, const std::string & user_limit, Channel & channel, Client & client)
 {
-	
+    if (is_add_mode)
+    {
+        channel.is_user_limit_mode = true;
+        size_t limit = std::atoi(user_limit.c_str());
+        if (limit > 0)
+        {
+            channel.user_limit = limit;
+            return;
+        }
+        client.send_696(channel.name, 'l', user_limit, "User limit must be greater than 0");
+        return;
+    }
+    channel.is_user_limit_mode = false;
+    channel.user_limit = 0;
 }
