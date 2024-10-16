@@ -6,11 +6,12 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/13 22:32:46 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/16 17:56:38 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/bot.hpp"
+#include "../../../include/ai.hpp"
 #include <fstream>
 #include <cstdlib>
 #include <stdio.h>
@@ -92,19 +93,6 @@ bool	str_is_space(std::string *str)
 	return (rv);
 }
 
-// int	fill_slurs_vector(std::vector<std::string>	*slurs)
-// {
-// 	std::ifstream	infile("slurs.txt");
-// 	std::string		test;
-// 	if (!infile)
-// 		return (1);
-// 	if (infile.is_open())
-// 		while (std::getline(infile, test))
-// 			if (str_is_space(&test) == false)
-// 				slurs->push_back(test);
-// 	return (0);
-// }
-
 bool	pm_is_in_channel(std::string msg)
 {
 	size_t	pos = 0;
@@ -123,22 +111,19 @@ bool	pm_is_in_channel(std::string msg)
 	return (true);
 }
 
-int	main(int argc, char **argv)
+int	get_socket_fd(char **argv)
 {
-	struct pollfd	pollfds[1];
-	int	socket_fd;
-	struct addrinfo hints;
-	struct addrinfo *tmp;
-	struct addrinfo *servinfo;
+	int				socket_fd;
+	struct addrinfo	hints;
+	struct addrinfo	*tmp;
+	struct addrinfo	*servinfo;
 
-	if (argc != 2)
-	{
-		std::cout << "\033[0;31mUsage : ./bot <IP addr of server> <Server password>\033[0m" << std::endl;
-		return (1);
-	}
 	set_addrinfo(&hints);
-	if (getaddrinfo(argv[1], MYPORT, &hints, &servinfo) != 0)
-		return (1);
+	if (getaddrinfo(argv[1], argv[2], &hints, &servinfo) != 0)
+	{
+		std::cout << "\033[0;31mError! Getaddrinfo error!\033[0m" << std::endl;
+		return (-1);
+	}
 	for (tmp = servinfo; tmp != NULL; tmp = tmp->ai_next)
 	{
 		socket_fd = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
@@ -153,32 +138,78 @@ int	main(int argc, char **argv)
 			close(socket_fd);
 			continue;
 		}
-		break ;
+		break;
 	}
 	if (tmp == NULL)
 	{
 		std::cout << "\033[0;31mError! The adress is not available\033[0m" << std::endl;
 		freeaddrinfo(servinfo);
+		return (-1);
+	}
+	freeaddrinfo(servinfo);
+	return (socket_fd);
+}
+
+int	main(int argc, char **argv)
+{
+	struct pollfd	pollfds[1];
+	int	socket_fd;
+
+	if (argc != 4 && argc != 5)
+	{
+		std::cout << "\033[0;31mUsage : ./bot <IP addr of server> <Port of server> <Server password> <Name (optionnal)>\033[0m" << std::endl;
 		return (1);
 	}
-	char s[INET6_ADDRSTRLEN];
-	inet_ntop(tmp->ai_family, get_in_addr((struct sockaddr *)tmp->ai_addr),s, sizeof(s));
-	freeaddrinfo(servinfo);
+	socket_fd = get_socket_fd(argv);
+	if (socket_fd == -1)
+		return (1);
 	int	num_bytes;
 	pollfds[0].fd = socket_fd;
 	pollfds[0].events = POLLIN;
 	std::string	msg;
-	msg = "PRIVMSG Celiastral";
+	int		step = 0;
+	char	buf[MAXDATASIZE];
+	std::string password = argv[2];
+	msg = "PASS " + password + "\r\n";
+	std::cout << "bot send1: " << msg << std::endl;
+	usleep(100);
 	send(socket_fd, msg.c_str(), msg.length(), 0);
+	msg.clear();
+	msg = "USER Celiastral:Celia And\r\n";
+	usleep(100);
+	send(socket_fd, msg.c_str(), msg.length(), 0);
+	msg.clear();
+	msg = "NICK Celiastral\r\n";
+	std::cout << "bot send3: " << msg << std::endl;
+	if (poll(pollfds, 1, -1) == -1)
+		return (1);
+	num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
+	if (num_bytes == -1)
+		return (close(socket_fd), 1);
+	buf[num_bytes] = '\0';
+	std::cout << "bot received 1: " << buf << std::endl;
+	buf[0] ='\0';
+	usleep(100);
+	send(socket_fd, msg.c_str(), msg.length(), 0);
+	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 	while (42)
 	{
-		char	buf[MAXDATASIZE];
-		std::string	msg;
 		std::string	channel;
 		if (poll(pollfds, 1, -1) == -1)
 			return (1);
+		switch (step)
+		{
+			case 0:
+				break ;
+			case 1:
+				break ;
+			case 2:
+				break ;
+		}
 		num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
 		if (num_bytes == -1)
+			return (close(socket_fd), 1);
+		if (num_bytes == 0)
 			return (close(socket_fd), 1);
 		buf[num_bytes] = '\0';
 		std::cout << "bot received: " << buf << std::endl;
@@ -271,7 +302,4 @@ int	main(int argc, char **argv)
 		curl_cmd.clear();
 	}
 	close(socket_fd);
-	// close(socket_fd);
-	// return (std::system(CURL_CMD));
-	// return (200);
 }

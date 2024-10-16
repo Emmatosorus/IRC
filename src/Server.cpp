@@ -100,6 +100,7 @@ void Server::_handle_client_message(PollfdIterator it)
         return;
     }
     buf[bytes_received] = '\0';
+	std::cout << buf << std::endl;
     Client& client = m_clients[it->fd];
     client.buf += buf;
     if (client.buf.length() > MESSAGE_SIZE)
