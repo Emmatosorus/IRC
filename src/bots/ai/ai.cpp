@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/17 15:03:00 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/17 21:13:33 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,24 +54,6 @@ void	set_addrinfo(struct addrinfo *ai)
 	ai->ai_socktype = SOCK_STREAM;
 }
 
-bool	pm_is_in_channel(std::string msg)
-{
-	size_t	pos = 0;
-	size_t	pos2 = 0;
-	pos2 = msg.find("PRIVMSG", 0);
-	if (pos2 != std::string::npos)
-	{
-		pos = msg.find("#", 0);
-		if (pos != std::string::npos)
-		{
-			pos2 = msg.find(":", 0);
-			if (pos2 < pos)
-				return (false);
-		}
-	}
-	return (true);
-}
-
 int	get_socket_fd(char **argv)
 {
 	int				socket_fd;
@@ -111,6 +93,62 @@ int	get_socket_fd(char **argv)
 	return (socket_fd);
 }
 
+bool	is_name_incorrect(std::string msg, std::string bot_name)
+{
+	return (msg == ":42chan 432 guest " + bot_name + " :Invalid nickname: Nickname contains invalid characters : #:,*?!@.\\t\\r\\n \r\n"
+		|| msg == ":42chan 432 guest " + bot_name + " :Invalid nickname: First character of nickname must be a-z or A-Z\r\n"
+		|| msg  == ":42chan 433 guest " + bot_name + " :Nickname is already taken\r\n"
+		|| msg == ":42chan 431 guest :No nickname was given\r\n"
+		|| msg == ":42chan 461 " + bot_name + " USER :Not enough prameters\r\n"
+		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username contains invalid characters: #:,*?!@.\\t\\r\\n \r\n"
+		|| msg == ":42chan 417 guest :Message is too long\r\n"
+		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username is too long\r\n");
+}
+
+int	connect_to_server(int socket_fd, std::string password, std::string bot_name)
+{
+	std::string	msg;
+
+	msg = "PASS " + password + "\r\n";
+	std::cout << "bot send3: " << msg << std::endl;
+	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+	{
+		std::cout << "\033[0;31mError! Send error\033[0m" << std::endl;
+		return (close(socket_fd), 1);
+	}
+	msg.clear();
+	usleep(10);
+	msg = "NICK " + bot_name + "\r\n";
+	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+	{
+		std::cout << "\033[0;31mError! Send error\033[0m" << std::endl;
+		return (close(socket_fd), 1);
+	}
+	msg.clear();
+	usleep(10);
+	msg = "USER " + bot_name + " * *:" + bot_name + "\r\n";
+	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+	{
+		std::cout << "\033[0;31mError! Send error\033[0m" << std::endl;
+		return (close(socket_fd), 1);
+	}
+	return (0);
+}
+
+std::string	get_sender_name(std::string msg)
+{
+	std::string sender_name;
+	std::string tmp;
+	size_t		pos = 0;
+
+	pos = msg.find(" PRIVMSG", 1);
+	tmp = msg;
+	tmp[pos] = '\0';
+	tmp = &tmp[1];
+	sender_name = tmp;
+	return (sender_name);
+}
+
 int	main(int argc, char **argv)
 {
 	struct pollfd	pollfds[1];
@@ -135,90 +173,59 @@ int	main(int argc, char **argv)
 	pollfds[0].fd = socket_fd;
 	pollfds[0].events = POLLIN;
 	std::string	msg;
+	std::string	sender_name;
+	std::string		get;
+	std::string	curl_cmd;
 	int		step = 0;
 	char	buf[MAXDATASIZE];
-	// msg = "PASS " + password + "\r\n";
-	// std::cout << "bot send1: " << msg << std::endl;
-	// usleep(100);
-	// send(socket_fd, msg.c_str(), msg.length(), 0);
-	// msg.clear();
-	// msg = "USER Celiastral:Celia And\r\n";
-	// usleep(100);
-	// send(socket_fd, msg.c_str(), msg.length(), 0);
-	// msg.clear();
-	// msg = "NICK Celiastral\r\n";
-	// std::cout << "bot send3: " << msg << std::endl;
-	// usleep(100);
-	// send(socket_fd, msg.c_str(), msg.length(), 0);
-	// if (poll(pollfds, 1, -1) == -1)
-	// 	return (1);
-	// num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
-	// if (num_bytes == -1)
-	// 	return (close(socket_fd), 1);
-	// msg = buf;
-	// if (msg != ":42Chan   :You are connected\n")
-	// 	return (-1);
-	// msg.clear();
-	// buf[num_bytes] = '\0';
-	// std::cout << "bot received 1: " << buf << std::endl;
-	// buf[0] ='\0';
-	// fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 	while (42)
 	{
-		if (poll(pollfds, 1, -1) == -1)
+		if (step != 0)
 		{
-			std::cout << "\033[0;31mError! Poll error\033[0m" << std::endl;
-			return (close(socket_fd), 1);
+			if (poll(pollfds, 1, -1) == -1)
+			{
+				std::cout << "\033[0;31mError! Poll error\033[0m" << std::endl;
+				return (close(socket_fd), 1);
+			}
+			num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
+			if (num_bytes == -1)
+			{
+				std::cout << "\033[0;31mError! Recv error\033[0m" << std::endl;
+				return (close(socket_fd), 1);
+			}
+			if (num_bytes == 0)
+			{
+				std::cout << "\033[0;31mError! The server closed\033[0m" << std::endl;
+				return (close(socket_fd), 1);
+			}
+			buf[num_bytes] = '\0';
+			msg = buf;
 		}
-		num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
-		if (num_bytes == -1)
-		{
-			std::cout << "\033[0;31mError! Recv error\033[0m" << std::endl;
-			return (close(socket_fd), 1);
-		}
-		if (num_bytes == 0)
-		{
-			std::cout << "\033[0;31mError! The server closed\033[0m" << std::endl;
-			return (close(socket_fd), 1);
-		}
-		buf[num_bytes] = '\0';
-		msg = buf;
 		switch (step)
 		{
 			case 0:
 			{
-				if (msg != ":42Chan   :You are connected\n")
-				{
-					std::cout << "\033[0;31mError! This bot is restricted to our irc only\033[0m" << std::endl;
-					return (close(socket_fd), 1);
-				}
-				msg = "PASS " + password + "\r\n";
-				std::cout << "bot send3: " << msg << std::endl;
-				send(socket_fd, msg.c_str(), msg.length(), 0);
-				msg.clear();
-				usleep(100);
-				msg = "NICK " + bot_name + "\r\n";
-				send(socket_fd, msg.c_str(), msg.length(), 0);
-				msg.clear();
-				usleep(100);
-				msg = "USER " + bot_name + ":" + bot_name + "\r\n";
-				send(socket_fd, msg.c_str(), msg.length(), 0);
-				msg.clear();
+				if (connect_to_server(socket_fd, password, bot_name) == 1)
+					return (1);
 				step++;
 				break ;
 			}
 			case 1:
 			{
 				std::cout << "bot received: " << buf;
-				if (msg == ((":42Chan 464 ") + bot_name + (" :Incorrect password\n")))
+				if (msg == ((":42chan 464 ") + bot_name + (" :Password is incorrect or was not provided\r\n")) || msg == ":42chan 461 guest PASS :Not enough prameters\r\n:42chan 464 guest :Password is incorrect or was not provided\r\n")
 				{
 					std::cout << "\033[0;31mError! Incorrect password\033[0m" << std::endl;
 					return (close(socket_fd), 1);
 				}
-				//|| msg == (":42Chan 461  :Too many parameters :\nNICK <nickname>\n"
-				if (msg == (":42Chan 433  :Nickname is already taken\n"))
+				if (is_name_incorrect(msg, bot_name))
 				{
 					std::cout << "\033[0;31mError! Incorrect name\033[0m" << std::endl;
+					return (close(socket_fd), 1);
+				}
+				if (msg != ":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n")
+				{
+					std::cout << "\033[0;31mError! This bot is restricted to our irc only!\033[0m" << std::endl;
 					return (close(socket_fd), 1);
 				}
 				step++;
@@ -226,95 +233,75 @@ int	main(int argc, char **argv)
 			}
 			case 2:
 			{
+				curl_cmd = CURL_CMD;
+				size_t	pos = 0;
+				size_t	pos2 = 0;
+				size_t	pos3 = 0;
+				if (msg.find("PRIVMSG", 0) == std::string::npos)
+					continue ;
+				sender_name = get_sender_name(msg);
+				pos = curl_cmd.find("content", 0);
+				if (pos == std::string::npos)
+					continue ;
+				pos = curl_cmd.find("content", pos + sizeof("content"));
+				if (pos == std::string::npos)
+					continue ;
+				pos += 11;
+				pos2 = curl_cmd.find("\"", pos);
+				if (pos2 == std::string::npos)
+					continue ;
+				pos3 = msg.find("\r\n", 0);
+				msg.erase(pos3, 2);
+				pos3 = msg.find_first_of("\'\"", 0);
+				while (pos3 != std::string::npos && pos2 > pos3)
+				{
+					msg.erase(pos3, 1);
+					msg.insert(pos3, " ");
+					pos3 = msg.find_first_of("\'\"", pos3 + 1);
+				}
+				curl_cmd.erase(pos, pos2 - pos);
+				curl_cmd.insert(pos, msg);
+				std::cout << "bot cmd:"<< curl_cmd << std::endl;
+				FILE *fp = popen(curl_cmd.c_str(), "r");
+				if (fp == NULL)
+					return (close(socket_fd), 1);
+				char	buff[1024];
 				
+				while (fgets(buff, 1024, fp) != NULL)
+				{
+					get = buff;
+					pos = get.find("content", 0);
+					if (pos != std::string::npos)
+						break ;
+				}
+				int status = pclose(fp);
+				if (status == -1)
+					return (close(socket_fd), 1);
+				if (pos == std::string::npos)
+					continue ;
+				pos += 11;
+				pos2 = get.find("\"", pos);
+				pos3 = pos2;
+				while (pos3 != std::string::npos)
+				{
+					pos2 = get.find("\"", pos3 + 1);
+					pos3 = get.find("\"", pos2 + 1);
+				}
+				if (pos2 == std::string::npos)
+					continue ;
+				get[pos2] = '\0';
+				get = &get[pos];
+				msg = "PRIVMSG " + sender_name + ": " + get;
+				msg.append("\r\n");
+				std::cout << msg << std::endl;
+				send(socket_fd, msg.c_str(), msg.length(), 0);
 				break ;
 			}
 		}
-		std::cout << "bot received: " << buf;
-		std::string	curl_cmd(CURL_CMD);
-		size_t	pos = 0;
-		size_t	pos2 = 0;
-		size_t	pos3 = 0;
-		if (msg.find("PRIVMSG", 0) == std::string::npos)
-			continue ;
-		pos = curl_cmd.find("content", 0);
-		if (pos == std::string::npos)
-		{
-			// close(socket_fd);
-			continue ;
-		}
-		pos = curl_cmd.find("content", pos + sizeof("content"));
-		if (pos == std::string::npos)
-		{
-			// close(socket_fd);
-			continue ;
-		}
-		pos += 11;
-		pos2 = curl_cmd.find("\"", pos);
-		if (pos2 == std::string::npos)
-		{
-			// close(socket_fd);
-			continue ;
-		}
-		// pos3 = pos2;
-		// while (pos3 != std::string::npos)
-		// {
-		// 	pos2 = curl_cmd.find("\"", pos3 + 1);
-		// 	pos3 = curl_cmd.find("\"", pos2 + 1);
-		// }
-		// curl_cmd[pos2] = '\0';
-		pos3 = msg.find("\'", 0);
-		while (pos3 != std::string::npos)
-		{
-			msg.erase(pos3, 1);
-			msg.insert(pos3, " ");
-			pos3 = msg.find("\'", pos3 + 1);
-		}
-		curl_cmd.erase(pos, pos2 - pos);
-		curl_cmd.insert(pos, msg);
-		std::cout << "bot cmd:"<< curl_cmd << std::endl;
-		FILE *fp = popen(curl_cmd.c_str(), "r");
-		if (fp == NULL)
-			return (close(socket_fd), -1);
-		char	buff[1024];
-		std::string		get;
-		while (fgets(buff, 1024, fp) != NULL)
-		{
-			get = buff;
-			pos = get.find("content", 0);
-			if (pos != std::string::npos)
-				break ;
-		}
-		pclose(fp);
-		if (pos == std::string::npos)
-		{
-			// close(socket_fd);
-			continue ;
-		}
-		// close(socket_fd);
-		pos += 11;
-		pos2 = get.find("\"", pos);
-		pos3 = pos2;
-		while (pos3 != std::string::npos)
-		{
-			pos2 = get.find("\"", pos3 + 1);
-			pos3 = get.find("\"", pos2 + 1);
-		}
-		if (pos2 == std::string::npos)
-		{
-			// close(socket_fd);
-			continue ;
-		}
-		get[pos2] = '\0';
-		get = &get[pos];
-		msg = "PRIVMSG ";
-		msg.append(get);
-		msg.append("\r\n");
-		std::cout << msg << std::endl;
-		send(socket_fd, msg.c_str(), msg.length(), 0);
 		buf[0] = '\0';
 		msg.clear();
 		get.clear();
+		sender_name.clear();
 		curl_cmd.clear();
 	}
 	close(socket_fd);
