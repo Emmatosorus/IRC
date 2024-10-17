@@ -1,6 +1,7 @@
 *.o
 ircserv
 .direnv
+.vscode
 .envrc
 ai
 bot

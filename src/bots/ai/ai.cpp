@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/16 21:39:28 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/17 15:03:00 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,15 +192,22 @@ int	main(int argc, char **argv)
 					std::cout << "\033[0;31mError! This bot is restricted to our irc only\033[0m" << std::endl;
 					return (close(socket_fd), 1);
 				}
+				msg = "PASS " + password + "\r\n";
+				std::cout << "bot send3: " << msg << std::endl;
+				send(socket_fd, msg.c_str(), msg.length(), 0);
+				msg.clear();
+				usleep(100);
+				msg = "NICK " + bot_name + "\r\n";
+				send(socket_fd, msg.c_str(), msg.length(), 0);
+				msg.clear();
+				usleep(100);
+				msg = "USER " + bot_name + ":" + bot_name + "\r\n";
+				send(socket_fd, msg.c_str(), msg.length(), 0);
+				msg.clear();
 				step++;
 				break ;
 			}
 			case 1:
-			{
-				step++;
-				break ;
-			}
-			case 2:
 			{
 				std::cout << "bot received: " << buf;
 				if (msg == ((":42Chan 464 ") + bot_name + (" :Incorrect password\n")))
@@ -208,6 +215,18 @@ int	main(int argc, char **argv)
 					std::cout << "\033[0;31mError! Incorrect password\033[0m" << std::endl;
 					return (close(socket_fd), 1);
 				}
+				//|| msg == (":42Chan 461  :Too many parameters :\nNICK <nickname>\n"
+				if (msg == (":42Chan 433  :Nickname is already taken\n"))
+				{
+					std::cout << "\033[0;31mError! Incorrect name\033[0m" << std::endl;
+					return (close(socket_fd), 1);
+				}
+				step++;
+				break ;
+			}
+			case 2:
+			{
+				
 				break ;
 			}
 		}
