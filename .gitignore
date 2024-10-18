@@ -3,6 +3,7 @@ ircserv
 .direnv
 .vscode/
 .envrc
+.obj
 .env
 ai
 bot

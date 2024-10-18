@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/17 21:13:33 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/18 14:10:00 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,10 +240,10 @@ int	main(int argc, char **argv)
 				if (msg.find("PRIVMSG", 0) == std::string::npos)
 					continue ;
 				sender_name = get_sender_name(msg);
-				pos = curl_cmd.find("content", 0);
-				if (pos == std::string::npos)
-					continue ;
-				pos = curl_cmd.find("content", pos + sizeof("content"));
+				// pos = curl_cmd.find("content", 0);
+				// if (pos == std::string::npos)
+				// 	continue ;
+				pos = curl_cmd.find("content", 600);
 				if (pos == std::string::npos)
 					continue ;
 				pos += 11;
