@@ -19,6 +19,7 @@ class Client
 		std::string nickname;
 		std::string username;
 		std::string fullname;
+		std::vector<std::string> channels;
 
 		void send_msg(const std::string& msg);
 		void send_001();

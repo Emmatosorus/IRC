@@ -31,7 +31,7 @@ class Server
     void _init_listening_socket();
     void _handle_client_message(PollfdIterator* it);
     void _handle_client_connection();
-    void _remove_client(PollfdIterator* it);
+    void _remove_client(PollfdIterator* it, Client &client);
     void _add_client(int fd);
     void _send_to_client(int fd, std::string error_code, std::string msg);
 	void _send_to_fd(int fd, const std::string& msg);
@@ -49,7 +49,7 @@ class Server
 
     /* All functions for JOIN cmd */
     void _join(PollfdIterator* it, const std::vector<std::string>& args);
-	void _join_channel(PollfdIterator* it, Channel& channel, const Client& client, bool should_add);
+	void _add_client_to_channel(PollfdIterator* it, Channel& channel, Client& client, bool should_add);
 
     /* All functions for PRIVMSG cmd */
     void _privmsg(PollfdIterator* it, const std::vector<std::string>& args);

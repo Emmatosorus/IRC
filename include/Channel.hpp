@@ -9,6 +9,7 @@ class Client;
 class Channel
 {
   public:
+    Channel();
     Channel(int creator_fd, std::string name);
     Channel(const Channel& c);
     Channel& operator=(const Channel& c);

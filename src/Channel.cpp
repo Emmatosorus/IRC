@@ -4,6 +4,26 @@
 #include <sys/socket.h>
 #include "../include/utils.hpp"
 
+Channel::Channel()
+    : creator_fd(-1),
+      created_timestamp(0),
+      name(""),
+	  topic(),
+	  topic_starter_nickname(),
+      topic_timestampt(),
+      subscribed_users_fd(1, creator_fd),
+	  channel_operators_fd(1, creator_fd),
+	  invited_users_fd(),
+	  password(""), 
+	  user_limit(-1),
+	  is_password_mode(false),
+      is_user_limit_mode(false),
+      is_invite_only_mode(false),
+	  is_const_topic_mode(false)
+{
+    return;
+}
+
 Channel::Channel(int creator_fd, std::string name)
     : creator_fd(creator_fd),
       name(name),
@@ -110,6 +130,5 @@ void Channel::remove_client(Client& client)
     std::vector<int>::iterator channel_operator_it = std::find(channel_operators_fd.begin(), channel_operators_fd.end(), client.fd);
     if (channel_operator_it != channel_operators_fd.end())
         channel_operators_fd.erase(channel_operator_it);
-
     subscribed_users_fd.erase(subscribed_user_it);
 }

@@ -9,7 +9,8 @@ Client::Client()
       password(""),
       nickname(""),
       username(""),
-      fullname("")
+      fullname(""),
+      channels()
 {
     return;
 }
@@ -22,7 +23,8 @@ Client::Client(int fd)
       password(""),
       nickname(""),
       username(""),
-      fullname("")
+      fullname(""),
+      channels()
 {
     return;
 }
@@ -35,7 +37,8 @@ Client::Client(const Client& c)
       password(""),
       nickname(c.nickname),
       username(c.username),
-      fullname(c.fullname)
+      fullname(c.fullname),
+      channels(c.channels)
 {
     return;
 }
@@ -52,6 +55,7 @@ Client& Client::operator=(const Client& c)
     nickname = c.nickname;
     username = c.username;
     fullname = c.fullname;
+	channels = c.channels;
     return *this;
 }
 
