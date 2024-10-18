@@ -13,6 +13,7 @@
 #define POLL_TIMEOUT 10000
 #define SERVER_NAME ":42Chan "
 #define MAX_CHANNEL_NAME 50
+#define MAX_CHANNELS 16
 class Server
 {
   public:
