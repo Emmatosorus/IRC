@@ -6,9 +6,9 @@ static std::string _is_channel_name_valid(const std::string& channel_name);
 
 /* https://modern.ircdocs.horse/#join-message
  * Parameters: <channel>{,<channel>} [<key>{,<key>}] */
-void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients.find(it->fd)->second;
+	Client& client = m_clients.find((*it)->fd)->second;
 	if (args.size() < 2)
 		return client.send_461("JOIN");
 
@@ -60,7 +60,7 @@ void Server::_join(PollfdIterator it, const std::vector<std::string>& args)
 	}
 }
 
-void Server::_join_channel(PollfdIterator it, Channel& channel, const Client& client, bool should_add)
+void Server::_join_channel(PollfdIterator* it, Channel& channel, const Client& client, bool should_add)
 {
 	if (should_add)
 		channel.subscribed_users_fd.push_back(client.fd);

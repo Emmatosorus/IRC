@@ -4,9 +4,9 @@
 
 /* https://modern.ircdocs.horse/#mode-message
  * Parameters: <target> [<modestring> [<mode arguments>...]] */
-void Server::_mode(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 {
-    Client& client = m_clients.find(it->fd)->second;
+    Client& client = m_clients.find((*it)->fd)->second;
 	if (args.size() < 2)
 		return client.send_461("MODE");
 
@@ -18,7 +18,7 @@ void Server::_mode(PollfdIterator it, const std::vector<std::string>& args)
 		return client.send_403(args[1]);
 	Channel& channel = target_channel->second;
 
-    std::map<int, Client>::iterator client_it = m_clients.find(it->fd);
+    std::map<int, Client>::iterator client_it = m_clients.find((*it)->fd);
     if (_check_presence(target_channel, client_it, is_operator) != 0)
     {
         client.send_442(target_channel->second);

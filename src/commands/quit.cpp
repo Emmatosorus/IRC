@@ -3,24 +3,13 @@
 
 /* https://modern.ircdocs.horse/#quit-message
  * Parameters: [<reason>] */
-void Server::_quit(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_quit(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	(void)args;
-	(void)it;
-	for (size_t i = 0; i < args.size(); i++)
-	{
-		std::cout << args[i];
-		if (i != args.size() - 1)
-			std::cout << ' ';
-	}
-	std::cout << '\n';
-	// TODO: validate and parse arguments
-	// =====
+	Client& client = m_clients[(*it)->fd];
+
+	std::string quit_message = ": " + client.nickname + " QUIT";
 	if (args.size() > 1)
-	{
-		// distribute quit message
-	}
-	// this is how to remove client
-	_remove_client(&it);
-	// no numeric replies
+		quit_message + ":" + args[1];
+
+	_remove_client(it);
 }

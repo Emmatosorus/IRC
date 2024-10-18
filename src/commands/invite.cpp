@@ -2,9 +2,9 @@
 
 /* https://modern.ircdocs.horse/#invite-message
  * Parameters: <nickname> <channel> */
-void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_invite(PollfdIterator* it, const std::vector<std::string>& args)
 {
-    Client& client = m_clients.find(it->fd)->second;
+    Client& client = m_clients.find((*it)->fd)->second;
     if (args.size() < 2)
 		return client.send_461("INVITE");
 
@@ -16,7 +16,7 @@ void Server::_invite(PollfdIterator it, const std::vector<std::string>& args)
     std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
     if (target_channel != m_channels.end())
     	return;
-    std::map<int, Client>::iterator client_it = m_clients.find(it->fd);
+    std::map<int, Client>::iterator client_it = m_clients.find((*it)->fd);
     std::map<int, Client>::iterator target_client = _find_client_by_nickname(target_name);
 
     

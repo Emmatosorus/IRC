@@ -29,7 +29,7 @@ class Server
 	typedef std::map<std::string, Channel>::iterator ChannelIterator;
     typedef std::map<int, Client>::iterator ClientIterator;
     void _init_listening_socket();
-    void _handle_client_message(PollfdIterator it);
+    void _handle_client_message(PollfdIterator* it);
     void _handle_client_connection();
     void _remove_client(PollfdIterator* it);
     void _add_client(int fd);
@@ -39,43 +39,43 @@ class Server
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 
     /* All functions for USER cmd */
-    void _user(PollfdIterator it, const std::vector<std::string>& args);
+    void _user(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for PASS cmd */
-    void _pass(PollfdIterator it, const std::vector<std::string>& args);
+    void _pass(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for NICK cmd */
-    void _nick(PollfdIterator it, const std::vector<std::string>& args);
+    void _nick(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for JOIN cmd */
-    void _join(PollfdIterator it, const std::vector<std::string>& args);
-	void _join_channel(PollfdIterator it, Channel& channel, const Client& client, bool should_add);
+    void _join(PollfdIterator* it, const std::vector<std::string>& args);
+	void _join_channel(PollfdIterator* it, Channel& channel, const Client& client, bool should_add);
 
     /* All functions for PRIVMSG cmd */
-    void _privmsg(PollfdIterator it, const std::vector<std::string>& args);
+    void _privmsg(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for LIST cmd */
-    void _list(PollfdIterator it, const std::vector<std::string>& args);
+    void _list(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for NAME cmd */
-    void _names(PollfdIterator it, const std::vector<std::string>& args);
+    void _names(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for NOTICE cmd */
-    void _notice(PollfdIterator it, const std::vector<std::string>& args);
+    void _notice(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for QUIT cmd */
-    void _quit(PollfdIterator it, const std::vector<std::string>& args);
+    void _quit(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for INVITE cmd */
-    void _invite(PollfdIterator it, const std::vector<std::string>& args);
+    void _invite(PollfdIterator* it, const std::vector<std::string>& args);
     int _check_invite_args(const std::vector<std::string>& args, Client& client);
     int _check_presence(std::map<std::string, Channel>::iterator target_channel,  std::map<int, Client>::iterator client, bool & is_operator);
 
     /* All functions for TOPIC cmd */
-    void _topic(PollfdIterator it, const std::vector<std::string>& args);
+    void _topic(PollfdIterator* it, const std::vector<std::string>& args);
 
 	/* All functions for MODE cmd */
-	void _mode(PollfdIterator it, const std::vector<std::string>& args);
+	void _mode(PollfdIterator* it, const std::vector<std::string>& args);
     void _mode_i(bool  is_add_mode, Channel & channel);
     void _mode_t(bool  is_add_mode, Channel & channel);
     void _mode_k(bool  is_add_mode, const std::string & args, Channel & channel);
@@ -83,7 +83,7 @@ class Server
     void _mode_l(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
  
     /* All functions for KICK cmd */ 
-    void _kick(PollfdIterator it, const std::vector<std::string>& args);
+    void _kick(PollfdIterator* it, const std::vector<std::string>& args);
     
 
     const std::string m_password;
@@ -91,7 +91,7 @@ class Server
     std::vector<struct pollfd> m_pfds;
     std::map<int, Client> m_clients;
     std::map<std::string, Channel> m_channels;
-    std::map<std::string, void (Server::*)(PollfdIterator, const std::vector<std::string>&)>
+    std::map<std::string, void (Server::*)(PollfdIterator*, const std::vector<std::string>&)>
         m_commands;
     int m_sockfd;
 };

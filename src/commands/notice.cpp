@@ -3,9 +3,9 @@
 
 /* https://modern.ircdocs.horse/#notice-message
  * Parameters: <target>{,<target>} <text to be sent> */
-void Server::_notice(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_notice(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients[it->fd];
+	Client& client = m_clients[(*it)->fd];
 
 	if (args.size() > 3)
 		return client.send_407("Too many targets");

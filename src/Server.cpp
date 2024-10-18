@@ -64,7 +64,7 @@ void Server::start()
             if ((it->revents & POLLIN) && it->fd == m_sockfd)
                 _handle_client_connection();
             else if ((it->revents & POLLIN) && it->fd != m_sockfd)
-                _handle_client_message(it);
+                _handle_client_message(&it);
         }
     }
 }
@@ -85,10 +85,10 @@ void Server::_handle_client_connection()
     std::cout << "Connection accepted: " << new_fd << "\n";
 }
 
-void Server::_handle_client_message(PollfdIterator it)
+void Server::_handle_client_message(PollfdIterator* it)
 {
     char buf[MESSAGE_SIZE + 1];
-    int bytes_received = recv(it->fd, buf, MESSAGE_SIZE, 0);
+    int bytes_received = recv((*it)->fd, buf, MESSAGE_SIZE, 0);
     if (bytes_received < 0 && s_should_run)
     {
         std::cerr << "Error: recv failed\n";
@@ -97,12 +97,12 @@ void Server::_handle_client_message(PollfdIterator it)
     // the client is disconnected
     else if (bytes_received == 0)
     {
-        std::cout << "Connection closed: " << it->fd << "\n";
-        _remove_client(&it);
+        std::cout << "Connection closed: " << (*it)->fd << "\n";
+        _remove_client(it);
         return;
     }
     buf[bytes_received] = '\0';
-    Client& client = m_clients[it->fd];
+    Client& client = m_clients[(*it)->fd];
     client.buf += buf;
     if (client.buf.length() > MESSAGE_SIZE)
     {
@@ -120,12 +120,12 @@ void Server::_handle_client_message(PollfdIterator it)
 
         std::vector<std::string> parsed_command = parse_client_msg(raw_message);
         const std::string& command = parsed_command[0];
-		if (!client.entered_password && command != "pass")
+		if (!client.entered_password && command != "pass" && command != "quit")
 		{
 			client.send_464();
 		}
 		else if (client.entered_password &&
-				(!client.is_registered && !(command == "nick" || command == "user")))
+				(!client.is_registered && !(command == "nick" || command == "user" || command != "quit")))
 		{
 			client.send_451();
 		}
@@ -188,11 +188,10 @@ void Server::_init_listening_socket()
 
 void Server::_remove_client(PollfdIterator* it)
 {
-    PollfdIterator old_it = *it;
-    close(old_it->fd);
-    m_clients.erase(old_it->fd);
-    *it = m_pfds.erase(old_it);
-    std::advance(*it, -1);
+    close((*it)->fd);
+    m_clients.erase((*it)->fd);
+    *it = m_pfds.erase(*it);
+	std::advance(*it, -1);
 }
 
 void Server::_add_client(int fd)

@@ -3,9 +3,9 @@
 
 /* https://modern.ircdocs.horse/#names-message
  * Parameters: <channel>{,<channel>} */
-void Server::_names(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_names(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients.find(it->fd)->second;
+	Client& client = m_clients.find((*it)->fd)->second;
 
 	if (args.size() < 2) 
 		return client.send_461("NAMES");

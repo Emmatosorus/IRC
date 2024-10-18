@@ -5,9 +5,9 @@ static std::string _topic_message(const Client& client, const Channel& channel);
 
 /* https://modern.ircdocs.horse/#topic-message
  * Parameters: <channel> [<topic>] */
-void Server::_topic(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_topic(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients.find(it->fd)->second;
+	Client& client = m_clients.find((*it)->fd)->second;
 	if (args.size() < 2)
 		return client.send_461("TOPIC");
 

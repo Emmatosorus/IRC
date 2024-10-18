@@ -2,9 +2,9 @@
 
 /* https://modern.ircdocs.horse/#user-message
  * Parameters: <username> 0 * : <realname> */
-void Server::_user(PollfdIterator it, const std::vector<std::string>& args)
+void Server::_user(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients[it->fd];
+	Client& client = m_clients[(*it)->fd];
 
 	if (client.is_registered || (!client.is_registered && client.username != ""))
 		return client.send_462();
