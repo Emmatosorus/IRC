@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/18 14:10:00 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/18 15:47:28 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ int	connect_to_server(int socket_fd, std::string password, std::string bot_name)
 	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 	{
 		std::cout << "\033[0;31mError! Send error\033[0m" << std::endl;
-		return (close(socket_fd), 1);
+		return (1);
 	}
 	msg.clear();
 	usleep(10);
@@ -122,7 +122,7 @@ int	connect_to_server(int socket_fd, std::string password, std::string bot_name)
 	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 	{
 		std::cout << "\033[0;31mError! Send error\033[0m" << std::endl;
-		return (close(socket_fd), 1);
+		return (1);
 	}
 	msg.clear();
 	usleep(10);
@@ -130,7 +130,7 @@ int	connect_to_server(int socket_fd, std::string password, std::string bot_name)
 	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 	{
 		std::cout << "\033[0;31mError! Send error\033[0m" << std::endl;
-		return (close(socket_fd), 1);
+		return (1);
 	}
 	return (0);
 }
@@ -147,6 +147,32 @@ std::string	get_sender_name(std::string msg)
 	tmp = &tmp[1];
 	sender_name = tmp;
 	return (sender_name);
+}
+
+bool	is_password_incorrect(std::string msg)
+{
+	return (msg == ((":42chan 464 ") + bot_name + (" :Password is incorrect or was not provided\r\n")) 
+	|| msg == ":42chan 461 guest PASS :Not enough prameters\r\n:42chan 464 guest :Password is incorrect or was not provided\r\n");
+}
+
+int	parse_connection_errors(std::string msg, std::string bot_name)
+{
+	if (is_password_incorrect(msg))
+	{
+		std::cout << "\033[0;31mError! Incorrect password\033[0m" << std::endl;
+		return (1);
+	}
+	if (is_name_incorrect(msg, bot_name))
+	{
+		std::cout << "\033[0;31mError! Incorrect name\033[0m" << std::endl;
+		return (1);
+	}
+	if (msg != ":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n")
+	{
+		std::cout << "\033[0;31mError! This bot is restricted to our irc only!\033[0m" << std::endl;
+		return (1);
+	}
+	return (0);
 }
 
 int	main(int argc, char **argv)
@@ -206,28 +232,14 @@ int	main(int argc, char **argv)
 			case 0:
 			{
 				if (connect_to_server(socket_fd, password, bot_name) == 1)
-					return (1);
+					return (close(socket_fd), 1);
 				step++;
 				break ;
 			}
 			case 1:
 			{
-				std::cout << "bot received: " << buf;
-				if (msg == ((":42chan 464 ") + bot_name + (" :Password is incorrect or was not provided\r\n")) || msg == ":42chan 461 guest PASS :Not enough prameters\r\n:42chan 464 guest :Password is incorrect or was not provided\r\n")
-				{
-					std::cout << "\033[0;31mError! Incorrect password\033[0m" << std::endl;
+				if (parse_connection_errors(msg, bot_name) == 1)
 					return (close(socket_fd), 1);
-				}
-				if (is_name_incorrect(msg, bot_name))
-				{
-					std::cout << "\033[0;31mError! Incorrect name\033[0m" << std::endl;
-					return (close(socket_fd), 1);
-				}
-				if (msg != ":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n")
-				{
-					std::cout << "\033[0;31mError! This bot is restricted to our irc only!\033[0m" << std::endl;
-					return (close(socket_fd), 1);
-				}
 				step++;
 				break ;
 			}
@@ -240,16 +252,16 @@ int	main(int argc, char **argv)
 				if (msg.find("PRIVMSG", 0) == std::string::npos)
 					continue ;
 				sender_name = get_sender_name(msg);
-				// pos = curl_cmd.find("content", 0);
-				// if (pos == std::string::npos)
-				// 	continue ;
-				pos = curl_cmd.find("content", 600);
+				pos = curl_cmd.find("content", 0);
 				if (pos == std::string::npos)
-					continue ;
+					return (close(socket_fd), 1);
+				pos = curl_cmd.find("content", pos + sizeof("content"));
+				if (pos == std::string::npos)
+					return (close(socket_fd), 1);
 				pos += 11;
 				pos2 = curl_cmd.find("\"", pos);
 				if (pos2 == std::string::npos)
-					continue ;
+					return (close(socket_fd), 1);
 				pos3 = msg.find("\r\n", 0);
 				msg.erase(pos3, 2);
 				pos3 = msg.find_first_of("\'\"", 0);
@@ -264,21 +276,37 @@ int	main(int argc, char **argv)
 				std::cout << "bot cmd:"<< curl_cmd << std::endl;
 				FILE *fp = popen(curl_cmd.c_str(), "r");
 				if (fp == NULL)
-					return (close(socket_fd), 1);
+					return (close(socket_fd), 1);;
 				char	buff[1024];
-				
+				int status = 0;
 				while (fgets(buff, 1024, fp) != NULL)
 				{
+					status++;
 					get = buff;
 					pos = get.find("content", 0);
+					if (get.find("You didn't provide an API key.", 0) != std::string::npos || get.find("Incorrect API key provided", 0) != std::string::npos)
+					{
+						std::cout << "\033[0;31mError! API key error!\033[0m" << std::endl;
+						return (pclose(fp), close(socket_fd), 1);
+					}
+					if (get.find("We could not parse the JSON body of your request.", 0) != std::string::npos)
+					{
+						std::cout << "\033[0;31mError! Curl cmd has an error!\033[0m" << std::endl;
+						return (pclose(fp), close(socket_fd), 1);
+					}
 					if (pos != std::string::npos)
 						break ;
 				}
-				int status = pclose(fp);
+				if (status == 0)
+				{
+					std::cout << "\033[0;31mError! You did a redirection again you silly goose!\033[0m" << std::endl;
+					return (pclose(fp), close(socket_fd), 1);
+				}
+				status = pclose(fp);
 				if (status == -1)
 					return (close(socket_fd), 1);
 				if (pos == std::string::npos)
-					continue ;
+					return (close(socket_fd), 1);
 				pos += 11;
 				pos2 = get.find("\"", pos);
 				pos3 = pos2;
@@ -288,7 +316,7 @@ int	main(int argc, char **argv)
 					pos3 = get.find("\"", pos2 + 1);
 				}
 				if (pos2 == std::string::npos)
-					continue ;
+					return (close(socket_fd), 1);
 				get[pos2] = '\0';
 				get = &get[pos];
 				msg = "PRIVMSG " + sender_name + ": " + get;
