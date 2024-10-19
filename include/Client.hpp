@@ -21,6 +21,7 @@ class Client
 		std::string fullname;
 		std::vector<std::string> channels;
 
+		void quit_channel(const std::string channel_name);
 		void send_msg(const std::string& msg);
 		void send_001();
 	    void send_324(const Channel& channel);

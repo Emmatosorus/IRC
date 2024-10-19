@@ -249,6 +249,24 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
     return it;
 }
 
+void Server::_remove_client_from_channel(Channel& channel, Client& client)
+{
+	channel.remove_client(client);
+	client.quit_channel(channel.name);
+	if (channel.subscribed_users_fd.size() == 0)
+	{
+		m_channels.erase(channel.name);
+	}
+}
+
+void Server::_remove_client_from_all_channels(Client& client)
+{
+	for (size_t i = 0; i < client.channels.size(); i++)
+	{
+		_remove_client_from_channel(m_channels[client.channels[i]], client);
+	}
+}
+
 void Server::_handle_signal(int signum)
 {
     if (signum == SIGINT)

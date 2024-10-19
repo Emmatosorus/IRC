@@ -33,6 +33,8 @@ class Server
     void _handle_client_message(PollfdIterator* it);
     void _handle_client_connection();
     void _remove_client(PollfdIterator* it, Client &client);
+	void _remove_client_from_all_channels(Client &client);
+	void _remove_client_from_channel(Channel& channel, Client& client);
     void _add_client(int fd);
     void _send_to_client(int fd, std::string error_code, std::string msg);
 	void _send_to_fd(int fd, const std::string& msg);
@@ -68,9 +70,8 @@ class Server
     void _quit(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for INVITE cmd */
+    void extracted();
     void _invite(PollfdIterator* it, const std::vector<std::string>& args);
-    int _check_invite_args(const std::vector<std::string>& args, Client& client);
-    int _check_presence(std::map<std::string, Channel>::iterator target_channel,  std::map<int, Client>::iterator client, bool & is_operator);
 
     /* All functions for TOPIC cmd */
     void _topic(PollfdIterator* it, const std::vector<std::string>& args);
@@ -86,7 +87,6 @@ class Server
     /* All functions for KICK cmd */ 
     void _kick(PollfdIterator* it, const std::vector<std::string>& args);
     
-
     const std::string m_password;
     const std::string m_port;
     std::vector<struct pollfd> m_pfds;
