@@ -27,18 +27,18 @@ class Server
     static void _handle_signal(int signum);
 
     typedef std::vector<struct pollfd>::iterator PollfdIterator;
-	typedef std::map<std::string, Channel>::iterator ChannelIterator;
+    typedef std::map<std::string, Channel>::iterator ChannelIterator;
     typedef std::map<int, Client>::iterator ClientIterator;
     void _init_listening_socket();
     void _handle_client_message(PollfdIterator* it);
     void _handle_client_connection();
-    void _remove_client(PollfdIterator* it, Client &client);
-	void _remove_client_from_all_channels(Client &client);
-	void _remove_client_from_channel(Channel& channel, Client& client);
+    void _remove_client(PollfdIterator* it, Client& client);
+    void _remove_client_from_all_channels(Client& client);
+    void _remove_client_from_channel(Channel& channel, Client& client);
     void _add_client(int fd);
     void _send_to_client(int fd, std::string error_code, std::string msg);
-	void _send_to_fd(int fd, const std::string& msg);
-	void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
+    void _send_to_fd(int fd, const std::string& msg);
+    void _send_to_channel_subscribers(const Channel& channel, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 
     /* All functions for USER cmd */
@@ -52,7 +52,8 @@ class Server
 
     /* All functions for JOIN cmd */
     void _join(PollfdIterator* it, const std::vector<std::string>& args);
-	void _add_client_to_channel(PollfdIterator* it, Channel& channel, Client& client, bool should_add);
+    void _add_client_to_channel(PollfdIterator* it, Channel& channel, Client& client,
+                                bool should_add);
 
     /* All functions for PRIVMSG cmd */
     void _privmsg(PollfdIterator* it, const std::vector<std::string>& args);
@@ -76,17 +77,17 @@ class Server
     /* All functions for TOPIC cmd */
     void _topic(PollfdIterator* it, const std::vector<std::string>& args);
 
-	/* All functions for MODE cmd */
-	void _mode(PollfdIterator* it, const std::vector<std::string>& args);
-    void _mode_i(bool  is_add_mode, Channel & channel);
-    void _mode_t(bool  is_add_mode, Channel & channel);
-    void _mode_k(bool  is_add_mode, const std::string & args, Channel & channel);
-    void _mode_o(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
-    void _mode_l(bool  is_add_mode, const std::string & args, Channel & channel, Client & client);
- 
-    /* All functions for KICK cmd */ 
+    /* All functions for MODE cmd */
+    void _mode(PollfdIterator* it, const std::vector<std::string>& args);
+    void _mode_i(bool is_add_mode, Channel& channel);
+    void _mode_t(bool is_add_mode, Channel& channel);
+    void _mode_k(bool is_add_mode, const std::string& args, Channel& channel);
+    void _mode_o(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
+    void _mode_l(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
+
+    /* All functions for KICK cmd */
     void _kick(PollfdIterator* it, const std::vector<std::string>& args);
-    
+
     const std::string m_password;
     const std::string m_port;
     std::vector<struct pollfd> m_pfds;

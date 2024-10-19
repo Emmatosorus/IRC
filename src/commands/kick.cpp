@@ -6,22 +6,21 @@
  * Parameters: <channel> <user> *( "," <user> ) [<comment>] */
 void Server::_kick(PollfdIterator* it, const std::vector<std::string>& args)
 {
-	Client& client = m_clients[(*it)->fd];
- 
-	if (args.size() < 3)
-		return client.send_461("KICK");
+    Client& client = m_clients[(*it)->fd];
+    if (args.size() < 3)
+        return client.send_461("KICK");
 
     const std::string& channel_name = args[1];
 
-	ChannelIterator target_channel = m_channels.find(channel_name);
-	if (target_channel == m_channels.end())
-		return client.send_403(args[1]);
-	Channel& channel = target_channel->second;
+    ChannelIterator target_channel = m_channels.find(channel_name);
+    if (target_channel == m_channels.end())
+        return client.send_403(args[1]);
+    Channel& channel = target_channel->second;
 
-	if (!channel.is_subscribed(client.fd))
-		return client.send_442(target_channel->second);
+    if (!channel.is_subscribed(client.fd))
+        return client.send_442(target_channel->second);
 
-	if (!channel.is_operator(client.fd))
+    if (!channel.is_operator(client.fd))
         return client.send_482(target_channel->second);
 
     std::vector<std::string> targets = parse_comma_arg(args[2]);
@@ -30,12 +29,12 @@ void Server::_kick(PollfdIterator* it, const std::vector<std::string>& args)
         message = args[3];
     for (size_t i = 0; i < targets.size(); i++)
     {
-        ClientIterator target_it = _find_client_by_nickname(targets[i]); 
+        ClientIterator target_it = _find_client_by_nickname(targets[i]);
         if (target_it == m_clients.end())
-		{
-			client.send_401(targets[i]);
+        {
+            client.send_401(targets[i]);
             continue;
-		}
+        }
 
         Client& target = target_it->second;
         if (!channel.is_subscribed(target.fd))
@@ -44,6 +43,6 @@ void Server::_kick(PollfdIterator* it, const std::vector<std::string>& args)
             continue;
         }
         channel.send_msg(client.nickname + " KICK " + channel.name + " " + target.nickname);
-		_remove_client_from_channel(channel, target);
+        _remove_client_from_channel(channel, target);
     }
 }

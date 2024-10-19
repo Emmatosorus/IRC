@@ -58,8 +58,8 @@ void Server::start()
 
         for (PollfdIterator it = m_pfds.begin(); it != m_pfds.end(); it++)
         {
-			if (!s_should_run && it.base() == NULL)
-				break;
+            if (!s_should_run && it.base() == NULL)
+                break;
             if ((it->revents & POLLIN) && it->fd == m_sockfd)
                 _handle_client_connection();
             else if ((it->revents & POLLIN) && it->fd != m_sockfd)
@@ -105,7 +105,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     client.buf += buf;
     if (client.buf.length() > MESSAGE_SIZE)
     {
-		client.send_417();
+        client.send_417();
         return;
     }
 
@@ -114,31 +114,31 @@ void Server::_handle_client_message(PollfdIterator* it)
     while (end_of_msg != std::string::npos)
     {
         raw_message = client.buf.substr(0, end_of_msg);
-		std::cout << raw_message << "\n";
+        std::cout << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
 
         std::vector<std::string> args = parse_client_msg(raw_message);
         const std::string& command = args[0];
-		if (command == "quit")
-		{
-			return _quit(it, args);
-		}
-		else if (!client.entered_password && command != "pass")
-		{
-			client.send_464();
-		}
-		else if (client.entered_password &&
-				(!client.is_registered && !(command == "nick" || command == "user")))
-		{
-			client.send_451();
-		}
-		else if (m_commands.find(command) != m_commands.end())
-		{
-			(this->*m_commands[command])(it, args);
-		}
-		else
+        if (command == "quit")
         {
-			client.send_421(command);
+            return _quit(it, args);
+        }
+        else if (!client.entered_password && command != "pass")
+        {
+            client.send_464();
+        }
+        else if (client.entered_password &&
+                 (!client.is_registered && !(command == "nick" || command == "user")))
+        {
+            client.send_451();
+        }
+        else if (m_commands.find(command) != m_commands.end())
+        {
+            (this->*m_commands[command])(it, args);
+        }
+        else
+        {
+            client.send_421(command);
         }
         end_of_msg = client.buf.find("\r\n");
     }
@@ -191,15 +191,15 @@ void Server::_init_listening_socket()
 
 void Server::_remove_client(PollfdIterator* it, Client& client)
 {
-	for (size_t i = 0; i < client.channels.size(); i++)
-	{
-		Channel& target_channel = m_channels[client.channels[i]];
-		target_channel.remove_client(client);
-	}
-	close((*it)->fd);
+    for (size_t i = 0; i < client.channels.size(); i++)
+    {
+        Channel& target_channel = m_channels[client.channels[i]];
+        target_channel.remove_client(client);
+    }
+    close((*it)->fd);
     m_clients.erase((*it)->fd);
     *it = m_pfds.erase(*it);
-	std::advance(*it, -1);
+    std::advance(*it, -1);
 }
 
 void Server::_add_client(int fd)
@@ -224,18 +224,18 @@ void Server::_send_to_client(int fd, std::string error_code, std::string msg)
 
 void Server::_send_to_fd(int fd, const std::string& msg)
 {
-	std::string total = msg + "\r\n";
+    std::string total = msg + "\r\n";
     send(fd, total.c_str(), total.size(), MSG_CONFIRM);
 }
 
 void Server::_send_to_channel_subscribers(const Channel& channel, const std::string& msg)
 {
-	std::string total = msg + "\r\n";
-	for (std::vector<int>::const_iterator it = channel.subscribed_users_fd.begin();
-		it != channel.subscribed_users_fd.end(); it++)
-	{
-		send(*it, total.c_str(), total.size(), MSG_CONFIRM);
-	}
+    std::string total = msg + "\r\n";
+    for (std::vector<int>::const_iterator it = channel.subscribed_users_fd.begin();
+         it != channel.subscribed_users_fd.end(); it++)
+    {
+        send(*it, total.c_str(), total.size(), MSG_CONFIRM);
+    }
 }
 
 Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
@@ -251,20 +251,20 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
 
 void Server::_remove_client_from_channel(Channel& channel, Client& client)
 {
-	channel.remove_client(client);
-	client.quit_channel(channel.name);
-	if (channel.subscribed_users_fd.size() == 0)
-	{
-		m_channels.erase(channel.name);
-	}
+    channel.remove_client(client);
+    client.quit_channel(channel.name);
+    if (channel.subscribed_users_fd.size() == 0)
+    {
+        m_channels.erase(channel.name);
+    }
 }
 
 void Server::_remove_client_from_all_channels(Client& client)
 {
-	for (size_t i = 0; i < client.channels.size(); i++)
-	{
-		_remove_client_from_channel(m_channels[client.channels[i]], client);
-	}
+    for (size_t i = 0; i < client.channels.size(); i++)
+    {
+        _remove_client_from_channel(m_channels[client.channels[i]], client);
+    }
 }
 
 void Server::_handle_signal(int signum)

@@ -46,8 +46,8 @@ Client::Client(const Client& c)
 
 Client& Client::operator=(const Client& c)
 {
-	if (this == &c)
-		return *this;
+    if (this == &c)
+        return *this;
     fd = c.fd;
     entered_password = c.entered_password;
     is_registered = c.is_registered;
@@ -56,7 +56,7 @@ Client& Client::operator=(const Client& c)
     nickname = c.nickname;
     username = c.username;
     fullname = c.fullname;
-	channels = c.channels;
+    channels = c.channels;
     return *this;
 }
 
@@ -64,21 +64,22 @@ Client::~Client() { return; }
 
 void Client::send_msg(const std::string& msg)
 {
-	std::string total = msg + "\r\n";
-	send(fd, total.c_str(), total.size(), MSG_CONFIRM);
+    std::string total = msg + "\r\n";
+    send(fd, total.c_str(), total.size(), MSG_CONFIRM);
 }
 
 void Client::quit_channel(const std::string channel_name)
 {
-	std::vector<std::string>::iterator it = std::find(channels.begin(), channels.end(), channel_name);
-	channels.erase(it);
+    std::vector<std::string>::iterator it =
+        std::find(channels.begin(), channels.end(), channel_name);
+    channels.erase(it);
 }
 
 std::string Client::_resolve_nickname()
 {
-	if (nickname == "" && username == "")
-		return "guest";
-	else if (nickname == "")
-		return username;
-	return nickname;
+    if (nickname == "" && username == "")
+        return "guest";
+    else if (nickname == "")
+        return username;
+    return nickname;
 }
