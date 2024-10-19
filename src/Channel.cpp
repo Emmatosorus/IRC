@@ -136,3 +136,17 @@ void Channel::remove_client(Client& client)
         channel_operators_fd.erase(channel_operator_it);
     subscribed_users_fd.erase(subscribed_user_it);
 }
+
+std::string Channel::get_modestring()
+{
+	std::string modestring = "+";
+	if (is_invite_only_mode)
+		modestring += "i";
+	if (is_password_mode)
+		modestring += "k";
+	if (is_user_limit_mode)
+		modestring += "l";
+	if (is_const_topic_mode)
+		modestring += "t";
+	return modestring;
+}

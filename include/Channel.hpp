@@ -37,6 +37,7 @@ class Channel
     void send_msg(const std::string& msg);
     void send_msg_except(int fd, const std::string& msg);
     void remove_client(Client& client);
+	std::string get_modestring();
 };
 
 #endif
