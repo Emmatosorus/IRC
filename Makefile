@@ -13,7 +13,7 @@ SRC_DIR = src/
 SRC_AI_DIR = $(SRC_DIR)bots/ai/
 SRC_BOT_DIR = $(SRC_DIR)bots/guardian/
 
-HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp include/bot.hpp
+HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp include/bot.hpp include/ai.hpp
 
 SRCS_BOT = guardian_bot.cpp
 SRCS_AI = ai.cpp
