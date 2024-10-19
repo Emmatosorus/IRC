@@ -15,5 +15,6 @@ void Server::_quit(PollfdIterator* it, const std::vector<std::string>& args)
 		Channel& target_channel = m_channels[client.channels[i]];
 		target_channel.send_msg(quit_msg);
 	}
+	_remove_client_from_all_channels(client);
 	_remove_client(it, client);
 }

@@ -1,4 +1,5 @@
 #include "../include/Client.hpp"
+#include <algorithm>
 #include <sys/socket.h>
 
 Client::Client()
@@ -65,6 +66,12 @@ void Client::send_msg(const std::string& msg)
 {
 	std::string total = msg + "\r\n";
 	send(fd, total.c_str(), total.size(), MSG_CONFIRM);
+}
+
+void Client::quit_channel(const std::string channel_name)
+{
+	std::vector<std::string>::iterator it = std::find(channels.begin(), channels.end(), channel_name);
+	channels.erase(it);
 }
 
 std::string Client::_resolve_nickname()

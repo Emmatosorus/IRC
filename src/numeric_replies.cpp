@@ -11,7 +11,7 @@ void Client::send_001()
 
 void Client::send_324(const Channel& channel)
 {
-    std::string reply = "42Chan 324 " + _resolve_nickname() + " " + channel.name;
+    std::string reply = ":42Chan 324 " + _resolve_nickname() + " " + channel.name;
     channel.is_invite_only_mode ? reply += " +i" : reply += " -i";
     channel.is_const_topic_mode ? reply += " +t" : reply += " -t";
     channel.is_password_mode ? reply += " +k " + channel.password : reply += " -k";
@@ -21,7 +21,7 @@ void Client::send_324(const Channel& channel)
 
 void Client::send_329(const Channel& channel)
 {
-     std::string reply = "42Chan 329 " + _resolve_nickname() + " " + channel.name + " " + channel.created_timestamp;
+     std::string reply = ":42Chan 329 " + _resolve_nickname() + " " + channel.name + " " + channel.created_timestamp;
     send_msg(reply);
 }
 
@@ -207,6 +207,8 @@ void Client::send_482(const Channel& channel)
 
 void Client::send_696(std::string target_name, char modechar, std::string parameter, std::string description)
 {
-    std::string reply = ":42chan 696 " + _resolve_nickname() + " " + target_name + " " + modechar + " " + parameter + " :" + description;
+	if (parameter != "")
+		parameter = " " + parameter;
+    std::string reply = ":42chan 696 " + _resolve_nickname() + " " + target_name + " " + modechar + parameter + " :" + description;
     send_msg(reply);
 }
