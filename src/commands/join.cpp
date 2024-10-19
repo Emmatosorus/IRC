@@ -82,6 +82,10 @@ void Server::_add_client_to_channel(PollfdIterator* it, Channel& channel, Client
 	names_args.push_back("NAMES");
 	names_args.push_back(channel.name);
 	_names(it, names_args);
+	std::vector<std::string> mode_args;
+	mode_args.push_back("MODE");
+	mode_args.push_back(channel.name);
+	_mode(it, mode_args);
 	if (channel.is_invite_only_mode)
 	{
 		std::vector<int>::iterator it = std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
