@@ -32,7 +32,7 @@ class Server
     void _init_listening_socket();
     void _handle_client_message(PollfdIterator* it);
     void _handle_client_connection();
-    void _remove_client(PollfdIterator* it, Client& client);
+    void _quit_client(PollfdIterator* it, Client& client, const std::string& reason);
     void _remove_client_from_all_channels(Client& client);
     void _remove_client_from_channel(Channel& channel, Client& client);
     void _add_client(int fd);
