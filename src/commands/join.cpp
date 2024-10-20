@@ -73,11 +73,14 @@ void Server::_add_client_to_channel(Channel& channel, Client& client,
 		channel.subscribed_users_fd.push_back(client.fd);
 	client.channels.push_back(channel.name);
 	channel.send_msg(":" + client.nickname + " JOIN :" + channel.name);
+	if (channel.topic != "")
+	{
+		client.send_332(channel);
+		client.send_333(channel);
+	}
 	client.send_353(channel, channel.get_list_of_clients(m_clients));
 	client.send_366(channel.name);
 	client.send_329(channel);
-	if (channel.topic != "")
-		client.send_332(channel);
 	if (channel.is_invite_only_mode)
 	{
 		std::vector<int>::iterator it =
