@@ -190,19 +190,6 @@ void Server::_init_listening_socket()
     }
 }
 
-void Server::_remove_client(PollfdIterator* it, Client& client)
-{
-    for (size_t i = 0; i < client.channels.size(); i++)
-    {
-        Channel& target_channel = m_channels[client.channels[i]];
-        target_channel.remove_client(client);
-    }
-    close((*it)->fd);
-    m_clients.erase((*it)->fd);
-    *it = m_pfds.erase(*it);
-    std::advance(*it, -1);
-}
-
 void Server::_add_client(int fd)
 {
     struct pollfd new_pollfd;
@@ -248,6 +235,15 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
             return it;
     }
     return it;
+}
+
+void Server::_remove_client(PollfdIterator* it, Client& client)
+{
+	_remove_client_from_all_channels(client);
+    close((*it)->fd);
+    m_clients.erase((*it)->fd);
+    *it = m_pfds.erase(*it);
+    std::advance(*it, -1);
 }
 
 void Server::_remove_client_from_channel(Channel& channel, Client& client)
