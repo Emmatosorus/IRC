@@ -26,9 +26,12 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
         return;
     }
 
-    if (!channel.is_operator(client.fd))
-        return client.send_482(target_channel->second);
+	if (!channel.is_operator(client.fd))
+		return client.send_482(target_channel->second);
 
+	std::string added_modes;
+	std::string added_modes_args;
+	std::string removed_modes;
     size_t j = 3;
     bool is_add_mode = false;
     for (size_t i = 0; i < args[2].size(); i++)
@@ -43,62 +46,99 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
             break;
         case 'i':
 			channel.is_invite_only_mode = is_add_mode;
+			added_modes += is_add_mode ? "i" : "";
+			removed_modes += !is_add_mode ? "i" : "";
             break;
         case 't':
 			channel.is_const_topic_mode = is_add_mode;
+			added_modes += is_add_mode ? "t" : "";
+			removed_modes += !is_add_mode ? "t" : "";
             break;
 		case 'n':
 			channel.is_const_topic_mode = is_add_mode;
+			added_modes += is_add_mode ? "n" : "";
+			removed_modes += !is_add_mode ? "n" : "";
 			break;
         case 'k':
-            if (j > args.size() - 1)
+            if (is_add_mode && j > args.size() - 1)
             {
                 client.send_696(channel.name, 'k', "", "No argument given");
-                return;
+                continue;
             }
-            _mode_k(is_add_mode, args[j], channel);
+            _mode_k(added_modes, added_modes_args, removed_modes, is_add_mode, args[j], channel);
             if (is_add_mode)
                 j++;
             break;
         case 'o':
-            if (j > args.size() - 1)
+            if (is_add_mode && j > args.size() - 1)
             {
                 client.send_696(channel.name, 'o', "", "No argument given");
-                return;
+                continue;
             }
             _mode_o(is_add_mode, args[j], channel, client);
             if (is_add_mode)
                 j++;
             break;
         case 'l':
-            if (j > args.size() - 1)
+            if (is_add_mode && j > args.size() - 1)
             {
                 client.send_696(channel.name, 'l', "", "No argument given");
-                return;
+                continue;
             }
-            _mode_l(is_add_mode, args[j], channel, client);
+            _mode_l(added_modes, added_modes_args, removed_modes, is_add_mode, args[j], channel, client);
             if (is_add_mode)
                 j++;
             break;
         default:
             client.send_472(args[2][i]);
-            return;
+            continue;
         }
     }
-	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " " + channel.get_modestring());
+	std::string mode_string_to_send;
+	if (removed_modes != "")
+		mode_string_to_send += "-" + removed_modes;
+	if (added_modes != "")
+		mode_string_to_send += "+" + added_modes + added_modes_args;
+	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " " + mode_string_to_send);
 }
 
 /* Set/removes channel password */
-void Server::_mode_k(bool is_add_mode, const std::string& password, Channel& channel)
+void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& password, Channel& channel)
 {
     if (!is_add_mode)
     {
         channel.is_password_mode = false;
         channel.password.clear();
+		removed_modes += 'k';
         return;
     }
+	added_modes += 'k';
+	added_modes_args += " " + password;
     channel.is_password_mode = true;
     channel.password = password;
+}
+
+/* set/removes user limit on channel */
+void Server::_mode_l(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& user_limit, Channel& channel,
+                     Client& client)
+{
+    if (is_add_mode)
+    {
+        channel.is_user_limit_mode = true;
+        size_t limit = std::atoi(user_limit.c_str());
+        if (limit > 0)
+        {
+			added_modes += 'l';
+			added_modes_args += " " + user_limit;
+            channel.user_limit = limit;
+            return;
+        }
+        client.send_696(channel.name, 'l', user_limit, "User limit must be greater than 0");
+        return;
+    }
+	removed_modes += 'l';
+    channel.is_user_limit_mode = false;
+    channel.user_limit = 0;
 }
 
 /* Give/remove operator priviliges */
@@ -123,24 +163,4 @@ void Server::_mode_o(bool is_add_mode, const std::string& nickname, Channel& cha
                                               channel.channel_operators_fd.end(), target.fd);
     channel.channel_operators_fd.erase(it);
 	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " -o " + target.nickname);
-}
-
-/* set/removes user limit on channel */
-void Server::_mode_l(bool is_add_mode, const std::string& user_limit, Channel& channel,
-                     Client& client)
-{
-    if (is_add_mode)
-    {
-        channel.is_user_limit_mode = true;
-        size_t limit = std::atoi(user_limit.c_str());
-        if (limit > 0)
-        {
-            channel.user_limit = limit;
-            return;
-        }
-        client.send_696(channel.name, 'l', user_limit, "User limit must be greater than 0");
-        return;
-    }
-    channel.is_user_limit_mode = false;
-    channel.user_limit = 0;
 }
