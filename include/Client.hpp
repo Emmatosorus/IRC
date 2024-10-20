@@ -22,7 +22,7 @@ class Client
     std::vector<std::string> channels;
 
     void quit_channel(const std::string channel_name);
-    void send_msg(const std::string& msg);
+    void send_msg(const std::string& msg) const;
     void send_001();
     void send_324(const Channel& channel);
     void send_329(const Channel& channel);

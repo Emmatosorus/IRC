@@ -1,6 +1,5 @@
 #include "../include/Channel.hpp"
 #include "../include/Client.hpp"
-#include "../include/utils.hpp"
 #include <string>
 
 void Client::send_001()
@@ -12,11 +11,8 @@ void Client::send_001()
 
 void Client::send_324(const Channel& channel)
 {
-    std::string reply = ":42Chan 324 " + _resolve_nickname() + " " + channel.name;
-    channel.is_invite_only_mode ? reply += " +i" : reply += " -i";
-    channel.is_const_topic_mode ? reply += " +t" : reply += " -t";
-    channel.is_password_mode ? reply += " +k " + channel.password : reply += " -k";
-    channel.is_user_limit_mode ? reply += " +l " + long_to_str(channel.user_limit) : reply += " -l";
+    std::string reply = ":42Chan 324 " + _resolve_nickname() + " " + channel.name + " ";
+	reply += channel.get_modestring();
     send_msg(reply);
 }
 
@@ -58,7 +54,7 @@ void Client::send_341(const Channel& channel, const std::string& client_nick)
 void Client::send_353(const Channel& channel, const std::string& list_of_clients)
 {
     std::string reply =
-        ":42chan 353 " + _resolve_nickname() + " " + channel.name + " :" + list_of_clients;
+        ":42chan 353 " + _resolve_nickname() + " = " + channel.name + " :" + list_of_clients;
     send_msg(reply);
 }
 

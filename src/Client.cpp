@@ -62,7 +62,7 @@ Client& Client::operator=(const Client& c)
 
 Client::~Client() { return; }
 
-void Client::send_msg(const std::string& msg)
+void Client::send_msg(const std::string& msg) const
 {
     std::string total = msg + "\r\n";
     send(fd, total.c_str(), total.size(), MSG_CONFIRM);

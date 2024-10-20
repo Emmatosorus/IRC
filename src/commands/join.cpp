@@ -38,7 +38,7 @@ void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
         {
             Channel new_channel(client.fd, channel_name);
             m_channels.insert(std::make_pair(channel_name, new_channel));
-            _add_client_to_channel(it, new_channel, client, false);
+            _add_client_to_channel(new_channel, client, false);
             continue;
         }
 
@@ -62,38 +62,28 @@ void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
             continue;
         }
 
-        _add_client_to_channel(it, channel, client, true);
+        _add_client_to_channel(channel, client, true);
     }
 }
 
-void Server::_add_client_to_channel(PollfdIterator* it, Channel& channel, Client& client,
+void Server::_add_client_to_channel(Channel& channel, Client& client,
                                     bool should_add)
 {
-    if (should_add)
-        channel.subscribed_users_fd.push_back(client.fd);
-    client.channels.push_back(channel.name);
-    channel.send_msg(":" + client.nickname + " JOIN :" + channel.name);
-    if (channel.topic != "")
-    {
-        std::vector<std::string> topic_args;
-        topic_args.push_back("TOPIC");
-        topic_args.push_back(channel.name);
-        _topic(it, topic_args);
-    }
-    std::vector<std::string> names_args;
-    names_args.push_back("NAMES");
-    names_args.push_back(channel.name);
-    _names(it, names_args);
-    std::vector<std::string> mode_args;
-    mode_args.push_back("MODE");
-    mode_args.push_back(channel.name);
-    _mode(it, mode_args);
-    if (channel.is_invite_only_mode)
-    {
-        std::vector<int>::iterator it =
-            std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
-        channel.invited_users_fd.erase(it);
-    }
+	if (should_add)
+		channel.subscribed_users_fd.push_back(client.fd);
+	client.channels.push_back(channel.name);
+	channel.send_msg(":" + client.nickname + " JOIN :" + channel.name);
+	client.send_353(channel, channel.get_list_of_clients(m_clients));
+	client.send_366(channel.name);
+	client.send_329(channel);
+	if (channel.topic != "")
+		client.send_332(channel);
+	if (channel.is_invite_only_mode)
+	{
+		std::vector<int>::iterator it =
+			std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
+		channel.invited_users_fd.erase(it);
+	}
 }
 
 static std::string _is_channel_name_valid(const std::string& channel_name)

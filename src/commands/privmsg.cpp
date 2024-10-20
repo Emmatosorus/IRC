@@ -21,7 +21,7 @@ void Server::_privmsg(PollfdIterator* it, const std::vector<std::string>& args)
         if (target_channel_it != m_channels.end())
         {
             Channel& target_channel = target_channel_it->second;
-            if (!target_channel.is_subscribed(client.fd))
+            if (!target_channel.is_subscribed(client.fd) && target_channel.is_no_external_messages_mode)
             {
                 client.send_441(target_channel.name);
                 continue;

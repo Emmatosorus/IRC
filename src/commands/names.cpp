@@ -10,6 +10,7 @@ void Server::_names(PollfdIterator* it, const std::vector<std::string>& args)
         return client.send_461("NAMES");
 
     std::vector<std::string> targets = parse_comma_arg(args[1]);
+	make_unique(targets);
     for (size_t i = 0; i < targets.size(); i++)
     {
         const std::string& channel_name = targets[i];
@@ -20,20 +21,8 @@ void Server::_names(PollfdIterator* it, const std::vector<std::string>& args)
             client.send_366(channel_name);
             continue;
         }
-
         Channel& channel = target_channel->second;
-        std::string list_of_clients;
-        for (std::vector<int>::iterator it = channel.subscribed_users_fd.begin();
-             it != channel.subscribed_users_fd.end(); it++)
-        {
-            const Client& client = m_clients.find(*it)->second;
-            if (channel.is_operator(client.fd))
-                list_of_clients += "@";
-            list_of_clients += client.nickname;
-            if (it + 1 != channel.subscribed_users_fd.end())
-                list_of_clients += " ";
-        }
-        client.send_353(channel, list_of_clients);
+        client.send_353(channel, channel.get_list_of_clients(m_clients));
         client.send_366(channel_name);
     }
 }

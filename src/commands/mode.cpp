@@ -42,11 +42,14 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
             is_add_mode = true;
             break;
         case 'i':
-            _mode_i(is_add_mode, channel);
+			channel.is_invite_only_mode = is_add_mode;
             break;
         case 't':
-            _mode_t(is_add_mode, channel);
+			channel.is_const_topic_mode = is_add_mode;
             break;
+		case 'n':
+			channel.is_const_topic_mode = is_add_mode;
+			break;
         case 'k':
             if (j > args.size() - 1)
             {
@@ -82,28 +85,6 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
             return;
         }
     }
-}
-
-/* toggles invite only */
-void Server::_mode_i(bool is_add_mode, Channel& channel)
-{
-    if (!is_add_mode)
-    {
-        channel.is_invite_only_mode = false;
-        return;
-    }
-    channel.is_invite_only_mode = true;
-}
-
-/* toggles operator priviliges to change topic */
-void Server::_mode_t(bool is_add_mode, Channel& channel)
-{
-    if (!is_add_mode)
-    {
-        channel.is_const_topic_mode = false;
-        return;
-    }
-    channel.is_const_topic_mode = true;
 }
 
 /* Set/removes channel password */

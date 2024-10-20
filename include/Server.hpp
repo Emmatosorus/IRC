@@ -52,7 +52,7 @@ class Server
 
     /* All functions for JOIN cmd */
     void _join(PollfdIterator* it, const std::vector<std::string>& args);
-    void _add_client_to_channel(PollfdIterator* it, Channel& channel, Client& client,
+    void _add_client_to_channel(Channel& channel, Client& client,
                                 bool should_add);
 
     /* All functions for PRIVMSG cmd */
@@ -79,8 +79,6 @@ class Server
 
     /* All functions for MODE cmd */
     void _mode(PollfdIterator* it, const std::vector<std::string>& args);
-    void _mode_i(bool is_add_mode, Channel& channel);
-    void _mode_t(bool is_add_mode, Channel& channel);
     void _mode_k(bool is_add_mode, const std::string& args, Channel& channel);
     void _mode_o(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
     void _mode_l(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
