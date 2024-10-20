@@ -1,8 +1,6 @@
 #include "../../include/Server.hpp"
 #include "../../include/utils.hpp"
 
-static std::string _topic_message(const Client& client, const Channel& channel);
-
 /* https://modern.ircdocs.horse/#topic-message
  * Parameters: <channel> [<topic>] */
 void Server::_topic(PollfdIterator* it, const std::vector<std::string>& args)
@@ -35,10 +33,5 @@ void Server::_topic(PollfdIterator* it, const std::vector<std::string>& args)
     channel.topic = args[2];
     channel.topic_timestampt = long_to_str(time(NULL));
     channel.topic_starter_nickname = client.nickname;
-    channel.send_msg(_topic_message(client, channel));
-}
-
-static std::string _topic_message(const Client& client, const Channel& channel)
-{
-    return client.nickname + " TOPIC " + channel.name + " :" + channel.topic;
+    channel.send_msg(":" + client.nickname + " TOPIC " + channel.name + " :" + channel.topic);
 }
