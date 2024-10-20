@@ -99,7 +99,8 @@ void Server::_handle_client_message(PollfdIterator* it)
     else if (bytes_received == 0)
     {
         std::cout << "Connection closed: " << (*it)->fd << "\n";
-        _remove_client(it, client);
+		std::vector<std::string> args(1, "QUIT");
+		_quit(it, args);
         return;
     }
     buf[bytes_received] = '\0';
@@ -237,8 +238,17 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
     return it;
 }
 
-void Server::_remove_client(PollfdIterator* it, Client& client)
+void Server::_quit_client(PollfdIterator* it, Client& client, const std::string& reason)
 {
+	std::string quit_msg = ":" + client.nickname + " QUIT";
+	if (reason != "")
+		quit_msg += " :" + reason;
+
+    for (size_t i = 0; i < client.channels.size(); i++)
+    {
+        Channel& target_channel = m_channels[client.channels[i]];
+        target_channel.send_msg(quit_msg);
+    }
 	_remove_client_from_all_channels(client);
     close((*it)->fd);
     m_clients.erase((*it)->fd);
