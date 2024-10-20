@@ -67,6 +67,9 @@ class Server
     /* All functions for NOTICE cmd */
     void _notice(PollfdIterator* it, const std::vector<std::string>& args);
 
+    /* All functions for PART cmd */
+	void _part(PollfdIterator* it, const std::vector<std::string>& args);
+
     /* All functions for QUIT cmd */
     void _quit(PollfdIterator* it, const std::vector<std::string>& args);
 

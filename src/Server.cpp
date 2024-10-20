@@ -30,6 +30,7 @@ Server::Server(const char* password, const char* port)
     m_commands.insert(make_pair("names", &Server::_names));
     m_commands.insert(make_pair("nick", &Server::_nick));
     m_commands.insert(make_pair("notice", &Server::_notice));
+    m_commands.insert(make_pair("part", &Server::_part));
     m_commands.insert(make_pair("pass", &Server::_pass));
     m_commands.insert(make_pair("privmsg", &Server::_privmsg));
     m_commands.insert(make_pair("user", &Server::_user));
