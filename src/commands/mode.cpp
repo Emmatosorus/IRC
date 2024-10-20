@@ -85,6 +85,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
             return;
         }
     }
+	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " " + channel.get_modestring());
 }
 
 /* Set/removes channel password */
@@ -115,11 +116,13 @@ void Server::_mode_o(bool is_add_mode, const std::string& nickname, Channel& cha
     if (is_add_mode)
     {
         channel.channel_operators_fd.push_back(target.fd);
+		channel.send_msg(":" + client.nickname + " MODE " + channel.name + " +o " + target.nickname);
         return;
     }
     std::vector<int>::iterator it = std::find(channel.channel_operators_fd.begin(),
                                               channel.channel_operators_fd.end(), target.fd);
     channel.channel_operators_fd.erase(it);
+	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " -o " + target.nickname);
 }
 
 /* set/removes user limit on channel */
