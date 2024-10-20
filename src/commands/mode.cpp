@@ -99,7 +99,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 		mode_string_to_send += "-" + removed_modes;
 	if (added_modes != "")
 		mode_string_to_send += "+" + added_modes + added_modes_args;
-	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " " + mode_string_to_send);
+	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " :" + mode_string_to_send);
 }
 
 /* Set/removes channel password */
