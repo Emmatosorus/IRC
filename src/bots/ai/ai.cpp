@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/21 13:17:50 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/21 13:40:28 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ bool	Ai::is_name_incorrect()
 int	Ai::log_into_server()
 {
 	msg = "PASS " + password + "\r\n";
-	std::cout << "bot send3: " << msg << std::endl;
 	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 		return (error_msg("\033[0;31mError! Send error\033[0m", 1));
 	msg.clear();
