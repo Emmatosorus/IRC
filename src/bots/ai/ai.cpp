@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/21 13:40:28 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/21 20:49:10 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,6 @@ int	Ai::execute_curl_cmd_and_parse_result()
 		return (error_msg("\033[0;31mError! Popen error!\033[0m", 1));;
 	while (fgets(fgets_buf, 1024, fp) != NULL)
 	{
-		status++;
 		ai_msg = fgets_buf;
 		pos = ai_msg.find("content", 0);
 		if (ai_msg.find("You didn't provide an API key.", 0) != std::string::npos || ai_msg.find("Incorrect API key provided", 0) != std::string::npos)
