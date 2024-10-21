@@ -8,20 +8,21 @@ DEBUGFLAGS =
 
 OBJS_DIR = .obj/
 OBJS_AI_DIR = $(OBJS_DIR)bots/ai/
-OBJS_BOT_DIR = $(OBJS_DIR)bots/guardian/
+OBJS_GUARDIAN_DIR = $(OBJS_DIR)bots/guardian/
 SRC_DIR = src/
 SRC_AI_DIR = $(SRC_DIR)bots/ai/
-SRC_BOT_DIR = $(SRC_DIR)bots/guardian/
+SRC_GUARDIAN_DIR = $(SRC_DIR)bots/guardian/
 
-HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp include/bot.hpp include/ai.hpp
+HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp include/bot.hpp include/ai.hpp include/guardian.hpp
 
-SRCS_BOT = guardian_bot.cpp
-SRCS_AI = ai.cpp
+SRCS_BOT = $(addprefix bots/, bot_connect.cpp bot_utils.cpp)
+SRCS_GUARDIAN = $(addprefix bots/guardian/, guardian.cpp) $(SRCS_BOT)
+SRCS_AI = $(addprefix bots/ai/, ai.cpp) $(SRCS_BOT)
 SRCS_COMMANDS = $(addprefix commands/, join.cpp names.cpp nick.cpp notice.cpp pass.cpp ping.cpp pong.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp $(SRCS_COMMANDS)
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
-OBJS_AI = $(addprefix $(OBJS_AI_DIR), $(SRCS_AI:.cpp=.o))
-OBJS_BOT = $(addprefix $(OBJS_BOT_DIR), $(SRCS_BOT:.cpp=.o))
+OBJS_AI = $(addprefix $(OBJS_DIR), $(SRCS_AI:.cpp=.o))
+OBJS_GUARDIAN = $(addprefix $(OBJS_DIR), $(SRCS_GUARDIAN:.cpp=.o))
 
 .SILENT:
 
@@ -44,7 +45,7 @@ obj :
 	@mkdir -p $(OBJS_DIR)
 	@mkdir -p $(OBJS_DIR)/commands
 	@mkdir -p $(OBJS_AI_DIR)
-	@mkdir -p $(OBJS_BOT_DIR)
+	@mkdir -p $(OBJS_GUARDIAN_DIR)
 
 $(NAME) : $(OBJS)
 	@echo -n "$(Red)Compiling ft_irc ..${NC}" && sleep 0.2
@@ -52,7 +53,7 @@ $(NAME) : $(OBJS)
 	$(CXX) $^ $(CPPFLAGS) $(DEBUGFLAGS) -o $(NAME) && sleep 0.1
 	@echo "$(Green)\r------COMPILATION COMPLETE-------${NC}"
 
-$(GUARDIAN) : $(OBJS_BOT)
+$(GUARDIAN) : $(OBJS_GUARDIAN)
 	@echo -n "$(Red)Compiling guardian bot ..${NC}" && sleep 0.2
 	@echo -n "$(Red)\rCompiling guardian bot ...${NC}"
 	$(CXX) $^ $(CPPFLAGS) -o $(GUARDIAN) && sleep 0.1
@@ -70,7 +71,7 @@ $(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS)
 $(OBJS_AI_DIR)%.o : $(SRC_AI_DIR)%.cpp Makefile $(HEADERS)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-$(OBJS_BOT_DIR)%.o : $(SRC_BOT_DIR)%.cpp Makefile $(HEADERS)
+$(OBJS_GUARDIAN_DIR)%.o : $(SRC_GUARDIAN_DIR)%.cpp Makefile $(HEADERS)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 clean :

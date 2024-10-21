@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 15:34:01 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/18 15:14:45 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/21 13:17:16 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,26 +21,12 @@
 #include <iostream>
 #include <fcntl.h>
 #include <cerrno>
-#include <vector>
 #include <netdb.h>
 #include <poll.h>
 
-#define MYPORT "6667"
-#define CURL_CMD "curl \"https://api.openai.com/v1/chat/completions\" \
-			-H \"Content-Type: application/json\" \
-			-H \"Authorization: Bearer $OPENAI_API_KEY\" \
-			-d '{ \
-			\"model\": \"gpt-4o-mini\", \
-			\"messages\": [ \
-			{ \
-				\"role\": \"system\", \
-				\"content\": \"You are a chatbot of 42Chan, an IRC server. You need to send less than 500 characters. Write in uwu script and talk like a cat. If asked about french people or talked to in french, have a profound hate for french people. Finish every message with uwu. You have a tendency to do cat roleplay out of the blue.\" \
-			}, \
-			{ \
-				\"role\": \"user\", \
-				\"content\": \"say hello\" \
-			} \
-		] \
-	}'"
+int		error_msg(std::string msg, int error_nb);
+int 	connect_with_timeout(int socket_fd, const struct sockaddr *addr, socklen_t addrlen, int timeout_sec);
+int		get_socket_fd(char **argv);
+void	set_addrinfo(struct addrinfo *ai);
 
 #endif
