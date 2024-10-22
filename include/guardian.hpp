@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 17:11:51 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/21 16:46:58 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/22 23:23:00 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,16 @@ class Guardian
 		std::string					sender_name;
 		std::string					guardian_msg;
 		const int					socket_fd;
+		std::string					command;
 		int							botjoin();
 		int							addword();
 		int							parse_msg();
 		int							log_into_server();
 		int							parse_connection_errors();
 		int							get_sender_name();
-		int							get_word(size_t pos_, std::string &word);
+		int							get_word(size_t pos_, std::string &word, std::string str, std::string to_find);
+		int							get_full_msg();
+		int							get_channel();
 		bool						is_password_incorrect();
 		bool						is_name_incorrect();
 

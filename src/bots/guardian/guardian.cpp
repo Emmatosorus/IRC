@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/21 16:58:04 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/22 23:30:43 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,24 +45,14 @@ int	Guardian::parse_connection_errors()
 int	Guardian::botjoin()
 {
 	size_t	pos = 0;
-	std::string	command;
 
-	pos = msg.find(":", 1);
-	if (pos != std::string::npos)
-	{
-		if (!msg[pos + 1])
-			return (error_msg("\033[0;31mError! Server error\033[0m", -1));
-		command = &msg[pos + 1];
-		pos = command.find("!botjoin ", 0);
-		if (pos != 0)
-			return (1);
-		channel = &command[9];
-		msg = "JOIN " + channel + "\r\n";
-		channel.erase(channel.find("\r\n", 0), 2);
-		bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
-	}
-	else
-		return (error_msg("\033[0;31mError! Server error\033[0m", -1));
+	pos = command.find("!botjoin ", 0);
+	if (pos != 0)
+		return (1);
+	channel = &command[9];
+	channel.erase(channel.find("\r\n", 0), 2);
+	msg = "JOIN " + channel + "\r\n";
+	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
 	return (0);
 }
 
@@ -101,68 +91,89 @@ int	Guardian::addword()
 {
 	std::vector<banned_words>::iterator it = bw.begin();
 	std::string							new_word;
-	std::string							command;
+	size_t								pos = command.find("!addword ", 0);
 
-	size_t pos = msg.find(":", 1);
-	if (pos != std::string::npos)
+
+	if (pos != 0)
+		return (1);
+	for (; it != bw.end(); it++)
 	{
-		if (!msg[pos + 1])
-			return (error_msg("\033[0;31mError! Server error\033[0m", -1));
-		command = &msg[pos + 1];
-		pos = command.find("!addword ", 0);
-		if (pos != 0)
-			return (0);
-		if (get_word(msg.find("#", 0), channel) == -1)
-			return (0); //TODO send error to server
-		
-		for (; it != bw.end(); it++)
-		{
-			if ((*it).channel == channel)
-				break ;
-		}
-		if (it == bw.end())
-			return (-1);
-		if (get_word((pos + 10), new_word) == -1)
-			return (-1);
-		(*it).words.push_back(new_word);
+		if ((*it).channel == channel)
+			break ;
 	}
-	else
+	if (it == bw.end())
+		return (-1);
+	if (get_word((9), new_word, command, "\r\n") == -1)
+		return (-1);
+	(*it).words.push_back(new_word);
+	return (0);
+}
+
+int	Guardian::get_word(size_t begin_pos, std::string &word_got, std::string str, std::string last_char_to_find)
+{
+	size_t		pos2;
+	std::string	tmp;
+
+	if (begin_pos == std::string::npos)
+		return (-1);
+	tmp = str;
+	pos2 = tmp.find(last_char_to_find, begin_pos);
+	if (pos2 == std::string::npos)
+		return (-1);
+	std::cout << word_got;
+	tmp.erase(pos2, tmp.length());
+	std::cout << word_got;
+	word_got = &tmp[begin_pos];
+	return (0);
+}
+
+int	Guardian::get_full_msg()
+{
+	size_t pos = msg.find(":", 1);
+	if (pos == std::string::npos)
+		return (-1);
+	command = &msg[pos + 1];
+	if (command.empty())
 		return (-1);
 	return (0);
 }
 
-int	Guardian::get_word(size_t pos_, std::string &word)
+int	Guardian::get_channel()
 {
-	size_t		pos = pos_;
-	size_t		pos2;
-	std::string	tmp;
-
+	size_t pos = msg.find("#", 0);
 	if (pos == std::string::npos)
 		return (-1);
-	tmp = msg;
-	pos2 = tmp.find(" ", pos);
-	if (pos == std::string::npos)
-		return (-1);
-	tmp.erase(pos2, tmp.length());
-	word = &tmp[pos];
-	return (0);
+	return (get_word(pos, channel, msg, " "));
 }
 
 int	Guardian::parse_msg()
 {
 	std::vector<banned_words>::iterator it = bw.begin();
 
-	if (get_word(msg.find("#", 0), channel) == -1)
-		return (-1);
+	// if (get_word(msg.find("#", 0), channel, msg, " ") == -1)
+	// 	return (-1);
 	for (; it != bw.end(); it++)
 	{
 		if ((*it).channel == channel)
 			break ;
 	}
+	if (it == bw.end())
+	{
+		//error
+		return (1);
+	}
+	if ((*it).words.empty())
+	{
+		std::cout << "hello" << std::endl; //send error to server
+		return (10);
+	}
 	for (std::vector<std::string>::iterator it2 = (*it).words.begin(); it2 != (*it).words.end(); it2++)
 	{
 		if (msg.find(*it2, 0) != std::string::npos)
-			std::cout << "WTF" << std::endl;
+		{
+			std::cout << *it2 << std::endl;
+			return (1);
+		}
 	}
 	return (0);
 }
@@ -226,25 +237,42 @@ int	Guardian::run()
 				int	status = pm_is_in_channel(msg);
 				if (status == FALSE)
 				{
-					int i = botjoin();
-					if (i == -1)
+					if (get_full_msg() == 1)
 						return (close(socket_fd), 1);
-					else if (i == 1)
-						continue ;
 					
+					status = botjoin();
+					if (status == -1)
+						return (close(socket_fd), 1);
+					else if (status == 1)
+						continue ;
+					step++;
 				}
 				else if (status == TRUE)
 				{
-					if (addword() == -1)
+					//do error managment
+					if (get_full_msg() == -1)
+						return (close(socket_fd), 1);
+					if (get_channel() == -1)
+						return (close(socket_fd), 1);
+						
+					status = addword();
+					if (status == -1)
 					{
 						std::cout << "oui" << std::endl;
 						continue ;
 					}
-					if (parse_msg() == -1)
+					else if (status == 0)
 						continue ;
+					
+					status = parse_msg();
+					if (status == -1)
+						continue ;
+					else if (status == 1)
+						msg = "PRIVMSG @%" + channel + ": BADWORD SAID!\r\n";
 				}
-				else
+				else if (status == -1)
 					continue ;
+				std::cout << "non";
 				//===get sender name===
 
 				
@@ -264,7 +292,7 @@ int	Guardian::run()
 
 				if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 					return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
-				step++;
+				
 				break ;
 			}
 			case 3:
