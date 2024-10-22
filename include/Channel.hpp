@@ -37,6 +37,7 @@ class Channel
     bool is_operator(int fd) const;
     bool is_invited(int fd) const;
     void send_msg(const std::string& msg) const;
+    void send_msg_to_operators(int fd, const std::string& msg) const;
     void send_msg_except(int fd, const std::string& msg) const;
     void remove_client(Client& client);
 	std::string get_list_of_clients(const std::map<int, Client> m_clients) const;

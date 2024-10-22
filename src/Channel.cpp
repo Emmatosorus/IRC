@@ -120,6 +120,17 @@ void Channel::send_msg(const std::string& msg) const
     }
 }
 
+void Channel::send_msg_to_operators(int fd, const std::string& msg) const
+{
+    std::string total = msg + "\r\n";
+    for (std::vector<int>::const_iterator it = channel_operators_fd.begin();
+         it != channel_operators_fd.end(); it++)
+    {
+		if (*it != fd)
+			send(*it, total.c_str(), total.size(), MSG_CONFIRM);
+    }
+}
+
 void Channel::send_msg_except(int fd, const std::string& msg) const
 {
     std::string total = msg + "\r\n";

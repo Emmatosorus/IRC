@@ -55,7 +55,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 			removed_modes += !is_add_mode ? "t" : "";
             break;
 		case 'n':
-			channel.is_const_topic_mode = is_add_mode;
+			channel.is_no_external_messages_mode = is_add_mode;
 			added_modes += is_add_mode ? "n" : "";
 			removed_modes += !is_add_mode ? "n" : "";
 			break;
@@ -99,7 +99,8 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 		mode_string_to_send += "-" + removed_modes;
 	if (added_modes != "")
 		mode_string_to_send += "+" + added_modes + added_modes_args;
-	channel.send_msg(":" + client.nickname + " MODE " + channel.name + " :" + mode_string_to_send);
+	if (mode_string_to_send != "")
+		channel.send_msg(":" + client.nickname + " MODE " + channel.name + " :" + mode_string_to_send);
 }
 
 /* Set/removes channel password */

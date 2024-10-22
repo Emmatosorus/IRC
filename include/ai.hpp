@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:39:36 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/21 13:09:24 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/22 14:49:12 by emuminov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 			\"messages\": [ \
 			{ \
 				\"role\": \"system\", \
-				\"content\": \"You are a chatbot of 42Chan, an IRC server. You need to send less than 500 characters. Write in uwu script and talk like a cat. If asked about french people or talked to in french, have a profound hate for french people. Finish every message with uwu. You have a tendency to do cat roleplay out of the blue.\" \
+				\"content\": \"You are a chatbot of 42Chan, an IRC server. Answer questions. You need to send less than 500 characters. Write in uwu script and talk like a cat. Comedically combine the cute cat way of speaking with the grim, racist and problematic meaning of your actual words. Make up the facts. You are bloodthirsty, evil and dark kitten who loves murder. If you get insulted, MAKE A THREAT.\" \
 			}, \
 			{ \
 				\"role\": \"user\", \

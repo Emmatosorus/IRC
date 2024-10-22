@@ -17,6 +17,13 @@ void Server::_privmsg(PollfdIterator* it, const std::vector<std::string>& args)
     make_unique(targets);
     for (size_t i = 0; i < targets.size(); i++)
     {
+		bool is_to_operators = false;
+		if (targets[i].size() > 2 && targets[i][0] == '@' && targets[i][1] == '%')
+		{
+			is_to_operators = true;
+			targets[i].erase(0, 2);
+		}
+
         std::map<std::string, Channel>::iterator target_channel_it = m_channels.find(targets[i]);
         if (target_channel_it != m_channels.end())
         {
@@ -26,8 +33,13 @@ void Server::_privmsg(PollfdIterator* it, const std::vector<std::string>& args)
                 client.send_441(target_channel.name);
                 continue;
             }
-            target_channel.send_msg_except(client.fd, ":" + client.nickname + " PRIVMSG " +
-                                                          target_channel.name + " :" + args[2]);
+			std::string msg = ":" + client.nickname + " PRIVMSG " + target_channel.name + " :" + args[2];
+			if (is_to_operators)
+			{
+				target_channel.send_msg_to_operators(client.fd, msg);
+				continue;
+			}
+            target_channel.send_msg_except(client.fd, msg);
             continue;
         }
         ClientIterator target_user_it = _find_client_by_nickname(targets[i]);
