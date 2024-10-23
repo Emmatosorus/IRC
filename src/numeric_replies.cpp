@@ -1,11 +1,28 @@
 #include "../include/Channel.hpp"
 #include "../include/Client.hpp"
+#include "../include/utils.hpp"
 #include <string>
 
 void Client::send_001()
 {
     std::string reply =
         ":42Chan 001 " + _resolve_nickname() + " :Welcome to the 42Chan Network " + username + "!";
+    send_msg(reply);
+}
+
+void Client::send_322(const Channel& channel)
+{
+	std::string reply =
+		":42Chan 322 " + _resolve_nickname() + " " + channel.name + " " + long_to_str(channel.subscribed_users_fd.size());
+	if (channel.topic != "")
+		reply += " :" + channel.topic;
+	send_msg(reply);
+}
+
+void Client::send_323()
+{
+    std::string reply =
+        ":42Chan 323 " + _resolve_nickname() + " :End of /LIST";
     send_msg(reply);
 }
 

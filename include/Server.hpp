@@ -36,9 +36,11 @@ class Server
     void _remove_client_from_all_channels(Client& client);
     void _remove_client_from_channel(Channel& channel, Client& client);
     void _add_client(int fd);
+	void _register_user(Client& client);
     void _send_to_client(int fd, std::string error_code, std::string msg);
     void _send_to_fd(int fd, const std::string& msg);
 	void _send_to_client_channels(Client& client, const std::string& msg);
+	void _send_channel_list(Client& client);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 
     /* All functions for USER cmd */

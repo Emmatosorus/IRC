@@ -25,7 +25,18 @@ void Server::_user(PollfdIterator* it, const std::vector<std::string>& args)
         if (client.password != m_password)
             return client.send_464();
 
-        client.is_registered = true;
-        client.send_001();
+		_register_user(client);
     }
+}
+
+void Server::_register_user(Client& client)
+{
+	client.is_registered = true;
+	client.send_001();
+	if (m_channels.size() == 0)
+		return;
+	for (ChannelIterator it = m_channels.begin(); it != m_channels.end(); it++)
+		client.send_322(it->second);
+	client.send_323();
+	return;
 }

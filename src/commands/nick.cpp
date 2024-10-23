@@ -28,10 +28,7 @@ void Server::_nick(PollfdIterator* it, const std::vector<std::string>& args)
             return client.send_464();
 
         if (!client.is_registered)
-        {
-            client.is_registered = true;
-            return client.send_001();
-        }
+			_register_user(client);
     }
 	_send_to_client_channels(client, ":" + old_nickname + " NICK " + client.nickname);
 }

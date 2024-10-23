@@ -38,6 +38,7 @@ Server::Server(const char* password, const char* port)
     m_commands.insert(make_pair("topic", &Server::_topic));
     m_commands.insert(make_pair("mode", &Server::_mode));
     m_commands.insert(make_pair("kick", &Server::_kick));
+    m_commands.insert(make_pair("list", &Server::_list));
 
     signal(SIGINT, Server::_handle_signal);
 }
