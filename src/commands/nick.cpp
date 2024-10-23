@@ -17,7 +17,7 @@ void Server::_nick(PollfdIterator* it, const std::vector<std::string>& args)
                                "Nickname contains invalid characters : #:,*?!@.\\t\\r\\n ");
 
     ClientIterator potential_nickname_holder = _find_client_by_nickname(nickname);
-    if (potential_nickname_holder != m_clients.end())
+    if (potential_nickname_holder != m_clients.end() && potential_nickname_holder->second.fd != client.fd)
         return client.send_433(nickname);
 
     client.nickname = nickname;

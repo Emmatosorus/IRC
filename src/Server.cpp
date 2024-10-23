@@ -130,7 +130,7 @@ void Server::_handle_client_message(PollfdIterator* it)
             client.send_464();
         }
         else if (client.entered_password &&
-                 (!client.is_registered && !(command == "nick" || command == "user")))
+                 (!client.is_registered && !(command == "nick" || command == "user" || command == "pass")))
         {
             client.send_451();
         }

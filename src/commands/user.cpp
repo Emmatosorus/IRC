@@ -8,9 +8,8 @@ void Server::_user(PollfdIterator* it, const std::vector<std::string>& args)
     if (args.size() < 5)
         return client.send_461("USER");
 
-    if (client.is_registered || (!client.is_registered && client.username != ""))
+    if (client.is_registered)
         return client.send_462();
-
 
     if (args[1].size() > USERLEN)
         return client.send_468("username is too long");
