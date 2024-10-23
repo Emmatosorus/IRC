@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:39:36 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/22 14:49:12 by emuminov         ###   ########.fr       */
+/*   Updated: 2024/10/23 15:52:41 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ class Ai
 		~Ai();
 		int	run();
 	private:
+		static void 		handle_signal(int signum);
+		static bool			should_run;
 		struct pollfd		pollfds[1];
 		std::string			&bot_name;
 		const std::string 	&password;
@@ -57,5 +59,7 @@ class Ai
 		bool				is_password_incorrect();
 		bool				is_name_incorrect();
 };
+
+
 
 #endif

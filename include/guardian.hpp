@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 17:11:51 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/22 23:23:00 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/23 15:51:18 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ class Guardian
 		~Guardian();
 		int	run();
 	private:
+		static void 				handle_signal(int signum);
+		static bool					should_run;
 		std::vector<banned_words>	bw;
 		struct pollfd				pollfds[1];
 		std::string					&bot_name;
@@ -43,6 +45,8 @@ class Guardian
 		std::string					command;
 		int							botjoin();
 		int							addword();
+		int							cleanword();
+		int							rmword();
 		int							parse_msg();
 		int							log_into_server();
 		int							parse_connection_errors();

@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/22 16:26:34 by emuminov         ###   ########.fr       */
+/*   Updated: 2024/10/23 15:54:38 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,20 @@
 #include <stdio.h>
 #define MAXDATASIZE 500
 
+bool Ai::should_run = true;
+
+void Ai::handle_signal(int signum)
+{
+	if (signum == SIGINT)
+		should_run = false;
+}
+
 Ai::Ai(std::string &bot_name_, const std::string &password_, const int socket_fd_) : bot_name(bot_name_), password(password_), socket_fd(socket_fd_)
 {
 	pollfds[0].fd = socket_fd;
 	pollfds[0].events = POLLIN;
+	should_run = true;
+	signal(SIGINT, handle_signal);
 }
 
 Ai::~Ai()
@@ -190,17 +200,17 @@ int	Ai::run()
 	char		buf[MAXDATASIZE];
 	static int	step;
 
-	while (42)
+	while (should_run)
 	{
 		if (step != 0)
 		{
 			//===recv msg===
 			
-			if (poll(pollfds, 1, -1) == -1)
+			if (poll(pollfds, 1, -1) == -1 && should_run)
 				return (close(socket_fd), error_msg("\033[0;31mError! Poll error\033[0m", 1));
 
 			num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
-			if (num_bytes == -1)
+			if (num_bytes == -1 && should_run)
 				return (close(socket_fd), error_msg("\033[0;31mError! Recv error\033[0m", 1));
 			if (num_bytes == 0)
 				return (close(socket_fd), error_msg("\033[0;31mError! The server closed\033[0m", 1));
@@ -282,7 +292,6 @@ int	Ai::run()
 		sender_name.clear();
 		curl_cmd.clear();
 	}
-
 	close(socket_fd);
 	return (0);
 }

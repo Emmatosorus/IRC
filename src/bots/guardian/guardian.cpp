@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/22 23:30:43 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/23 19:35:57 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,19 @@
 #include <stdio.h>
 #define MAXDATASIZE 500
 
+bool Guardian::should_run = true;
+
+void Guardian::handle_signal(int signum)
+{
+	if (signum == SIGINT)
+		should_run = false;
+}
+
 Guardian::Guardian(std::string &bot_name_, const std::string &password_, const int socket_fd_) : bot_name(bot_name_), password(password_), socket_fd(socket_fd_)
 {
 	pollfds[0].fd = socket_fd;
 	pollfds[0].events = POLLIN;
+	signal(SIGINT, handle_signal);
 }
 
 Guardian::~Guardian()
@@ -37,7 +46,7 @@ int	Guardian::parse_connection_errors()
 		return (error_msg("\033[0;31mError! Incorrect password\033[0m", 1));
 	if (is_name_incorrect())
 		return (error_msg("\033[0;31mError! Incorrect name\033[0m", 1));
-	if (msg != ":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n")
+	if (msg.find(":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n") != 0)
 		return (error_msg("\033[0;31mError! This bot is restricted to our irc only!\033[0m", 1));
 	return (0);
 }
@@ -103,7 +112,7 @@ int	Guardian::addword()
 	}
 	if (it == bw.end())
 		return (-1);
-	if (get_word((9), new_word, command, "\r\n") == -1)
+	if (get_word((9), new_word, command, " \r\n") == -1)
 		return (-1);
 	(*it).words.push_back(new_word);
 	return (0);
@@ -117,7 +126,7 @@ int	Guardian::get_word(size_t begin_pos, std::string &word_got, std::string str,
 	if (begin_pos == std::string::npos)
 		return (-1);
 	tmp = str;
-	pos2 = tmp.find(last_char_to_find, begin_pos);
+	pos2 = tmp.find_first_of(last_char_to_find, begin_pos);
 	if (pos2 == std::string::npos)
 		return (-1);
 	std::cout << word_got;
@@ -146,37 +155,96 @@ int	Guardian::get_channel()
 	return (get_word(pos, channel, msg, " "));
 }
 
+int	Guardian::rmword()
+{
+	std::vector<banned_words>::iterator it_bw = bw.begin();
+	std::vector<std::string>::iterator	it_word;
+	std::string							word_to_rm;
+	size_t								pos = command.find("!rmword ", 0);
+
+
+	if (pos != 0)
+		return (1);
+	for (; it_bw != bw.end(); it_bw++)
+	{
+		if ((*it_bw).channel == channel)
+			break ;
+	}
+	if (it_bw == bw.end())
+		return (-1);
+	if (get_word((8), word_to_rm, command, " \r\n") == -1)
+		return (-1);
+	it_word = (*it_bw).words.begin();
+	for (; it_word != (*it_bw).words.end(); it_word++)
+	{
+		if ((*it_word) == word_to_rm)
+			break ;
+	}
+	if (it_word == (*it_bw).words.end())
+		return (-1); // SEND ERROR TO SERVER
+	(*it_bw).words.erase(it_word);
+	return (0);
+}
+
+int	Guardian::cleanword()
+{
+	std::vector<banned_words>::iterator it_bw = bw.begin();
+	std::string							word_to_rm;
+	size_t								pos = command.find("!cleanword\r", 0);
+
+
+	if (pos != 0)
+		return (1);
+	for (; it_bw != bw.end(); it_bw++)
+	{
+		if ((*it_bw).channel == channel)
+			break ;
+	}
+	if (it_bw == bw.end())
+		return (-1);
+	(*it_bw).words.erase((*it_bw).words.begin(), (*it_bw).words.end());
+	return (0);
+}
+
+std::vector<std::string> parse_comma_arg(std::string comma_arg)
+{
+	std::vector<std::string> targets;
+	size_t pos = 0;
+	std::string target;
+	while ((pos = comma_arg.find_first_of(" ,.\r")) != std::string::npos)
+	{
+		target = comma_arg.substr(0, pos);
+		targets.push_back(target);
+		comma_arg.erase(0, pos + 1);
+	}
+	targets.push_back(comma_arg);
+	return (targets);
+}
+
 int	Guardian::parse_msg()
 {
 	std::vector<banned_words>::iterator it = bw.begin();
+	std::vector<std::string>			msg_split;
 
-	// if (get_word(msg.find("#", 0), channel, msg, " ") == -1)
-	// 	return (-1);
 	for (; it != bw.end(); it++)
 	{
 		if ((*it).channel == channel)
 			break ;
 	}
 	if (it == bw.end())
-	{
-		//error
-		return (1);
-	}
+		return (1); //error
 	if ((*it).words.empty())
-	{
-		std::cout << "hello" << std::endl; //send error to server
-		return (10);
-	}
-	for (std::vector<std::string>::iterator it2 = (*it).words.begin(); it2 != (*it).words.end(); it2++)
-	{
-		if (msg.find(*it2, 0) != std::string::npos)
-		{
-			std::cout << *it2 << std::endl;
-			return (1);
-		}
-	}
+		return (10); //send error to server
+	msg_split = parse_comma_arg(command);
+	for (std::vector<std::string>::iterator it3 = msg_split.begin(); it3 != msg_split.end(); it3++)
+		for (std::vector<std::string>::iterator it2 = (*it).words.begin(); it2 != (*it).words.end(); it2++)
+			if ((*it3).find(*it2, 0) != std::string::npos)
+				if ((*it3).length() == (*it2).length())
+					return (1);
 	return (0);
 }
+
+
 
 int	Guardian::run()
 {
@@ -184,17 +252,17 @@ int	Guardian::run()
 	char		buf[MAXDATASIZE];
 	static int	step;
 
-	while (42)
+	while (should_run)
 	{
 		if (step != 0)
 		{
 			//===recv msg===
 			
-			if (poll(pollfds, 1, -1) == -1)
+			if (poll(pollfds, 1, -1) == -1 && should_run)
 				return (close(socket_fd), error_msg("\033[0;31mError! Poll error\033[0m", 1));
 
 			num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
-			if (num_bytes == -1)
+			if (num_bytes == -1 && should_run)
 				return (close(socket_fd), error_msg("\033[0;31mError! Recv error\033[0m", 1));
 			if (num_bytes == 0)
 				return (close(socket_fd), error_msg("\033[0;31mError! The server closed\033[0m", 1));
@@ -237,7 +305,7 @@ int	Guardian::run()
 				int	status = pm_is_in_channel(msg);
 				if (status == FALSE)
 				{
-					if (get_full_msg() == 1)
+					if (get_full_msg() == -1)
 						return (close(socket_fd), 1);
 					
 					status = botjoin();
@@ -263,7 +331,22 @@ int	Guardian::run()
 					}
 					else if (status == 0)
 						continue ;
-					
+					status = rmword();
+					if (status == -1)
+					{
+						std::cout << "oui" << std::endl;
+						continue ;
+					}
+					else if (status == 0)
+						continue ;
+					status = cleanword();
+					if (status == -1)
+					{
+						std::cout << "oui" << std::endl;
+						continue ;
+					}
+					else if (status == 0)
+						continue ;
 					status = parse_msg();
 					if (status == -1)
 						continue ;
@@ -292,13 +375,39 @@ int	Guardian::run()
 
 				if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 					return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+				usleep(50);
 				
 				break ;
 			}
 			case 3:
 			{
 				//TODO server error parsing
-				step--;
+				// if (parse_join_error())
+				// {
+				std::cout << channel << std::endl;
+				std::cout << (":42chan 353 " + bot_name + " = " + channel + " :@" + bot_name + "\r\n") << std::endl;
+				
+				std::cout << msg.find((":42chan 353 " + bot_name + " = " + channel + " :@" + bot_name), 0) << std::endl;
+				if (msg.find((":GuardianBot JOIN :#oui"), 0) == 0)
+				{
+					std::cout << "hello" << std::endl;
+					continue ;
+				}
+				else if (msg.find((":42chan 353 " + bot_name + " = " + channel + " :@" + bot_name)) == 0)
+				{
+					msg = "PART " + channel + "\r\n" + "PRIVMSG Celiastral: SALE PUTE\r\n";
+					if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+						return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+					step--;
+				}
+				else
+				{
+
+				}
+
+					// return (close(socket_fd), 1);
+						//manage error
+				// }
 				break ;
 			}
 		}
@@ -307,7 +416,7 @@ int	Guardian::run()
 
 		buf[0] = '\0';
 		msg.clear();
-		channel.clear();
+		// channel.clear();
 		guardian_msg.clear();
 		sender_name.clear();
 	}
@@ -356,20 +465,28 @@ int	main(int argc, char **argv)
 	
 	if (argc != 4 && argc != 5)
 		return (error_msg("\033[0;31mUsage : ./bot <IP addr of server> <Port of server> <Server password> <Name (optionnal)>\033[0m", 1));
-	if (argc == 5)
-		bot_name = argv[4];
-	password = argv[3];
+	try
+	{
+		if (argc == 5)
+			bot_name = argv[4];
+		password = argv[3];
 
-	//===connection to server===
+		//===connection to server===
 
-	socket_fd = get_socket_fd(argv);
-	if (socket_fd == -1)
+		socket_fd = get_socket_fd(argv);
+		if (socket_fd == -1)
+			return (1);
+		
+		//===launch guardian===
+
+		if (launch_guardian(bot_name, password, socket_fd) == 1)
+			return (1);
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << "\n";
 		return (1);
-	
-	//===launch guardian===
-
-	if (launch_guardian(bot_name, password, socket_fd) == 1)
-		return (1);
+	}
 }
 
 
