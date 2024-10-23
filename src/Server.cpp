@@ -217,16 +217,6 @@ void Server::_send_to_fd(int fd, const std::string& msg)
     send(fd, total.c_str(), total.size(), MSG_CONFIRM);
 }
 
-void Server::_send_to_channel_subscribers(const Channel& channel, const std::string& msg)
-{
-    std::string total = msg + "\r\n";
-    for (std::vector<int>::const_iterator it = channel.subscribed_users_fd.begin();
-         it != channel.subscribed_users_fd.end(); it++)
-    {
-        send(*it, total.c_str(), total.size(), MSG_CONFIRM);
-    }
-}
-
 Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
 {
     ClientIterator it;
@@ -238,17 +228,22 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
     return it;
 }
 
+void Server::_send_to_client_channels(Client& client, const std::string& msg)
+{
+    for (size_t i = 0; i < client.channels.size(); i++)
+    {
+        Channel& target_channel = m_channels[client.channels[i]];
+        target_channel.send_msg(msg);
+    }
+}
+
 void Server::_quit_client(PollfdIterator* it, Client& client, const std::string& reason)
 {
 	std::string quit_msg = ":" + client.nickname + " QUIT";
 	if (reason != "")
 		quit_msg += " :" + reason;
 
-    for (size_t i = 0; i < client.channels.size(); i++)
-    {
-        Channel& target_channel = m_channels[client.channels[i]];
-        target_channel.send_msg(quit_msg);
-    }
+	_send_to_client_channels(client, quit_msg);
 	_remove_client_from_all_channels(client);
     close((*it)->fd);
     m_clients.erase((*it)->fd);
