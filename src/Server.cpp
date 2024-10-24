@@ -28,6 +28,7 @@ Server::Server(const char* password, const char* port)
     m_pfds.push_back(serv_pfd);
 
     /* Commands are case insensitive, hence they are lower case. */
+    m_commands.insert(make_pair("away", &Server::_away));
     m_commands.insert(make_pair("join", &Server::_join));
     m_commands.insert(make_pair("names", &Server::_names));
     m_commands.insert(make_pair("nick", &Server::_nick));

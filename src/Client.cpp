@@ -12,6 +12,7 @@ Client::Client()
       nickname(""),
       username(""),
       fullname(""),
+	  away_msg(""),
       channels()
 {
     return;
@@ -26,6 +27,7 @@ Client::Client(int fd)
       nickname(""),
       username(""),
       fullname(""),
+	  away_msg(""),
       channels()
 {
     return;
@@ -40,6 +42,7 @@ Client::Client(const Client& c)
       nickname(c.nickname),
       username(c.username),
       fullname(c.fullname),
+	  away_msg(c.away_msg),
       channels(c.channels)
 {
     return;
@@ -57,6 +60,7 @@ Client& Client::operator=(const Client& c)
     nickname = c.nickname;
     username = c.username;
     fullname = c.fullname;
+	away_msg = c.away_msg;
     channels = c.channels;
     return *this;
 }

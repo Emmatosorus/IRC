@@ -18,7 +18,7 @@ HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/clie
 SRCS_BOT = $(addprefix bots/, bot_connect.cpp bot_utils.cpp)
 SRCS_GUARDIAN = $(addprefix bots/guardian/, guardian.cpp) $(SRCS_BOT)
 SRCS_AI = $(addprefix bots/ai/, ai.cpp) $(SRCS_BOT)
-SRCS_COMMANDS = $(addprefix commands/, join.cpp kick.cpp list.cpp mode.cpp names.cpp nick.cpp notice.cpp part.cpp pass.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
+SRCS_COMMANDS = $(addprefix commands/, away.cpp join.cpp kick.cpp list.cpp mode.cpp names.cpp nick.cpp notice.cpp part.cpp pass.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp utils.cpp numeric_replies.cpp $(SRCS_COMMANDS)
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 OBJS_AI = $(addprefix $(OBJS_DIR), $(SRCS_AI:.cpp=.o))

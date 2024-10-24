@@ -47,6 +47,11 @@ void Server::_privmsg(PollfdIterator* it, const std::vector<std::string>& args)
         if (target_user_it != m_clients.end())
         {
             Client& target_user = target_user_it->second;
+			if (target_user.away_msg != "")
+			{
+				client.send_301(target_user.nickname, target_user.away_msg);
+				continue;
+			}
             target_user.send_msg(":" + client.nickname + " PRIVMSG " + target_user.nickname + " :" +
                                  msg);
             continue;
