@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 17:11:51 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/23 15:51:18 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/24 14:41:24 by emuminov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 
 typedef struct banned_words
 {
-	std::string	channel;
-	std::vector<std::string>	words;
-}	banned_words;
+    std::string channel;
+    std::vector<std::string> words;
+} banned_words;
 
 class Guardian
 {
@@ -56,7 +56,6 @@ class Guardian
 		int							get_channel();
 		bool						is_password_incorrect();
 		bool						is_name_incorrect();
-
 };
 
 #endif

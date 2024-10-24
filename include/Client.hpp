@@ -24,8 +24,8 @@ class Client
     void quit_channel(const std::string channel_name);
     void send_msg(const std::string& msg) const;
     void send_001();
-	void send_322(const Channel& channel);
-	void send_323();
+    void send_322(const Channel& channel);
+    void send_323();
     void send_324(const Channel& channel);
     void send_329(const Channel& channel);
     void send_331(const Channel& channel);

@@ -12,24 +12,23 @@ void Client::send_001()
 
 void Client::send_322(const Channel& channel)
 {
-	std::string reply =
-		":42Chan 322 " + _resolve_nickname() + " " + channel.name + " " + long_to_str(channel.subscribed_users_fd.size());
-	if (channel.topic != "")
-		reply += " :" + channel.topic;
-	send_msg(reply);
+    std::string reply = ":42Chan 322 " + _resolve_nickname() + " " + channel.name + " " +
+                        long_to_str(channel.subscribed_users_fd.size());
+    if (channel.topic != "")
+        reply += " :" + channel.topic;
+    send_msg(reply);
 }
 
 void Client::send_323()
 {
-    std::string reply =
-        ":42Chan 323 " + _resolve_nickname() + " :End of /LIST";
+    std::string reply = ":42Chan 323 " + _resolve_nickname() + " :End of /LIST";
     send_msg(reply);
 }
 
 void Client::send_324(const Channel& channel)
 {
     std::string reply = ":42Chan 324 " + _resolve_nickname() + " " + channel.name + " ";
-	reply += channel.get_modestring();
+    reply += channel.get_modestring();
     send_msg(reply);
 }
 

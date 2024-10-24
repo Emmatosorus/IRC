@@ -101,8 +101,8 @@ void Server::_handle_client_message(PollfdIterator* it)
     else if (bytes_received == 0)
     {
         std::cout << "Connection closed: " << (*it)->fd << "\n";
-		std::vector<std::string> args(1, "QUIT");
-		_quit(it, args);
+        std::vector<std::string> args(1, "QUIT");
+        _quit(it, args);
         return;
     }
     buf[bytes_received] = '\0';
@@ -118,7 +118,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     while (end_of_msg != std::string::npos)
     {
         raw_message = client.buf.substr(0, end_of_msg);
-		remove_unprintable_characters(raw_message);
+        remove_unprintable_characters(raw_message);
         std::cout << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
 
@@ -133,7 +133,8 @@ void Server::_handle_client_message(PollfdIterator* it)
             client.send_464();
         }
         else if (client.entered_password &&
-                 (!client.is_registered && !(command == "nick" || command == "user" || command == "pass")))
+                 (!client.is_registered &&
+                  !(command == "nick" || command == "user" || command == "pass")))
         {
             client.send_451();
         }
@@ -242,12 +243,12 @@ void Server::_send_to_client_channels(Client& client, const std::string& msg)
 
 void Server::_quit_client(PollfdIterator* it, Client& client, const std::string& reason)
 {
-	std::string quit_msg = ":" + client.nickname + " QUIT";
-	if (reason != "")
-		quit_msg += " :" + reason;
+    std::string quit_msg = ":" + client.nickname + " QUIT";
+    if (reason != "")
+        quit_msg += " :" + reason;
 
-	_send_to_client_channels(client, quit_msg);
-	_remove_client_from_all_channels(client);
+    _send_to_client_channels(client, quit_msg);
+    _remove_client_from_all_channels(client);
     close((*it)->fd);
     m_clients.erase((*it)->fd);
     *it = m_pfds.erase(*it);

@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:39:36 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/23 15:52:41 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/24 14:40:26 by emuminov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 #include "bot.hpp"
 
-#define CURL_CMD "curl \"https://api.openai.com/v1/chat/completions\" \
+#define CURL_CMD                                                                                   \
+    "curl \"https://api.openai.com/v1/chat/completions\" \
 			-H \"Content-Type: application/json\" \
 			-H \"Authorization: Bearer $OPENAI_API_KEY\" \
 			-d '{ \
