@@ -19,11 +19,15 @@ class Client
     std::string nickname;
     std::string username;
     std::string fullname;
+	std::string away_msg;
     std::vector<std::string> channels;
 
     void quit_channel(const std::string channel_name);
     void send_msg(const std::string& msg) const;
     void send_001();
+	void send_301(const std::string& target_nickname, const std::string& target_away_msg);
+	void send_305();
+	void send_306();
 	void send_322(const Channel& channel);
 	void send_323();
     void send_324(const Channel& channel);

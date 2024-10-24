@@ -10,6 +10,27 @@ void Client::send_001()
     send_msg(reply);
 }
 
+void Client::send_301(const std::string& target_nickname, const std::string& target_away_msg)
+{
+	std::string reply =
+		":42Chan 301 " + _resolve_nickname() + " " + target_nickname + " :" + target_away_msg;
+	send_msg(reply);
+}
+
+void Client::send_305()
+{
+	std::string reply =
+		":42Chan 305 " + _resolve_nickname() + " :You are not longer marked as being away";
+	send_msg(reply);
+}
+
+void Client::send_306()
+{
+	std::string reply =
+		":42Chan 306 " + _resolve_nickname() + " :You have been marked as being away";
+	send_msg(reply);
+}
+
 void Client::send_322(const Channel& channel)
 {
 	std::string reply =
