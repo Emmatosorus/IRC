@@ -31,3 +31,14 @@ void make_unique(std::vector<std::string>& vec)
     std::vector<std::string>::iterator last = std::unique(vec.begin(), vec.end());
     vec.erase(last, vec.end());
 }
+
+void remove_unprintable_characters(std::string& str)
+{
+	for (std::string::iterator it = str.begin(); it != str.end();)
+	{
+		if (!isprint(*it))
+			it = str.erase(it);
+		else
+			it++;
+	}
+}

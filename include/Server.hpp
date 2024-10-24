@@ -40,7 +40,6 @@ class Server
     void _send_to_client(int fd, std::string error_code, std::string msg);
     void _send_to_fd(int fd, const std::string& msg);
 	void _send_to_client_channels(Client& client, const std::string& msg);
-	void _send_channel_list(Client& client);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
 
     /* All functions for USER cmd */
@@ -76,7 +75,6 @@ class Server
     void _quit(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for INVITE cmd */
-    void extracted();
     void _invite(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for TOPIC cmd */

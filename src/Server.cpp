@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/client_msg_parse.hpp"
+#include "../include/utils.hpp"
 #include <csignal>
 #include <cstring>
 #include <iostream>
@@ -117,6 +118,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     while (end_of_msg != std::string::npos)
     {
         raw_message = client.buf.substr(0, end_of_msg);
+		remove_unprintable_characters(raw_message);
         std::cout << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
 
