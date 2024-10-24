@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <sys/socket.h>
 #include <vector>
 
 std::string long_to_str(long nbr)
@@ -41,4 +42,19 @@ void remove_unprintable_characters(std::string& str)
 		else
 			it++;
 	}
+}
+
+int sendall(int fd, const std::string& msg)
+{
+	int size = msg.size();
+	int total = 0;
+	int bytes_send = 0;
+	while (total < size)
+	{
+		bytes_send = send(fd, msg.c_str(), size, 0);
+		if (bytes_send == -1)
+			return -1;
+		total += bytes_send;
+	}
+	return total;
 }
