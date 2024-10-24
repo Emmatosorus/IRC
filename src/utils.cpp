@@ -34,11 +34,11 @@ void make_unique(std::vector<std::string>& vec)
 
 void remove_unprintable_characters(std::string& str)
 {
-    for (std::string::iterator it = str.begin(); it != str.end();)
-    {
-        if (!isprint(*it))
-            it = str.erase(it);
-        else
-            it++;
-    }
+	for (std::string::iterator it = str.begin(); it != str.end();)
+	{
+		if (!isprint(*it))
+			it = str.erase(it);
+		else
+			it++;
+	}
 }
