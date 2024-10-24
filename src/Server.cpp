@@ -5,6 +5,7 @@
 #include <cstring>
 #include <iostream>
 #include <netdb.h>
+#include <set>
 #include <stdexcept>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -101,8 +102,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     else if (bytes_received == 0)
     {
         std::cout << "Connection closed: " << (*it)->fd << "\n";
-		std::vector<std::string> args(1, "QUIT");
-		_quit(it, args);
+		_quit_client(it, client, "");
         return;
     }
     buf[bytes_received] = '\0';
@@ -233,11 +233,20 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
 
 void Server::_send_to_client_channels(Client& client, const std::string& msg)
 {
+	std::set<int> targets;
     for (size_t i = 0; i < client.channels.size(); i++)
     {
         Channel& target_channel = m_channels[client.channels[i]];
-        target_channel.send_msg(msg);
+		for (size_t j = 0; j < target_channel.subscribed_users_fd.size(); j++)
+		{
+			targets.insert(target_channel.subscribed_users_fd[j]);
+		}
     }
+	std::string total = msg + "\r\n";
+	for (std::set<int>::iterator it = targets.begin(); it != targets.begin(); it++)
+	{
+		send(*it, total.c_str(), total.size(), MSG_CONFIRM);
+	}
 }
 
 void Server::_quit_client(PollfdIterator* it, Client& client, const std::string& reason)
