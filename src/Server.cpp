@@ -243,7 +243,7 @@ void Server::_send_to_client_channels(Client& client, const std::string& msg)
 		}
     }
 	std::string total = msg + "\r\n";
-	for (std::set<int>::iterator it = targets.begin(); it != targets.begin(); it++)
+	for (std::set<int>::iterator it = targets.begin(); it != targets.end(); it++)
 	{
 		send(*it, total.c_str(), total.size(), MSG_CONFIRM);
 	}
