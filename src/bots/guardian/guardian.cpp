@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/24 21:19:53 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/26 00:04:45 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,15 +51,41 @@ int	Guardian::parse_connection_errors()
 	return (0);
 }
 
+bool	is_str_spaces(std::string str)
+{
+	return (str.find_first_not_of(" \n\r\t\v\f\0") == std::string::npos);
+}
+
+int	Guardian::botjoink()
+{
+	size_t		pos = 0;
+	std::string	channel_password;
+
+	pos = command.find("!botjoink ", 0);
+	if (pos != 0)
+		return (1); // CLIENT error
+	if (command.find_first_of(",") != std::string::npos)
+		return (CLIENT_ERROR); // CLIENT error
+	if (get_word(10, channel, command, " :") == -1 || is_str_spaces(&command[11 + channel.length()]))
+		return (PARAM_ERROR); // PARAM error
+	if (get_word(11 + channel.length(), channel_password, command, " :\r") == -1)
+		return (SERVER_ERROR); // SERVER error
+	msg = "JOIN " + channel + " " + channel_password + "\r\n";
+	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
+	return (0);
+}
+
 int	Guardian::botjoin()
 {
 	size_t	pos = 0;
 
 	pos = command.find("!botjoin ", 0);
 	if (pos != 0)
-		return (1);
-	if (get_word(9, channel, command, " ,:\r") == -1)
-		return (1);
+		return (1); // CLIENT error
+	if (command.find_first_of(",") != std::string::npos)
+		return (CLIENT_ERROR); // CLIENT error
+	if (get_word(9, channel, command, " :\r") == -1)
+		return (-1); // SERVER error
 	msg = "JOIN " + channel + "\r\n";
 	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
 	return (0);
@@ -82,9 +108,9 @@ int	pm_is_in_channel(std::string msg)
 				return (FALSE);
 		}
 		else
-			return (-1);
+			return (-1); // CLIENT error
 	}
-	return (-1);
+	return (-1); //not privmsg sent
 }
 
 int	launch_guardian(std::string bot_name, std::string password, int socket_fd)
@@ -98,40 +124,47 @@ int	launch_guardian(std::string bot_name, std::string password, int socket_fd)
 
 int	Guardian::addword()
 {
-	std::vector<banned_words>::iterator it = bw.begin();
+	std::vector<banned_words>::iterator it_bw = bw.begin();
+	std::vector<std::string>::iterator	it_word;
 	std::string							new_word;
 	size_t								pos = command.find("!addword ", 0);
 
 
 	if (pos != 0)
 		return (1);
-	for (; it != bw.end(); it++)
+	for (; it_bw != bw.end(); it_bw++)
 	{
-		if ((*it).channel == channel)
+		if ((*it_bw).channel == channel)
 			break ;
 	}
-	if (it == bw.end())
-		return (-1);
+	if (it_bw == bw.end())
+		return (-1); // SERVER error
 	if (get_word((9), new_word, command, " \r") == -1)
-		return (-1);
-	(*it).words.push_back(new_word);
+		return (-1); // SERVER error
+	for (it_word = (*it_bw).words.begin() ; it_word != (*it_bw).words.end(); it_word++)
+	{
+		if ((*it_word) == new_word)
+			break ;
+	}
+	if (it_word == (*it_bw).words.end())
+		(*it_bw).words.push_back(new_word);
+	else
+		return (CLIENT_ERROR); //CLIENT error
 	return (0);
 }
 
 int	Guardian::get_word(size_t begin_pos, std::string &word_got, std::string str, std::string last_char_to_find)
 {
-	size_t		pos2;
+	size_t		pos_end;
 	std::string	tmp;
 
 	if (begin_pos == std::string::npos)
 		return (-1);
 	tmp = str;
-	pos2 = tmp.find_first_of(last_char_to_find, begin_pos);
-	if (pos2 == std::string::npos)
+	pos_end = tmp.find_first_of(last_char_to_find, begin_pos);
+	if (pos_end == std::string::npos)
 		return (-1);
-	std::cout << word_got;
-	tmp.erase(pos2, tmp.length() - pos2);
-	std::cout << word_got;
+	tmp.erase(pos_end, tmp.length() - pos_end);
 	word_got = &tmp[begin_pos];
 	return (0);
 }
@@ -167,16 +200,16 @@ int	Guardian::rmword()
 
 
 	if (pos != 0)
-		return (1);
+		return (1); //CLIENT error
 	for (; it_bw != bw.end(); it_bw++)
 	{
 		if ((*it_bw).channel == channel)
 			break ;
 	}
 	if (it_bw == bw.end())
-		return (-1);
-	if (get_word((8), word_to_rm, command, " \r\n") == -1)
-		return (-1);
+		return (-1); //SERVER error
+	if (get_word((8), word_to_rm, command, " \r") == -1)
+		return (-1); //SERVER error
 	it_word = (*it_bw).words.begin();
 	for (; it_word != (*it_bw).words.end(); it_word++)
 	{
@@ -184,7 +217,7 @@ int	Guardian::rmword()
 			break ;
 	}
 	if (it_word == (*it_bw).words.end())
-		return (-1); // SEND ERROR TO SERVER
+		return (CLIENT_ERROR); //CLIENT error (different)
 	(*it_bw).words.erase(it_word);
 	return (0);
 }
@@ -197,26 +230,29 @@ int	Guardian::cleanword()
 
 
 	if (pos != 0)
-		return (1);
+		return (1); //CLIENT error
 	for (; it_bw != bw.end(); it_bw++)
 	{
 		if ((*it_bw).channel == channel)
 			break ;
 	}
 	if (it_bw == bw.end())
-		return (-1);
+		return (-1); //SERVER error
+	if ((*it_bw).words.empty())
+		return (CLIENT_ERROR); //CLIENT error (different)
 	(*it_bw).words.erase((*it_bw).words.begin(), (*it_bw).words.end());
 	return (0);
 }
 
-std::vector<std::string> mini_split(std::string arg)
+std::vector<std::string> mini_split(std::string arg, std::string to_split_on)
 {
 	std::vector<std::string> targets;
-	size_t pos = 0;
+	size_t pos = arg.find_first_of(to_split_on);
 	std::string target;
 
-	while ((pos = arg.find_first_of(" ,.\r")) != std::string::npos)
+	while (pos != std::string::npos)
 	{
+		pos = arg.find_first_of(to_split_on);
 		target = arg.substr(0, pos);
 		targets.push_back(target);
 		arg.erase(0, pos + 1);
@@ -225,30 +261,47 @@ std::vector<std::string> mini_split(std::string arg)
 	return (targets);
 }
 
-int	Guardian::parse_msg()
+int	Guardian::does_msg_contain_badword()
 {
-	std::vector<banned_words>::iterator it = bw.begin();
+	std::vector<banned_words>::iterator it_bw = bw.begin();
 	std::vector<std::string>			msg_split;
 
-	for (; it != bw.end(); it++)
+	for (; it_bw != bw.end(); it_bw++)
+	{
+		if ((*it_bw).channel == channel)
+			break ;
+	}
+	if (it_bw == bw.end())
+		return (-1); //SERVER error
+	if ((*it_bw).words.empty())
+		return (FALSE); //No error, just nothing to parse
+	msg_split = mini_split(command, " ,.\r");
+	for (std::vector<std::string>::iterator it_msg = msg_split.begin(); it_msg != msg_split.end(); it_msg++)
+		for (std::vector<std::string>::iterator it_word = (*it_bw).words.begin(); it_word != (*it_bw).words.end(); it_word++)
+			if ((*it_msg).find(*it_word, 0) != std::string::npos)
+				if ((*it_msg).length() == (*it_word).length())
+					return (TRUE); //BADWORD
+	return (FALSE); //no BADWORD
+}
+
+int	Guardian::botleave()
+{
+	size_t								pos = command.find("!botleave\r", 0);
+	std::vector<banned_words>::iterator it;
+
+	if (pos != 0)
+		return (1);
+	if (cleanword() == -1)
+		return (-1);
+	for (it = bw.begin(); it != bw.end(); it++)
 	{
 		if ((*it).channel == channel)
 			break ;
 	}
-	if (it == bw.end())
-		return (1); //error
-	if ((*it).words.empty())
-		return (10); //send error to server
-	msg_split = mini_split(command);
-	for (std::vector<std::string>::iterator it3 = msg_split.begin(); it3 != msg_split.end(); it3++)
-		for (std::vector<std::string>::iterator it2 = (*it).words.begin(); it2 != (*it).words.end(); it2++)
-			if ((*it3).find(*it2, 0) != std::string::npos)
-				if ((*it3).length() == (*it2).length())
-					return (1);
+	bw.erase(it);
+	msg = "PART " + channel + "\r\n";
 	return (0);
 }
-
-
 
 int	Guardian::run()
 {
@@ -258,6 +311,11 @@ int	Guardian::run()
 
 	while (should_run)
 	{
+		//===clear everything===
+		
+		buf[0] = '\0';
+		msg.clear();
+	
 		if (step != 0)
 		{
 			//===recv msg===
@@ -305,113 +363,160 @@ int	Guardian::run()
 			}
 			case 2:
 			{
-				//The bot check pm in channel to moderate (inside channel) or react to a !botjoin (inside private message) accordingly
 				int	status = pm_is_in_channel(msg);
+				//enum toggle get_msg_info(status) (FALSE = get_msg + get_sender_name, TRUE = get_msg + get_sender_name + get_channel, -1 = no get)
 				if (status == FALSE)
 				{
 					if (get_full_msg() == -1)
 						return (close(socket_fd), 1);
 					if (get_sender_name() == -1)
-						return (close(socket_fd), 1);
+						return (close(socket_fd), 1); //// REMOVING TOMORROW
+
+					//status = manage_pm_request
+					//if (status == server_error)
+					//	leave
+					//else if (status == NO_REQUEST (=1))
+					//	continue ;
+					//else 
+					// send/continue
 					status = botjoin();
-					if (status == -1)
+					if (status == SERVER_ERROR)
 						return (close(socket_fd), 1);
-					else if (status == 1)
+					else if (status == CLIENT_ERROR)
+					{
+						msg = "PRIVMSG " + sender_name + ": Error! This bot can't join multiple channels at once!\r\n";
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
+					else if (status == 0)
+					{
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
+					status = botjoink();
+					if (status == SERVER_ERROR)
+						return (close(socket_fd), 1);
+					else if (status == CLIENT_ERROR)
+					{
+						msg = "PRIVMSG " + sender_name + ": Error! This bot can't join multiple channels at once!\r\n";
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
+					else if (status == 0)
+					{
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
+					else if (status == PARAM_ERROR)
+					{
+						msg = "PRIVMSG " + sender_name + ": Error! Not enough arguments for this command!\r\n";
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
+					else
 						continue ;
 				}
 				else if (status == TRUE)
 				{
-					//do error managment
 					if (get_full_msg() == -1)
 						return (close(socket_fd), 1);
 					if (get_channel() == -1)
+						return (close(socket_fd), 1); //// REMOVING TOMORROW
+					if (get_sender_name() == -1)
 						return (close(socket_fd), 1);
-						
+					//status = manage_channel_cmd_request
+					//if (status == server_error)
+					//	leave
+					//else if (status == NO_REQUEST)
+					//	continue ;
+					//else
+					//	send/continue
 					status = addword();
 					if (status == -1)
 						return (close(socket_fd), 1);
+					else if (status == CLIENT_ERROR)
+					{
+						msg = "PRIVMSG " + channel + ": Error! You can't have multiples of the same word!\r\n";
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
 					else if (status == 0)
 						continue ;
 					status = rmword();
 					if (status == -1)
 						return (close(socket_fd), 1);
+					else if (status == CLIENT_ERROR)
+					{
+						msg = "PRIVMSG " + channel + ": Error! This word is not in the badword list yet!\r\n";
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
 					else if (status == 0)
 						continue ;
 					status = cleanword();
 					if (status == -1)
 						return (close(socket_fd), 1);
+					else if (status == CLIENT_ERROR)
+					{
+						msg = "PRIVMSG " + channel + ": Error! Nothing to clean yet!\r\n";
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+						continue ;
+					}
 					else if (status == 0)
 						continue ;
-					status = parse_msg();
+					status = botleave();
 					if (status == -1)
+						return (close(socket_fd), 1);
+					else if (status == 0)
+					{
+						if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
+							return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
 						continue ;
-					else if (status == 1)
-						msg = "PRIVMSG @%" + channel + ": BADWORD SAID!\r\n";
+					}
+					//status = manage_channel_badword
+					//if (status == server_error)
+					//	leave
+					//else if (status == NO_REQUEST)
+					//	continue ;
+					//else
+					//	send/continue
+					status = does_msg_contain_badword();
+					if (status == -1)
+						return (close(socket_fd), 1);
+					else if (status == TRUE)
+						msg = "PRIVMSG @%" + channel + ": BADWORD SAID BY " + sender_name + "\r\n";
+					else if (status == FALSE)
+						continue ;
 				}
 				else if (status == -1)
-					continue ;
-				step++;
-				// std::cout << "non";
-				//===get sender name===
-
-				
-				//===cleanup msg===
-
-				
-				//===setup curl cmd===
-
-
-				//===execute curl cmd and parse result===
-
-
-				//===find and prep ai msg for send===
-				
-				
-				//===send msg===
+				{
+					//if (parse error() == 0)
+					//	continue ;
+					if (msg == ":" + bot_name + " JOIN :" + channel +"\r\n")
+						continue ;
+					if (msg.find(bot_name + " " + channel + " :Cannot join channel (+") == 12
+						|| msg.find(bot_name + " " + channel + " Cannot join channel: ") == 12)
+						msg = "PRIVMSG " + sender_name + ":Error! This bot can't join this channel!\r\n";
+					else if (msg.find((":42chan 353 " + bot_name + " = " + channel + " :@" + bot_name + "\r\n")) == 0)
+						msg = "PART " + channel + "\r\n" + "PRIVMSG " + sender_name + ":Error! This bot can't create new channels!\r\n";
+					else
+						continue ;
+				}
 
 				if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 					return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
-				usleep(100);
-				
-				break ;
-			}
-			case 3:
-			{
-				//TODO server error parsing:
-				//don't accept comma and collumn (that makes it too complicated for parsing)
-				//nonexistent_nickname
-				//after parsing: too long / too short / to many channels / Cannot join channel /  :Cannot join channel (+
-				//:42chan 448 Celiastral #q Cannot join channel: Client joined too many channels
-				//
-				//
-				//
-				// if (parse_server_error())
-				// {
-				//
-				step--;
-				if (msg.find((":GuardianBot JOIN :" + channel), 0) == 0 && step++)
-					continue ;
-				else if (msg.find(bot_name + " " + channel + " :Cannot join channel (+") == 12
-						|| msg.find(bot_name + " " + channel + " Cannot join channel") == 12)
-					msg = "PRIVMSG " + sender_name + ":Error! This bot can't join this channel!\r\n";
-				else if (msg.find((":42chan 353 " + bot_name + " = " + channel + " :@" + bot_name + "\r\n")) == 0)
-					msg = "PART " + channel + "\r\n" + "PRIVMSG " + sender_name + ":Error! This bot can't create new channels!\r\n";
-				else
-					continue ;
-
-				if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
-					return (close(socket_fd), error_msg("\033[0;31mError! Send error\033[0m", 1));
+			
 				break ;
 			}
 		}
-
-		//===clear everything===
-
-		buf[0] = '\0';
-		msg.clear();
-		
-		guardian_msg.clear();
-		
 	}
 
 	close(socket_fd);

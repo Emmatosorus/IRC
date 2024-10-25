@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 17:11:51 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/23 15:51:18 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/25 23:37:10 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@
 #include <vector>
 #define TRUE 0
 #define FALSE 1
+#define NO_REQUEST 1
+#define SUCCESS 0
+#define PARAM_ERROR 2
+#define CLIENT_ERROR 10
+#define SERVER_ERROR -1
 
 typedef struct banned_words
 {
@@ -40,14 +45,15 @@ class Guardian
 		std::string					msg;
 		std::string					channel;
 		std::string					sender_name;
-		std::string					guardian_msg;
 		const int					socket_fd;
 		std::string					command;
+		int							botleave();
 		int							botjoin();
+		int							botjoink();
 		int							addword();
 		int							cleanword();
 		int							rmword();
-		int							parse_msg();
+		int							does_msg_contain_badword();
 		int							log_into_server();
 		int							parse_connection_errors();
 		int							get_sender_name();

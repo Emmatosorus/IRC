@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/23 15:54:38 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/25 17:12:55 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,14 @@ int	Ai::run()
 
 	while (should_run)
 	{
+		//===clear everything===
+
+		buf[0] = '\0';
+		msg.clear();
+		ai_msg.clear();
+		sender_name.clear();
+		curl_cmd.clear();
+
 		if (step != 0)
 		{
 			//===recv msg===
@@ -283,14 +291,6 @@ int	Ai::run()
 				break ;
 			}
 		}
-
-		//===clear everything===
-
-		buf[0] = '\0';
-		msg.clear();
-		ai_msg.clear();
-		sender_name.clear();
-		curl_cmd.clear();
 	}
 	close(socket_fd);
 	return (0);
