@@ -6,11 +6,13 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 13:05:18 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/21 13:11:17 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/26 18:18:15 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/bot.hpp"
+#include <fcntl.h>
+#include <cerrno>
 
 int	get_socket_fd(char **argv)
 {

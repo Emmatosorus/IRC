@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/25 17:12:55 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/26 18:35:35 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ Ai::Ai(std::string &bot_name_, const std::string &password_, const int socket_fd
 {
 	pollfds[0].fd = socket_fd;
 	pollfds[0].events = POLLIN;
-	should_run = true;
 	signal(SIGINT, handle_signal);
 }
 
@@ -62,7 +61,7 @@ int	Ai::log_into_server()
 	msg = "USER " + bot_name + " * *:" + bot_name + "\r\n";
 	if (send(socket_fd, msg.c_str(), msg.length(), 0) == -1)
 		return (error_msg("\033[0;31mError! Send error\033[0m", 1));
-	return (0);
+	return (SUCCESS);
 }
 
 int	Ai::get_sender_name()
@@ -71,12 +70,12 @@ int	Ai::get_sender_name()
 	size_t		pos = msg.find(" PRIVMSG", 1);
 
 	if (pos == std::string::npos)
-		return (1);
+		return (ERROR);
 	tmp = msg;
 	tmp[pos] = '\0';
 	tmp = &tmp[1];
 	sender_name = tmp;
-	return (0);
+	return (SUCCESS);
 }
 
 bool	Ai::is_password_incorrect()
@@ -93,7 +92,8 @@ int	Ai::parse_connection_errors()
 		return (error_msg("\033[0;31mError! Incorrect name\033[0m", 1));
 	if (msg != ":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n")
 		return (error_msg("\033[0;31mError! This bot is restricted to our irc only!\033[0m", 1));
-	return (0);
+	
+	return (SUCCESS);
 }
 
 int	Ai::cleanup_msg()
@@ -110,7 +110,7 @@ int	Ai::cleanup_msg()
 	if (pos == std::string::npos)
 		return (error_msg("\033[0;31mError! Client msg has an error!\033[0m", 1));
 	msg.erase(pos, 2);
-	return (0);
+	return (SUCCESS);
 }
 
 int	Ai::setup_curl_cmd()
@@ -121,16 +121,19 @@ int	Ai::setup_curl_cmd()
 	pos = curl_cmd.find("content", 0);
 	if (pos == std::string::npos)
 		return (error_msg("\033[0;31mError! Curl cmd has an error!\033[0m", 1));
+	
 	pos = curl_cmd.find("content", pos + 7);
 	if (pos == std::string::npos)
 		return (error_msg("\033[0;31mError! Curl cmd has an error!\033[0m", 1));
+
 	pos += 11;
 	end_pos = curl_cmd.find("\"", pos);
 	if (end_pos == std::string::npos)
 		return (error_msg("\033[0;31mError! Curl cmd has an error!\033[0m", 1));
+
 	curl_cmd.erase(pos, end_pos - pos);
 	curl_cmd.insert(pos, msg);
-	return (0);
+	return (SUCCESS);
 }
 
 int	Ai::execute_curl_cmd_and_parse_result()
@@ -141,7 +144,8 @@ int	Ai::execute_curl_cmd_and_parse_result()
 	size_t	pos = 0;
 
 	if (fp == NULL)
-		return (error_msg("\033[0;31mError! Popen error!\033[0m", 1));;
+		return (error_msg("\033[0;31mError! Popen error!\033[0m", 1));
+
 	while (fgets(fgets_buf, 1024, fp) != NULL)
 	{
 		ai_msg = fgets_buf;
@@ -155,10 +159,12 @@ int	Ai::execute_curl_cmd_and_parse_result()
 	}
 	if (pos == 0)
 		return (pclose(fp), error_msg("\033[0;31mError! You did a redirection again you silly goose!\033[0m", 1));
+	
 	status = pclose(fp);
 	if (status == -1)
 		return (error_msg("\033[0;31mError! Pclose error!\033[0m", 1));
-	return (0);
+	
+	return (SUCCESS);
 }
 
 int	Ai::find_and_prep_ai_msg_for_send()
@@ -182,7 +188,7 @@ int	Ai::find_and_prep_ai_msg_for_send()
 	ai_msg[end_pos] = '\0';
 	ai_msg = &ai_msg[pos];
 	msg = "PRIVMSG " + sender_name + ": " + ai_msg + "\r\n";
-	return (0);
+	return (SUCCESS);
 }
 
 int	launch_ai(std::string bot_name, std::string password, int socket_fd)
@@ -217,7 +223,7 @@ int	Ai::run()
 			if (poll(pollfds, 1, -1) == -1 && should_run)
 				return (close(socket_fd), error_msg("\033[0;31mError! Poll error\033[0m", 1));
 
-			num_bytes = recv(socket_fd, buf, MAXDATASIZE-1, 0);
+			num_bytes = recv(socket_fd, buf, MAXDATASIZE - 1, 0);
 			if (num_bytes == -1 && should_run)
 				return (close(socket_fd), error_msg("\033[0;31mError! Recv error\033[0m", 1));
 			if (num_bytes == 0)
@@ -234,8 +240,8 @@ int	Ai::run()
 
 				//===log into server===
 
-				if (log_into_server() == 1)
-					return (close(socket_fd), 1);
+				if (log_into_server() == ERROR)
+					return (close(socket_fd), ERROR);
 				
 				step++;
 				break ;
@@ -248,8 +254,8 @@ int	Ai::run()
 				size_t	pos = bot_name.find_first_of(": ", 0);
 				if (pos != std::string::npos)
 					bot_name.erase(pos, bot_name.length());
-				if (parse_connection_errors() == 1)
-					return (close(socket_fd), 1);
+				if (parse_connection_errors() == ERROR)
+					return (close(socket_fd), ERROR);
 				
 				step++;
 				break ;
@@ -265,23 +271,23 @@ int	Ai::run()
 				
 				//===cleanup msg===
 
-				if (cleanup_msg() == 1)
-					return (close(socket_fd), 1);
+				if (cleanup_msg() == ERROR)
+					return (close(socket_fd), ERROR);
 				
 				//===setup curl cmd===
 
-				if (setup_curl_cmd() == 1)
-					return (close(socket_fd), 1);
+				if (setup_curl_cmd() == ERROR)
+					return (close(socket_fd), ERROR);
 
 				//===execute curl cmd and parse result===
 
-				if (execute_curl_cmd_and_parse_result() == 1)
-					return (close(socket_fd), 1);
+				if (execute_curl_cmd_and_parse_result() == ERROR)
+					return (close(socket_fd), ERROR);
 
 				//===find and prep ai msg for send===
 				
-				if (find_and_prep_ai_msg_for_send() == 1)
-					return (close(socket_fd), 1);
+				if (find_and_prep_ai_msg_for_send() == ERROR)
+					return (close(socket_fd), ERROR);
 				
 				//===send msg===
 
@@ -292,8 +298,9 @@ int	Ai::run()
 			}
 		}
 	}
+
 	close(socket_fd);
-	return (0);
+	return (SUCCESS);
 }
 
 int	main(int argc, char **argv)
@@ -303,21 +310,31 @@ int	main(int argc, char **argv)
 	int				socket_fd;
 
 	//===arg management===
-	
+
 	if (argc != 4 && argc != 5)
 		return (error_msg("\033[0;31mUsage : ./bot <IP addr of server> <Port of server> <Server password> <Name (optionnal)>\033[0m", 1));
-	if (argc == 5)
-		bot_name = argv[4];
-	password = argv[3];
+	try
+	{
+		if (argc == 5)
+			bot_name = argv[4];
+		password = argv[3];
 
-	//===connection to server===
+		//===connection to server===
 
-	socket_fd = get_socket_fd(argv);
-	if (socket_fd == -1)
+		socket_fd = get_socket_fd(argv);
+		if (socket_fd == -1)
+			return (1);
+		
+		//===launch ai===
+
+		if (launch_ai(bot_name, password, socket_fd) == 1)
+			return (1);
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << "\n";
+		if (socket_fd != -1)
+			close(socket_fd);
 		return (1);
-	
-	//===launch ai===
-
-	if (launch_ai(bot_name, password, socket_fd) == 1)
-		return (1);
+	}
 }

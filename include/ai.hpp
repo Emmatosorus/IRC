@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:39:36 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/23 15:52:41 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/26 18:28:41 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 #define AI_HPP
 
 #include "bot.hpp"
+#include <unistd.h>
+#include <poll.h>
+
+#define ERROR 1
 
 #define CURL_CMD "curl \"https://api.openai.com/v1/chat/completions\" \
 			-H \"Content-Type: application/json\" \
@@ -35,29 +39,44 @@
 class Ai
 {
 	public:
+
 		Ai(std::string &bot_name, const std::string &password, const int socket_fd);
 		~Ai();
+	
 		int	run();
+	
 	private:
-		static void 		handle_signal(int signum);
-		static bool			should_run;
-		struct pollfd		pollfds[1];
+	
 		std::string			&bot_name;
 		const std::string 	&password;
-		std::string			msg;
+	
 		std::string			sender_name;
-		std::string			ai_msg;
 		std::string			curl_cmd;
+		std::string			ai_msg;
+		std::string			msg;
+	
+		static bool			should_run;
+		struct pollfd		pollfds[1];
 		const int			socket_fd;
+
+		//===log in and parsing===
+
 		int					log_into_server();
 		int					parse_connection_errors();
-		int					get_sender_name();
+		bool				is_name_incorrect();
+		bool				is_password_incorrect();
+
+		//===setup and exec curl===
+
 		int					cleanup_msg();
 		int					setup_curl_cmd();
-		int					execute_curl_cmd_and_parse_result();
 		int					find_and_prep_ai_msg_for_send();
-		bool				is_password_incorrect();
-		bool				is_name_incorrect();
+		int					execute_curl_cmd_and_parse_result();
+
+		//===utils===
+
+		int					get_sender_name();
+		static void 		handle_signal(int signum);
 };
 
 
