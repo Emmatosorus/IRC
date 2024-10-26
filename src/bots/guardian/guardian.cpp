@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/26 18:35:56 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/27 00:40:24 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ int	Guardian::botjoink()
 		return (NO_REQUEST);
 	if (command[9] == '\r')
 		return (PARAM_ERROR);
+	if (command[9] != ' ')
+		return (NO_REQUEST);
 	
 	if (command.find_first_of(",") != std::string::npos)
 		return (CLIENT_ERROR);
@@ -85,6 +87,8 @@ int	Guardian::botjoin()
 		return (NO_REQUEST);
 	if (command[8] == '\r')
 		return (PARAM_ERROR);
+	if (command[8] != ' ')
+		return (NO_REQUEST);
 	
 	if (command.find_first_of(",") != std::string::npos)
 		return (CLIENT_ERROR);
@@ -141,7 +145,9 @@ int	Guardian::addword()
 		return (NO_REQUEST);
 	if (command[8] == '\r')
 		return (PARAM_ERROR);
-
+	if (command[8] != ' ')
+		return (NO_REQUEST);
+	
 	for (; it_bw != bw.end(); it_bw++)
 	{
 		if ((*it_bw).channel == channel)
@@ -218,6 +224,8 @@ int	Guardian::rmword()
 		return (NO_REQUEST);
 	if (command[7] == '\r')
 		return (PARAM_ERROR);
+	if (command[7] != ' ')
+		return (NO_REQUEST);
 	
 	for (; it_bw != bw.end(); it_bw++)
 	{
