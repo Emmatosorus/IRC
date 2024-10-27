@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/27 00:40:24 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/27 22:38:12 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	Guardian::botjoink()
 	
 	if (command.find_first_of(",") != std::string::npos)
 		return (CLIENT_ERROR);
-	if (get_word(10, channel, command, " :") == -1 || is_str_spaces(&command[11 + channel.length()]))
+	if (get_word(10, channel, command, " :") == -1 || is_str_spaces(channel))
 		return (PARAM_ERROR);
 	if (get_word(11 + channel.length(), channel_password, command, " :\r") == -1)
 		return (SERVER_ERROR);
@@ -147,7 +147,6 @@ int	Guardian::addword()
 		return (PARAM_ERROR);
 	if (command[8] != ' ')
 		return (NO_REQUEST);
-	
 	for (; it_bw != bw.end(); it_bw++)
 	{
 		if ((*it_bw).channel == channel)
@@ -274,23 +273,6 @@ int	Guardian::cleanword()
 	(*it_bw).words.erase((*it_bw).words.begin(), (*it_bw).words.end());
 
 	return (SUCCESS);
-}
-
-std::vector<std::string> mini_split(std::string arg, std::string to_split_on)
-{
-	std::vector<std::string>	targets;
-	std::string					target;
-	size_t						pos = arg.find_first_of(to_split_on);
-
-	while (pos != std::string::npos)
-	{
-		pos = arg.find_first_of(to_split_on);
-		target = arg.substr(0, pos);
-		targets.push_back(target);
-		arg.erase(0, pos + 1);
-	}
-	targets.push_back(arg);
-	return (targets);
 }
 
 int	Guardian::does_msg_contain_badword()
@@ -438,7 +420,7 @@ int	Guardian::manage_pm_request()
 		return (0);
 	else if (status == PARAM_ERROR)
 	{
-		msg = "PRIVMSG " + sender_name + ":Usage :!botjoink <#channel> <channel_key>!\r\n";
+		msg = "PRIVMSG " + sender_name + ":Usage :!botjoink <#channel> <channel_key>\r\n";
 		return (0);
 	}
 	else
@@ -524,9 +506,7 @@ int	Guardian::run()
 
 				//===parse connection errors===
 
-				size_t	pos = bot_name.find_first_of(": ", 0);
-				if (pos != std::string::npos)
-					bot_name.erase(pos, bot_name.length());
+				str_trim_space(bot_name);
 				if (parse_connection_errors() == 1)
 					return (close(socket_fd), 1);
 				

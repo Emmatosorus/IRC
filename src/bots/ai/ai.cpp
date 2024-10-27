@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/26 18:35:35 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/27 22:41:41 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,9 +251,7 @@ int	Ai::run()
 
 				//===parse connection errors===
 
-				size_t	pos = bot_name.find_first_of(": ", 0);
-				if (pos != std::string::npos)
-					bot_name.erase(pos, bot_name.length());
+				str_trim_space(bot_name);
 				if (parse_connection_errors() == ERROR)
 					return (close(socket_fd), ERROR);
 				
