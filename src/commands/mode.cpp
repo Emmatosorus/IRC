@@ -65,7 +65,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
                 client.send_696(channel.name, 'k', "", "No argument given");
                 continue;
             }
-            _mode_k(added_modes, added_modes_args, removed_modes, is_add_mode, args[j], channel);
+            _mode_k(added_modes, added_modes_args, removed_modes, is_add_mode, args[j], client, channel);
             if (is_add_mode)
                 j++;
             break;
@@ -104,7 +104,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 }
 
 /* Set/removes channel password */
-void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& password, Channel& channel)
+void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& password, Client& client, Channel& channel)
 {
     if (!is_add_mode)
     {
@@ -113,6 +113,11 @@ void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, st
 		removed_modes += 'k';
         return;
     }
+	if (password.find_first_of(" %@#,"))
+	{
+		client.send_525(channel);
+		return;
+	}
 	added_modes += 'k';
 	added_modes_args += " " + password;
     channel.is_password_mode = true;

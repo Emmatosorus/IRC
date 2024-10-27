@@ -62,6 +62,7 @@ class Client
     void send_473(const Channel& channel);
     void send_475(const Channel& channel);
     void send_482(const Channel& channel);
+	void send_525(const Channel& channel);
     void send_696(std::string target_name, char modechar, std::string parameter,
                   std::string description);
 

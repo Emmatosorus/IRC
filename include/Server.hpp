@@ -83,7 +83,7 @@ class Server
 
     /* All functions for MODE cmd */
     void _mode(PollfdIterator* it, const std::vector<std::string>& args);
-    void _mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& args, Channel& channel);
+    void _mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& args, Client& client, Channel& channel);
 	void _mode_l(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& args, Channel& channel, Client& client);
     void _mode_o(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
 
