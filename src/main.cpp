@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 		}
 		if (password.find_first_of("#%:,*?!@.\t\r\n ") != std::string::npos)
 		{
-            std::cerr << "Forbidden characters in password: #%:,*?!@. \\t\\r\\n";
+            std::cerr << "Forbidden characters in password: #%:,*?!@. \\t\\r\\n\n";
 			return EXIT_FAILURE;
 		}
 
