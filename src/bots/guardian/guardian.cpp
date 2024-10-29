@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/27 22:38:12 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/29 08:33:55 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ int	Guardian::botjoink()
 		return (PARAM_ERROR);
 	if (get_word(11 + channel.length(), channel_password, command, " :\r") == -1)
 		return (SERVER_ERROR);
+	if (is_str_spaces(channel_password) || command[11 + channel.length()] == '\r')
+		return (PARAM_ERROR);
 	
 	msg = "JOIN " + channel + " " + channel_password + "\r\n";
 	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});

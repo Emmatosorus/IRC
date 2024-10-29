@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/27 22:41:41 by eandre           ###   ########.fr       */
+/*   Updated: 2024/10/29 08:52:18 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,12 @@ int	Ai::parse_connection_errors()
 		return (error_msg("\033[0;31mError! Incorrect password\033[0m", 1));
 	if (is_name_incorrect())
 		return (error_msg("\033[0;31mError! Incorrect name\033[0m", 1));
-	if (msg != ":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n")
+	if (msg.find(":42Chan 001 " + bot_name + " :Welcome to the 42Chan Network " + bot_name + "!\r\n") != 0)
 		return (error_msg("\033[0;31mError! This bot is restricted to our irc only!\033[0m", 1));
 	
 	return (SUCCESS);
 }
+
 
 int	Ai::cleanup_msg()
 {
