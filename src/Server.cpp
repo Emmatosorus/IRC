@@ -122,31 +122,33 @@ void Server::_handle_client_message(PollfdIterator* it)
 		remove_unprintable_characters(raw_message);
         std::cout << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
+		if (raw_message == "")
+			return;
 
         std::vector<std::string> args = parse_client_msg(raw_message);
         const std::string& command = args[0];
-        if (command == "quit")
-        {
-            return _quit(it, args);
-        }
-        else if (!client.entered_password && command != "pass")
-        {
-            client.send_464();
-        }
-        else if (client.entered_password &&
-                 (!client.is_registered && !(command == "nick" || command == "user" || command == "pass")))
-        {
-            client.send_451();
-        }
-        else if (m_commands.find(command) != m_commands.end())
-        {
-            (this->*m_commands[command])(it, args);
-        }
-        else
-        {
-            client.send_421(command);
-        }
-        end_of_msg = client.buf.find("\r\n");
+		if (command == "quit")
+		{
+			return _quit(it, args);
+		}
+		else if (!client.entered_password && command != "pass")
+		{
+			client.send_464();
+		}
+		else if (client.entered_password &&
+				(!client.is_registered && !(command == "nick" || command == "user" || command == "pass")))
+		{
+			client.send_451();
+		}
+		else if (m_commands.find(command) != m_commands.end())
+		{
+			(this->*m_commands[command])(it, args);
+		}
+		else
+		{
+			client.send_421(command);
+		}
+		end_of_msg = client.buf.find("\r\n");
     }
     return;
 }

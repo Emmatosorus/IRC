@@ -21,7 +21,7 @@ int main(int argc, char** argv)
             std::cerr << "ircserv must be called with : ./ircserv <port> <password>\n";
 			return EXIT_FAILURE;
 		}
-		if (password.find_first_of("#%:,*?!@.\t\r\n "))
+		if (password.find_first_of("#%:,*?!@.\t\r\n ") != std::string::npos)
 		{
             std::cerr << "Forbidden characters in password: #%:,*?!@. \\t\\r\\n";
 			return EXIT_FAILURE;
