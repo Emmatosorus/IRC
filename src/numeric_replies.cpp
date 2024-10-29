@@ -264,7 +264,8 @@ void Client::send_482(const Channel& channel)
 
 void Client::send_525(const Channel& channel)
 {
-	send_msg(":42chan 525 " + _resolve_nickname() + " " + channel.name + " :Forbidden characters in key");
+	std::string reply = ":42chan 525 " + _resolve_nickname() + " " + channel.name + " :Forbidden characters in key: #%:,*?!@. \\t\\r\\n";
+	send_msg(reply);
 }
 
 void Client::send_696(std::string target_name, char modechar, std::string parameter,

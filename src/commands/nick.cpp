@@ -12,9 +12,9 @@ void Server::_nick(PollfdIterator* it, const std::vector<std::string>& args)
     if (std::isalpha(args[1][0]) == 0)
         return client.send_432(nickname, "First character of nickname must be a-z or A-Z");
 
-    if (nickname.find_first_of("#:,*?!@.\t\r\n ") != std::string::npos)
+    if (nickname.find_first_of("#%:,*?!@.\t\r\n ") != std::string::npos)
         return client.send_432(nickname,
-                               "Nickname contains invalid characters : #:,*?!@.\\t\\r\\n ");
+                               "Nickname contains invalid characters: #%:,*?!@. \\t\\r\\n");
 
     ClientIterator potential_nickname_holder = _find_client_by_nickname(nickname);
 	if (potential_nickname_holder != m_clients.end() && potential_nickname_holder->second.fd != client.fd)

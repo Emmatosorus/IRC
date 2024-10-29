@@ -17,8 +17,16 @@ int main(int argc, char** argv)
             port = argv[1];
         }
         else
-            throw std::invalid_argument(
-                "ircserv must be called with : ./ircserv <port> <password>");
+		{
+            std::cerr << "ircserv must be called with : ./ircserv <port> <password>\n";
+			return EXIT_FAILURE;
+		}
+		if (password.find_first_of("#%:,*?!@.\t\r\n "))
+		{
+            std::cerr << "Forbidden characters in password: #%:,*?!@. \\t\\r\\n";
+			return EXIT_FAILURE;
+		}
+
         Server s(password.c_str(), port.c_str());
         s.start();
     }

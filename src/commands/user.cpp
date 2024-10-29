@@ -14,9 +14,9 @@ void Server::_user(PollfdIterator* it, const std::vector<std::string>& args)
     if (args[1].size() > USERLEN)
         return client.send_468("username is too long");
 
-    size_t pos = args[1].find_first_of("#:,*?!@.\t\r\n ");
+    size_t pos = args[1].find_first_of("#%:,*?!@.\t\r\n ");
     if (pos != std::string::npos)
-        return client.send_468("username contains invalid characters: #:,*?!@.\\t\\r\\n ");
+        return client.send_468("username contains invalid characters: #%:,*?!@. \\t\\r\\n");
 
     client.username = args[1];
     client.fullname = args[4];

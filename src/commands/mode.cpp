@@ -104,7 +104,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 }
 
 /* Set/removes channel password */
-void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& password, Client& client, Channel& channel)
+void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& channel_password, Client& client, Channel& channel)
 {
     if (!is_add_mode)
     {
@@ -113,15 +113,15 @@ void Server::_mode_k(std::string& added_modes, std::string& added_modes_args, st
 		removed_modes += 'k';
         return;
     }
-	if (password.find_first_of(" %@#,"))
+	if (channel_password.find_first_of(" %@#,") != std::string::npos)
 	{
 		client.send_525(channel);
 		return;
 	}
 	added_modes += 'k';
-	added_modes_args += " " + password;
+	added_modes_args += " " + channel_password;
     channel.is_password_mode = true;
-    channel.password = password;
+    channel.password = channel_password;
 }
 
 /* set/removes user limit on channel */
