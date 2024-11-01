@@ -56,6 +56,7 @@ class Server
     void _join(PollfdIterator* it, const std::vector<std::string>& args);
     void _add_client_to_channel(Channel& channel, Client& client,
                                 bool should_add);
+	void _part_all_channels(Client& client);
 
     /* All functions for PRIVMSG cmd */
     void _privmsg(PollfdIterator* it, const std::vector<std::string>& args);
@@ -71,6 +72,7 @@ class Server
 
     /* All functions for PART cmd */
 	void _part(PollfdIterator* it, const std::vector<std::string>& args);
+	void _part_channel(Client& client, Channel& channel, const std::string &reason);
 
     /* All functions for QUIT cmd */
     void _quit(PollfdIterator* it, const std::vector<std::string>& args);

@@ -9,8 +9,11 @@ static std::string _is_channel_name_valid(const std::string& channel_name);
 void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
 {
     Client& client = m_clients[(*it)->fd];
-    if (args.size() < 2)
-        return client.send_461("JOIN");
+	if (args.size() < 2)
+		return client.send_461("JOIN");
+
+	if (args[1] == "0")
+		return _part_all_channels(client);
 
     std::vector<std::string> channels_to_join = parse_comma_arg(args[1]);
     std::vector<std::string> password_to_channels = parse_comma_arg(args[2]);
@@ -100,4 +103,12 @@ static std::string _is_channel_name_valid(const std::string& channel_name)
     if (channel_name.find_first_of(": ,\a\t\r\n") != std::string::npos)
         return "Invalid channel character: : ,\\a\\t\\r\\n";
     return "";
+}
+
+void Server::_part_all_channels(Client& client)
+{
+	while (!client.channels.empty())
+	{
+		_part_channel(client, m_channels[client.channels[0]], "");
+	}
 }

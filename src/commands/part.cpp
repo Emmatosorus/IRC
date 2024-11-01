@@ -10,6 +10,9 @@ void Server::_part(PollfdIterator* it, const std::vector<std::string>& args)
         return client.send_461("PART");
 
     std::vector<std::string> channels_to_part = parse_comma_arg(args[1]);
+	std::string reason = "";
+	if (args.size() > 2)
+		reason = args[2];
     for (size_t i = 0; i < channels_to_part.size(); i++)
     {
         const std::string& channel_name = channels_to_part[i];
@@ -28,12 +31,15 @@ void Server::_part(PollfdIterator* it, const std::vector<std::string>& args)
             continue;
 		}
 
-		std::string msg = ":" + client.nickname + " PART " + channel.name;
-		if (args.size() > 2)
-			msg += " :" + args[2];
-		channel.send_msg(msg);
-        _remove_client_from_channel(channel, client);
+		_part_channel(client, channel, reason);
     }
 }
-// :emma!emma@46.231.218.157 PART #dogs :don't like dogs
-// :emma!emma@46.231.218.157 PART #dogs
+
+void Server::_part_channel(Client& client, Channel& channel, const std::string &reason)
+{
+	std::string msg = ":" + client.nickname + " PART " + channel.name;
+	if (reason != "")
+		msg += " :" + reason;
+	channel.send_msg(msg);
+	_remove_client_from_channel(channel, client);
+}
