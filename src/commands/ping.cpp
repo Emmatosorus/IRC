@@ -1,7 +1,7 @@
 #include "../../include/Server.hpp"
 
-/* https://modern.ircdocs.horse/#pass-message
- * Parameters: <password> */
+/* https://modern.ircdocs.horse/#ping-message
+ * Parameters: <token> */
 void Server::_ping(PollfdIterator* it, const std::vector<std::string>& args)
 {
     Client& client = m_clients[(*it)->fd];

@@ -13,7 +13,7 @@ void Client::send_001()
 void Client::send_002()
 {
     std::string reply = ":42Chan 002 " + _resolve_nickname() +
-                        " :Your host is 42Chan, running version 1.0 " + username + "!";
+                        " :Your host is 42Chan, running version 1.0";
     send_msg(reply);
 }
 

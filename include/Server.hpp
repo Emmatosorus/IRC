@@ -98,6 +98,9 @@ class Server
                  Channel& channel, Client& client);
     void _mode_o(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
 
+    /* All functions for MOTD cmd */
+	void _motd(PollfdIterator* it, const std::vector<std::string>& args);
+
     /* All functions for KICK cmd */
     void _kick(PollfdIterator* it, const std::vector<std::string>& args);
 

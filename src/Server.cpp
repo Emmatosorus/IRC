@@ -48,6 +48,7 @@ Server::Server(const char* password, const char* port)
     m_commands.insert(make_pair("list", &Server::_list));
     m_commands.insert(make_pair("who", &Server::_list));
     m_commands.insert(make_pair("ping", &Server::_ping));
+    m_commands.insert(make_pair("motd", &Server::_motd));
 
     signal(SIGINT, Server::_handle_signal);
 }
