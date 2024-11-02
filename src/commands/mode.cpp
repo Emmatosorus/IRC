@@ -155,8 +155,8 @@ void Server::_mode_l(std::string& added_modes, std::string& added_modes_args,
     if (is_add_mode)
     {
 		long res = strtol(user_limit.c_str(), NULL, 10);
-		if (res < 0 || res > INT_MAX)
-			return client.send_696(channel.name, 'l', user_limit, "User limit must be a positive integer up to 2147483647");
+		if (res < 1 || res > INT_MAX)
+			return client.send_696(channel.name, 'l', user_limit, "User limit must be greater than 0 and lower than 2147483647");
 
         channel.is_user_limit_mode = true;
         size_t limit = std::atoi(user_limit.c_str());
