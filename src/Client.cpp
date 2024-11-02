@@ -12,7 +12,7 @@ Client::Client()
       nickname(""),
       username(""),
       fullname(""),
-	  away_msg(""),
+      away_msg(""),
       channels()
 {
     return;
@@ -27,7 +27,7 @@ Client::Client(int fd)
       nickname(""),
       username(""),
       fullname(""),
-	  away_msg(""),
+      away_msg(""),
       channels()
 {
     return;
@@ -42,7 +42,7 @@ Client::Client(const Client& c)
       nickname(c.nickname),
       username(c.username),
       fullname(c.fullname),
-	  away_msg(c.away_msg),
+      away_msg(c.away_msg),
       channels(c.channels)
 {
     return;
@@ -60,7 +60,7 @@ Client& Client::operator=(const Client& c)
     nickname = c.nickname;
     username = c.username;
     fullname = c.fullname;
-	away_msg = c.away_msg;
+    away_msg = c.away_msg;
     channels = c.channels;
     return *this;
 }
@@ -70,7 +70,7 @@ Client::~Client() { return; }
 void Client::send_msg(const std::string& msg) const
 {
     std::string total = msg + "\r\n";
-	sendall(fd, total);
+    sendall(fd, total);
 }
 
 void Client::quit_channel(const std::string channel_name)

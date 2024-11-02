@@ -21,7 +21,7 @@ Channel::Channel()
       is_user_limit_mode(false),
       is_invite_only_mode(false),
       is_const_topic_mode(false),
-	  is_no_external_messages_mode(true)
+      is_no_external_messages_mode(true)
 {
     return;
 }
@@ -41,7 +41,7 @@ Channel::Channel(int creator_fd, std::string name)
       is_user_limit_mode(false),
       is_invite_only_mode(false),
       is_const_topic_mode(false),
-	  is_no_external_messages_mode(true)
+      is_no_external_messages_mode(true)
 {
     this->created_timestamp = long_to_str(time(NULL));
     return;
@@ -63,7 +63,7 @@ Channel::Channel(const Channel& c)
       is_user_limit_mode(c.is_user_limit_mode),
       is_invite_only_mode(c.is_invite_only_mode),
       is_const_topic_mode(c.is_invite_only_mode),
-	  is_no_external_messages_mode(c.is_no_external_messages_mode)
+      is_no_external_messages_mode(c.is_no_external_messages_mode)
 {
     return;
 }
@@ -116,7 +116,7 @@ void Channel::send_msg(const std::string& msg) const
     for (std::vector<int>::const_iterator it = subscribed_users_fd.begin();
          it != subscribed_users_fd.end(); it++)
     {
-		sendall(*it, total);
+        sendall(*it, total);
     }
 }
 
@@ -126,8 +126,8 @@ void Channel::send_msg_to_operators(int fd, const std::string& msg) const
     for (std::vector<int>::const_iterator it = channel_operators_fd.begin();
          it != channel_operators_fd.end(); it++)
     {
-		if (*it != fd)
-			sendall(*it, total);
+        if (*it != fd)
+            sendall(*it, total);
     }
 }
 
@@ -138,7 +138,7 @@ void Channel::send_msg_except(int fd, const std::string& msg) const
          it != subscribed_users_fd.end(); it++)
     {
         if (*it != fd)
-			sendall(*it, total);
+            sendall(*it, total);
     }
 }
 
@@ -155,37 +155,37 @@ void Channel::remove_client(Client& client)
 
 std::string Channel::get_modestring() const
 {
-	std::string modestring = "+";
-	if (is_no_external_messages_mode)
-		modestring += "n";
-	if (is_invite_only_mode)
-		modestring += "i";
-	if (is_password_mode)
-		modestring += "k";
-	if (is_user_limit_mode)
-		modestring += "l";
-	if (is_const_topic_mode)
-		modestring += "t";
+    std::string modestring = "+";
+    if (is_no_external_messages_mode)
+        modestring += "n";
+    if (is_invite_only_mode)
+        modestring += "i";
+    if (is_password_mode)
+        modestring += "k";
+    if (is_user_limit_mode)
+        modestring += "l";
+    if (is_const_topic_mode)
+        modestring += "t";
 
-	if (is_password_mode)
-		modestring += " " + password;
-	if (is_user_limit_mode)
-		modestring += " " + long_to_str(user_limit);
-	return modestring;
+    if (is_password_mode)
+        modestring += " " + password;
+    if (is_user_limit_mode)
+        modestring += " " + long_to_str(user_limit);
+    return modestring;
 }
 
 std::string Channel::get_list_of_clients(const std::map<int, Client> m_clients) const
 {
-	std::string list_of_clients;
-	for (std::vector<int>::const_iterator it = subscribed_users_fd.begin();
-			it != subscribed_users_fd.end(); it++)
-	{
-		const Client& client = m_clients.find(*it)->second;
-		if (is_operator(client.fd))
-			list_of_clients += "@";
-		list_of_clients += client.nickname;
-		if (it + 1 != subscribed_users_fd.end())
-			list_of_clients += " ";
-	}
-	return list_of_clients;
+    std::string list_of_clients;
+    for (std::vector<int>::const_iterator it = subscribed_users_fd.begin();
+         it != subscribed_users_fd.end(); it++)
+    {
+        const Client& client = m_clients.find(*it)->second;
+        if (is_operator(client.fd))
+            list_of_clients += "@";
+        list_of_clients += client.nickname;
+        if (it + 1 != subscribed_users_fd.end())
+            list_of_clients += " ";
+    }
+    return list_of_clients;
 }

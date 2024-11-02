@@ -13,19 +13,19 @@ std::string long_to_str(long nbr)
 
 std::string to_irc_lower_case(const std::string& str)
 {
-	std::string res("");
-	res.reserve(str.size());
-	std::string scandinavian_lower_case_chars = "{}|^";
-	std::string scandinavian_upper_case_chars = "[]\\~";
-	for (size_t i = 0; i < str.size(); i++)
-	{
-		size_t scandinavian_char = scandinavian_upper_case_chars.find_first_of(str[i]);
-		if (scandinavian_char != std::string::npos)
-			res += scandinavian_lower_case_chars[scandinavian_char];
-		else
-			res += tolower(str[i]);
-	}
-	return res;
+    std::string res("");
+    res.reserve(str.size());
+    std::string scandinavian_lower_case_chars = "{}|^";
+    std::string scandinavian_upper_case_chars = "[]\\~";
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        size_t scandinavian_char = scandinavian_upper_case_chars.find_first_of(str[i]);
+        if (scandinavian_char != std::string::npos)
+            res += scandinavian_lower_case_chars[scandinavian_char];
+        else
+            res += tolower(str[i]);
+    }
+    return res;
 }
 
 std::vector<std::string> parse_comma_arg(std::string comma_arg)
@@ -52,26 +52,26 @@ void make_unique(std::vector<std::string>& vec)
 
 void remove_unprintable_characters(std::string& str)
 {
-	for (std::string::iterator it = str.begin(); it != str.end();)
-	{
-		if (!isprint(*it))
-			it = str.erase(it);
-		else
-			it++;
-	}
+    for (std::string::iterator it = str.begin(); it != str.end();)
+    {
+        if (!isprint(*it))
+            it = str.erase(it);
+        else
+            it++;
+    }
 }
 
 int sendall(int fd, const std::string& msg)
 {
-	int size = msg.size();
-	int total = 0;
-	int bytes_send = 0;
-	while (total < size)
-	{
-		bytes_send = send(fd, msg.c_str(), size, 0);
-		if (bytes_send == -1)
-			return -1;
-		total += bytes_send;
-	}
-	return total;
+    int size = msg.size();
+    int total = 0;
+    int bytes_send = 0;
+    while (total < size)
+    {
+        bytes_send = send(fd, msg.c_str(), size, 0);
+        if (bytes_send == -1)
+            return -1;
+        total += bytes_send;
+    }
+    return total;
 }

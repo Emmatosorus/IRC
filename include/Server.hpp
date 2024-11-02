@@ -36,10 +36,10 @@ class Server
     void _remove_client_from_all_channels(Client& client);
     void _remove_client_from_channel(Channel& channel, Client& client);
     void _add_client(int fd);
-	void _register_user(Client& client);
-	void _send_to_client_channels(Client& client, const std::string& msg);
+    void _register_user(Client& client);
+    void _send_to_client_channels(Client& client, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
-	ChannelIterator _find_channel(const std::string& channel_name);
+    ChannelIterator _find_channel(const std::string& channel_name);
 
     /* All functions for AWAY cmd */
     void _away(PollfdIterator* it, const std::vector<std::string>& args);
@@ -50,14 +50,16 @@ class Server
     /* All functions for PASS cmd */
     void _pass(PollfdIterator* it, const std::vector<std::string>& args);
 
+    /* All functions for PING cmd */
+    void _ping(PollfdIterator* it, const std::vector<std::string>& args);
+
     /* All functions for NICK cmd */
     void _nick(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for JOIN cmd */
     void _join(PollfdIterator* it, const std::vector<std::string>& args);
-    void _add_client_to_channel(Channel& channel, Client& client,
-                                bool should_add);
-	void _part_all_channels(Client& client);
+    void _add_client_to_channel(Channel& channel, Client& client, bool should_add);
+    void _part_all_channels(Client& client);
 
     /* All functions for PRIVMSG cmd */
     void _privmsg(PollfdIterator* it, const std::vector<std::string>& args);
@@ -72,8 +74,8 @@ class Server
     void _notice(PollfdIterator* it, const std::vector<std::string>& args);
 
     /* All functions for PART cmd */
-	void _part(PollfdIterator* it, const std::vector<std::string>& args);
-	void _part_channel(Client& client, Channel& channel, const std::string &reason);
+    void _part(PollfdIterator* it, const std::vector<std::string>& args);
+    void _part_channel(Client& client, Channel& channel, const std::string& reason);
 
     /* All functions for QUIT cmd */
     void _quit(PollfdIterator* it, const std::vector<std::string>& args);
@@ -86,8 +88,14 @@ class Server
 
     /* All functions for MODE cmd */
     void _mode(PollfdIterator* it, const std::vector<std::string>& args);
-    void _mode_k(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& args, Client& client, Channel& channel);
-	void _mode_l(std::string& added_modes, std::string& added_modes_args, std::string& removed_modes, bool is_add_mode, const std::string& args, Channel& channel, Client& client);
+    void _resolve_channel_mode(const std::vector<std::string>& args, Client& client);
+    void _resolve_user_mode(const std::vector<std::string>& args, Client& client);
+    void _mode_k(std::string& added_modes, std::string& added_modes_args,
+                 std::string& removed_modes, bool is_add_mode, const std::string& args,
+                 Client& client, Channel& channel);
+    void _mode_l(std::string& added_modes, std::string& added_modes_args,
+                 std::string& removed_modes, bool is_add_mode, const std::string& args,
+                 Channel& channel, Client& client);
     void _mode_o(bool is_add_mode, const std::string& args, Channel& channel, Client& client);
 
     /* All functions for KICK cmd */
@@ -95,6 +103,7 @@ class Server
 
     const std::string m_password;
     const std::string m_port;
+    const std::string m_creation_time;
     std::vector<struct pollfd> m_pfds;
     std::map<int, Client> m_clients;
     std::map<std::string, Channel> m_channels;

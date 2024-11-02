@@ -10,47 +10,74 @@ void Client::send_001()
     send_msg(reply);
 }
 
+void Client::send_002()
+{
+    std::string reply = ":42Chan 002 " + _resolve_nickname() +
+                        " :Your host is 42Chan, running version 1.0 " + username + "!";
+    send_msg(reply);
+}
+
+void Client::send_003(const std::string& server_creation_timestamp)
+{
+    std::string reply = ":42Chan 003 " + _resolve_nickname() + " :This server was created on " +
+                        server_creation_timestamp;
+    send_msg(reply);
+}
+
+void Client::send_004()
+{
+    std::string reply = ":42Chan 004 " + _resolve_nickname() + " :42chan 1.0 a intokl";
+    send_msg(reply);
+}
+
+void Client::send_221()
+{
+    std::string reply = ":42Chan 221 " + _resolve_nickname();
+    if (away_msg != "")
+        reply += " +a";
+    send_msg(reply);
+}
+
 void Client::send_301(const std::string& target_nickname, const std::string& target_away_msg)
 {
-	std::string reply =
-		":42Chan 301 " + _resolve_nickname() + " " + target_nickname + " :" + target_away_msg;
-	send_msg(reply);
+    std::string reply =
+        ":42Chan 301 " + _resolve_nickname() + " " + target_nickname + " :" + target_away_msg;
+    send_msg(reply);
 }
 
 void Client::send_305()
 {
-	std::string reply =
-		":42Chan 305 " + _resolve_nickname() + " :You are not longer marked as being away";
-	send_msg(reply);
+    std::string reply =
+        ":42Chan 305 " + _resolve_nickname() + " :You are not longer marked as being away";
+    send_msg(reply);
 }
 
 void Client::send_306()
 {
-	std::string reply =
-		":42Chan 306 " + _resolve_nickname() + " :You have been marked as being away";
-	send_msg(reply);
+    std::string reply =
+        ":42Chan 306 " + _resolve_nickname() + " :You have been marked as being away";
+    send_msg(reply);
 }
 
 void Client::send_322(const Channel& channel)
 {
-	std::string reply =
-		":42Chan 322 " + _resolve_nickname() + " " + channel.name + " " + long_to_str(channel.subscribed_users_fd.size());
-	if (channel.topic != "")
-		reply += " :" + channel.topic;
-	send_msg(reply);
+    std::string reply = ":42Chan 322 " + _resolve_nickname() + " " + channel.name + " " +
+                        long_to_str(channel.subscribed_users_fd.size());
+    if (channel.topic != "")
+        reply += " :" + channel.topic;
+    send_msg(reply);
 }
 
 void Client::send_323()
 {
-    std::string reply =
-        ":42Chan 323 " + _resolve_nickname() + " :End of /LIST";
+    std::string reply = ":42Chan 323 " + _resolve_nickname() + " :End of /LIST";
     send_msg(reply);
 }
 
 void Client::send_324(const Channel& channel)
 {
     std::string reply = ":42Chan 324 " + _resolve_nickname() + " " + channel.name + " ";
-	reply += channel.get_modestring();
+    reply += channel.get_modestring();
     send_msg(reply);
 }
 
@@ -100,6 +127,32 @@ void Client::send_366(const std::string& channel_name)
 {
     std::string reply =
         ":42chan 366 " + _resolve_nickname() + " " + channel_name + " :End of \\NAMES list";
+    send_msg(reply);
+}
+
+void Client::send_372()
+{
+    std::string reply =
+        ":42chan 372 " + _resolve_nickname() + " :Welcome to the 42Chan! :3\n" + ":42chan 372 " +
+        _resolve_nickname() + " : _  _ ___   _____ _                    \n" + ":42chan 372 " +
+        _resolve_nickname() + " : | || |__ \\ / ____| |                 \n" + ":42chan 372 " +
+        _resolve_nickname() + " : | || |_ ) | |    | |__   __ _ _ __    \n" + ":42chan 372 " +
+        _resolve_nickname() + " : |__   _/ /| |    | '_ \\ / _` | '_ \\ \n" + ":42chan 372 " +
+        _resolve_nickname() + " :    | |/ /_| |____| | | | (_| | | | |  \n" + ":42chan 372 " +
+        _resolve_nickname() + " :    |_|____|\\_____|_| |_|\\__,_|_| |_|\n" + ":42chan 372 " +
+        _resolve_nickname() + " :Have fun chatting and be polite to others!";
+    send_msg(reply);
+}
+
+void Client::send_375()
+{
+    std::string reply = ":42chan 375 " + _resolve_nickname() + " :- 42Chan Message of the day - ";
+    send_msg(reply);
+}
+
+void Client::send_376()
+{
+    std::string reply = ":42chan 376 " + _resolve_nickname() + " :End of /MOTD command.";
     send_msg(reply);
 }
 
@@ -262,10 +315,18 @@ void Client::send_482(const Channel& channel)
     send_msg(reply);
 }
 
+void Client::send_502()
+{
+    std::string reply =
+        ":42chan 502 " + _resolve_nickname() + " :Can't change mode for other users";
+    send_msg(reply);
+}
+
 void Client::send_525(const Channel& channel)
 {
-	std::string reply = ":42chan 525 " + _resolve_nickname() + " " + channel.name + " :Forbidden characters in key: #%:,*?!@. \\t\\r\\n";
-	send_msg(reply);
+    std::string reply = ":42chan 525 " + _resolve_nickname() + " " + channel.name +
+                        " :Forbidden characters in key: #%:,*?!@. \\t\\r\\n";
+    send_msg(reply);
 }
 
 void Client::send_696(std::string target_name, char modechar, std::string parameter,

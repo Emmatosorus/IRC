@@ -25,18 +25,24 @@ void Server::_user(PollfdIterator* it, const std::vector<std::string>& args)
         if (client.password != m_password)
             return client.send_464();
 
-		_register_user(client);
+        _register_user(client);
     }
 }
 
 void Server::_register_user(Client& client)
 {
-	client.is_registered = true;
-	client.send_001();
-	if (m_channels.size() == 0)
-		return;
-	for (ChannelIterator it = m_channels.begin(); it != m_channels.end(); it++)
-		client.send_322(it->second);
-	client.send_323();
-	return;
+    client.is_registered = true;
+    client.send_001();
+    client.send_002();
+    client.send_003(m_creation_time);
+    client.send_004();
+    client.send_375();
+    client.send_372();
+    client.send_376();
+    if (m_channels.size() == 0)
+        return;
+    for (ChannelIterator it = m_channels.begin(); it != m_channels.end(); it++)
+        client.send_322(it->second);
+    client.send_323();
+    return;
 }

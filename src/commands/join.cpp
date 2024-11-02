@@ -9,11 +9,11 @@ static std::string _is_channel_name_valid(const std::string& channel_name);
 void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
 {
     Client& client = m_clients[(*it)->fd];
-	if (args.size() < 2)
-		return client.send_461("JOIN");
+    if (args.size() < 2)
+        return client.send_461("JOIN");
 
-	if (args[1] == "0")
-		return _part_all_channels(client);
+    if (args[1] == "0")
+        return _part_all_channels(client);
 
     std::vector<std::string> channels_to_join = parse_comma_arg(args[1]);
     std::vector<std::string> password_to_channels = parse_comma_arg(args[2]);
@@ -69,27 +69,26 @@ void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
     }
 }
 
-void Server::_add_client_to_channel(Channel& channel, Client& client,
-                                    bool should_add)
+void Server::_add_client_to_channel(Channel& channel, Client& client, bool should_add)
 {
-	if (should_add)
-		channel.subscribed_users_fd.push_back(client.fd);
-	client.channels.push_back(channel.name);
-	channel.send_msg(":" + client.nickname + " JOIN :" + channel.name);
-	if (channel.topic != "")
-	{
-		client.send_332(channel);
-		client.send_333(channel);
-	}
-	client.send_353(channel, channel.get_list_of_clients(m_clients));
-	client.send_366(channel.name);
-	client.send_329(channel);
-	if (channel.is_invite_only_mode)
-	{
-		std::vector<int>::iterator it =
-			std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
-		channel.invited_users_fd.erase(it);
-	}
+    if (should_add)
+        channel.subscribed_users_fd.push_back(client.fd);
+    client.channels.push_back(channel.name);
+    channel.send_msg(":" + client.nickname + " JOIN :" + channel.name);
+    if (channel.topic != "")
+    {
+        client.send_332(channel);
+        client.send_333(channel);
+    }
+    client.send_353(channel, channel.get_list_of_clients(m_clients));
+    client.send_366(channel.name);
+    client.send_329(channel);
+    if (channel.is_invite_only_mode)
+    {
+        std::vector<int>::iterator it =
+            std::find(channel.invited_users_fd.begin(), channel.invited_users_fd.end(), client.fd);
+        channel.invited_users_fd.erase(it);
+    }
 }
 
 static std::string _is_channel_name_valid(const std::string& channel_name)
@@ -107,8 +106,8 @@ static std::string _is_channel_name_valid(const std::string& channel_name)
 
 void Server::_part_all_channels(Client& client)
 {
-	while (!client.channels.empty())
-	{
-		_part_channel(client, m_channels[client.channels[0]], "");
-	}
+    while (!client.channels.empty())
+    {
+        _part_channel(client, m_channels[client.channels[0]], "");
+    }
 }

@@ -10,7 +10,7 @@ void Server::_names(PollfdIterator* it, const std::vector<std::string>& args)
         return client.send_461("NAMES");
 
     std::vector<std::string> targets = parse_comma_arg(args[1]);
-	make_unique(targets);
+    make_unique(targets);
     for (size_t i = 0; i < targets.size(); i++)
     {
         const std::string& channel_name = targets[i];

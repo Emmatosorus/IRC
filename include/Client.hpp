@@ -19,17 +19,21 @@ class Client
     std::string nickname;
     std::string username;
     std::string fullname;
-	std::string away_msg;
+    std::string away_msg;
     std::vector<std::string> channels;
 
     void quit_channel(const std::string channel_name);
     void send_msg(const std::string& msg) const;
     void send_001();
-	void send_301(const std::string& target_nickname, const std::string& target_away_msg);
-	void send_305();
-	void send_306();
-	void send_322(const Channel& channel);
-	void send_323();
+    void send_002();
+    void send_003(const std::string& server_creation_timestamp);
+    void send_004();
+    void send_221();
+    void send_301(const std::string& target_nickname, const std::string& target_away_msg);
+    void send_305();
+    void send_306();
+    void send_322(const Channel& channel);
+    void send_323();
     void send_324(const Channel& channel);
     void send_329(const Channel& channel);
     void send_331(const Channel& channel);
@@ -38,6 +42,9 @@ class Client
     void send_341(const Channel& channel, const std::string& client_nick);
     void send_353(const Channel& channel, const std::string& list_of_clients);
     void send_366(const std::string& channel_name);
+    void send_372();
+    void send_375();
+    void send_376();
     void send_401(const std::string& nonexistent_nickname);
     void send_403(const std::string& channel_name);
     void send_407(const std::string& abort_msg);
@@ -62,7 +69,8 @@ class Client
     void send_473(const Channel& channel);
     void send_475(const Channel& channel);
     void send_482(const Channel& channel);
-	void send_525(const Channel& channel);
+    void send_502();
+    void send_525(const Channel& channel);
     void send_696(std::string target_name, char modechar, std::string parameter,
                   std::string description);
 

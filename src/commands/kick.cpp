@@ -42,10 +42,10 @@ void Server::_kick(PollfdIterator* it, const std::vector<std::string>& args)
             client.send_442(channel);
             continue;
         }
-		std::string msg = ":" + client.nickname + " KICK " + channel.name + " " + target.nickname;
-		if (args.size() > 3)
-			msg += " :" + args[3];
-		channel.send_msg(msg);
-		_remove_client_from_channel(channel, target);
+        std::string msg = ":" + client.nickname + " KICK " + channel.name + " " + target.nickname;
+        if (args.size() > 3)
+            msg += " :" + args[3];
+        channel.send_msg(msg);
+        _remove_client_from_channel(channel, target);
     }
 }

@@ -16,7 +16,11 @@
 bool Server::s_should_run = true;
 
 Server::Server(const char* password, const char* port)
-    : m_password(password), m_port(port), m_pfds(), m_sockfd(-1)
+    : m_password(password),
+      m_port(port),
+      m_creation_time(long_to_str(time(NULL))),
+      m_pfds(),
+      m_sockfd(-1)
 {
     _init_listening_socket();
 
@@ -42,6 +46,8 @@ Server::Server(const char* password, const char* port)
     m_commands.insert(make_pair("mode", &Server::_mode));
     m_commands.insert(make_pair("kick", &Server::_kick));
     m_commands.insert(make_pair("list", &Server::_list));
+    m_commands.insert(make_pair("who", &Server::_list));
+    m_commands.insert(make_pair("ping", &Server::_ping));
 
     signal(SIGINT, Server::_handle_signal);
 }
@@ -103,7 +109,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     else if (bytes_received == 0)
     {
         std::cout << "Connection closed: " << (*it)->fd << "\n";
-		_quit_client(it, client, "");
+        _quit_client(it, client, "");
         return;
     }
     buf[bytes_received] = '\0';
@@ -119,36 +125,37 @@ void Server::_handle_client_message(PollfdIterator* it)
     while (end_of_msg != std::string::npos)
     {
         raw_message = client.buf.substr(0, end_of_msg);
-		remove_unprintable_characters(raw_message);
+        remove_unprintable_characters(raw_message);
         std::cout << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
-		if (raw_message == "")
-			return;
+        if (raw_message == "")
+            return;
 
         std::vector<std::string> args = parse_client_msg(raw_message);
         const std::string& command = args[0];
-		if (command == "quit")
-		{
-			return _quit(it, args);
-		}
-		else if (!client.entered_password && command != "pass")
-		{
-			client.send_464();
-		}
-		else if (client.entered_password &&
-				(!client.is_registered && !(command == "nick" || command == "user" || command == "pass")))
-		{
-			client.send_451();
-		}
-		else if (m_commands.find(command) != m_commands.end())
-		{
-			(this->*m_commands[command])(it, args);
-		}
-		else
-		{
-			client.send_421(command);
-		}
-		end_of_msg = client.buf.find("\r\n");
+        if (command == "quit")
+        {
+            return _quit(it, args);
+        }
+        else if (!client.entered_password && command != "pass")
+        {
+            client.send_464();
+        }
+        else if (client.entered_password &&
+                 (!client.is_registered &&
+                  !(command == "nick" || command == "user" || command == "pass")))
+        {
+            client.send_451();
+        }
+        else if (m_commands.find(command) != m_commands.end())
+        {
+            (this->*m_commands[command])(it, args);
+        }
+        else
+        {
+            client.send_421(command);
+        }
+        end_of_msg = client.buf.find("\r\n");
     }
     return;
 }
@@ -211,7 +218,7 @@ void Server::_add_client(int fd)
 Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
 {
     ClientIterator it;
-	std::string lower_case_nickname = to_irc_lower_case(nickname);
+    std::string lower_case_nickname = to_irc_lower_case(nickname);
     for (it = m_clients.begin(); it != m_clients.end(); it++)
     {
         if (to_irc_lower_case(it->second.nickname) == lower_case_nickname)
@@ -222,36 +229,36 @@ Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickn
 
 Server::ChannelIterator Server::_find_channel(const std::string& channel_name)
 {
-	std::string lower_case_channel_name = to_irc_lower_case(channel_name);
-	return m_channels.find(lower_case_channel_name);
+    std::string lower_case_channel_name = to_irc_lower_case(channel_name);
+    return m_channels.find(lower_case_channel_name);
 }
 
 void Server::_send_to_client_channels(Client& client, const std::string& msg)
 {
-	std::set<int> targets;
+    std::set<int> targets;
     for (size_t i = 0; i < client.channels.size(); i++)
     {
         Channel& target_channel = m_channels[client.channels[i]];
-		for (size_t j = 0; j < target_channel.subscribed_users_fd.size(); j++)
-		{
-			targets.insert(target_channel.subscribed_users_fd[j]);
-		}
+        for (size_t j = 0; j < target_channel.subscribed_users_fd.size(); j++)
+        {
+            targets.insert(target_channel.subscribed_users_fd[j]);
+        }
     }
-	std::string total = msg + "\r\n";
-	for (std::set<int>::iterator it = targets.begin(); it != targets.end(); it++)
-	{
-		sendall(*it, total);
-	}
+    std::string total = msg + "\r\n";
+    for (std::set<int>::iterator it = targets.begin(); it != targets.end(); it++)
+    {
+        sendall(*it, total);
+    }
 }
 
 void Server::_quit_client(PollfdIterator* it, Client& client, const std::string& reason)
 {
-	std::string quit_msg = ":" + client.nickname + " QUIT";
-	if (reason != "")
-		quit_msg += " :" + reason;
+    std::string quit_msg = ":" + client.nickname + " QUIT";
+    if (reason != "")
+        quit_msg += " :" + reason;
 
-	_send_to_client_channels(client, quit_msg);
-	_remove_client_from_all_channels(client);
+    _send_to_client_channels(client, quit_msg);
+    _remove_client_from_all_channels(client);
     close((*it)->fd);
     m_clients.erase((*it)->fd);
     *it = m_pfds.erase(*it);
