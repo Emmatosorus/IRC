@@ -159,10 +159,9 @@ void Server::_mode_l(std::string& added_modes, std::string& added_modes_args,
 			return client.send_696(channel.name, 'l', user_limit, "User limit must be greater than 0 and lower than 2147483647");
 
         channel.is_user_limit_mode = true;
-        size_t limit = std::atoi(user_limit.c_str());
 		added_modes += 'l';
 		added_modes_args += " " + user_limit;
-		channel.user_limit = limit;
+		channel.user_limit = res;
 		return;
     }
     removed_modes += 'l';
