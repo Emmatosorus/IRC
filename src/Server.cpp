@@ -263,9 +263,9 @@ void Server::_remove_client_from_channel(Channel& channel, Client& client)
 
 void Server::_remove_client_from_all_channels(Client& client)
 {
-    for (size_t i = 0; i < client.channels.size(); i++)
+    while (!client.channels.empty())
     {
-        _remove_client_from_channel(m_channels[client.channels[i]], client);
+        _remove_client_from_channel(m_channels[client.channels[0]], client);
     }
 }
 

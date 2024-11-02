@@ -33,7 +33,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 	std::string added_modes_args;
 	std::string removed_modes;
     size_t j = 3;
-    bool is_add_mode = false;
+    bool is_add_mode = true;
     for (size_t i = 0; i < args[2].size(); i++)
     {
         switch (args[2][i])
@@ -70,7 +70,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
                 j++;
             break;
         case 'o':
-            if (is_add_mode && j > args.size() - 1)
+            if (j > args.size() - 1)
             {
                 client.send_696(channel.name, 'o', "", "No argument given");
                 continue;
