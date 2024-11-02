@@ -14,7 +14,7 @@ void Server::_names(PollfdIterator* it, const std::vector<std::string>& args)
     for (size_t i = 0; i < targets.size(); i++)
     {
         const std::string& channel_name = targets[i];
-        std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
+        ChannelIterator target_channel = _find_channel(channel_name);
 
         if (target_channel == m_channels.end())
         {

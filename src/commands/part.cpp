@@ -17,7 +17,7 @@ void Server::_part(PollfdIterator* it, const std::vector<std::string>& args)
     {
         const std::string& channel_name = channels_to_part[i];
 
-        std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
+        ChannelIterator target_channel = _find_channel(channel_name);
         if (target_channel == m_channels.end())
         {
 			client.send_403(channels_to_part[i]);

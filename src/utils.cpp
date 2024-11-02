@@ -11,6 +11,23 @@ std::string long_to_str(long nbr)
     return ss.str();
 }
 
+std::string to_irc_lower_case(const std::string& str)
+{
+	std::string res("");
+	res.reserve(str.size());
+	std::string scandinavian_lower_case_chars = "{}|^";
+	std::string scandinavian_upper_case_chars = "[]\\~";
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		size_t scandinavian_char = scandinavian_upper_case_chars.find_first_of(str[i]);
+		if (scandinavian_char != std::string::npos)
+			res += scandinavian_lower_case_chars[scandinavian_char];
+		else
+			res += tolower(str[i]);
+	}
+	return res;
+}
+
 std::vector<std::string> parse_comma_arg(std::string comma_arg)
 {
     std::vector<std::string> targets;

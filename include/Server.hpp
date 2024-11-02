@@ -39,6 +39,7 @@ class Server
 	void _register_user(Client& client);
 	void _send_to_client_channels(Client& client, const std::string& msg);
     ClientIterator _find_client_by_nickname(const std::string& nickname);
+	ChannelIterator _find_channel(const std::string& channel_name);
 
     /* All functions for AWAY cmd */
     void _away(PollfdIterator* it, const std::vector<std::string>& args);

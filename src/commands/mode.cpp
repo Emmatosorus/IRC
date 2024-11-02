@@ -11,7 +11,7 @@ void Server::_mode(PollfdIterator* it, const std::vector<std::string>& args)
 
     const std::string& channel_name = args[1];
 
-    ChannelIterator target_channel = m_channels.find(channel_name);
+    ChannelIterator target_channel = _find_channel(channel_name);
     if (target_channel == m_channels.end())
         return client.send_403(args[1]);
     Channel& channel = target_channel->second;

@@ -26,7 +26,7 @@ void Server::_notice(PollfdIterator* it, const std::vector<std::string>& args)
 			targets[i].erase(0, 2);
 		}
 
-        std::map<std::string, Channel>::iterator target_channel_it = m_channels.find(targets[i]);
+        ChannelIterator target_channel_it = _find_channel(targets[i]);
         if (target_channel_it != m_channels.end())
         {
             Channel& target_channel = target_channel_it->second;

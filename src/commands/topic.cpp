@@ -10,7 +10,7 @@ void Server::_topic(PollfdIterator* it, const std::vector<std::string>& args)
         return client.send_461("TOPIC");
 
     const std::string& channel_name = args[1];
-    std::map<std::string, Channel>::iterator target_channel_it = m_channels.find(channel_name);
+    ChannelIterator target_channel_it = _find_channel(channel_name);
     if (target_channel_it == m_channels.end())
         return client.send_403(channel_name);
 

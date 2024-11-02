@@ -36,7 +36,7 @@ void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
             continue;
         }
 
-        std::map<std::string, Channel>::iterator target_channel = m_channels.find(channel_name);
+        ChannelIterator target_channel = _find_channel(channel_name);
         if (target_channel == m_channels.end())
         {
             Channel new_channel(client.fd, channel_name);

@@ -211,12 +211,19 @@ void Server::_add_client(int fd)
 Server::ClientIterator Server::_find_client_by_nickname(const std::string& nickname)
 {
     ClientIterator it;
+	std::string lower_case_nickname = to_irc_lower_case(nickname);
     for (it = m_clients.begin(); it != m_clients.end(); it++)
     {
-        if (it->second.nickname == nickname)
+        if (to_irc_lower_case(it->second.nickname) == lower_case_nickname)
             return it;
     }
     return it;
+}
+
+Server::ChannelIterator Server::_find_channel(const std::string& channel_name)
+{
+	std::string lower_case_channel_name = to_irc_lower_case(channel_name);
+	return m_channels.find(lower_case_channel_name);
 }
 
 void Server::_send_to_client_channels(Client& client, const std::string& msg)

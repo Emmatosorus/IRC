@@ -16,7 +16,7 @@ void Server::_invite(PollfdIterator* it, const std::vector<std::string>& args)
         return client.send_401(target_name);
     Client& target_client = target_client_it->second;
 
-    ChannelIterator target_channel_it = m_channels.find(channel_name);
+    ChannelIterator target_channel_it = _find_channel(channel_name);
     if (target_channel_it == m_channels.end())
         return client.send_403(channel_name);
     Channel& target_channel = target_channel_it->second;
