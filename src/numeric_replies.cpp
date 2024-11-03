@@ -257,7 +257,7 @@ void Client::send_451()
 void Client::send_461(const std::string& command)
 {
     std::string reply =
-        ":42chan 461 " + _resolve_nickname() + " " + command + " :Not enough prameters";
+        ":42chan 461 " + _resolve_nickname() + " " + command + " :Not enough parameters";
     send_msg(reply);
 }
 

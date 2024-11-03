@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 15:34:01 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/27 22:37:37 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/03 18:32:41 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int							connect_with_timeout(int socket_fd, const struct sockaddr *addr, sockl
 int							error_msg(std::string msg, int error_nb);
 int							get_socket_fd(char **argv);
 void						set_addrinfo(struct addrinfo *ai);
-void						str_trim_space(std::string &str);
+void						bot_name_trim(std::string &str);
 std::vector<std::string>	mini_split(std::string arg, std::string to_split_on);
 
 #endif

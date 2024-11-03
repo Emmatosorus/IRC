@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 13:10:39 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/29 09:01:18 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/03 18:42:42 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,19 @@ std::vector<std::string> mini_split(std::string arg, std::string to_split_on)
 	return (targets);
 }
 
-void	str_trim_space(std::string &str)
+void	bot_name_trim(std::string &str)
 {
-	size_t	start_pos = str.find_first_not_of(" \n\r\t\v\f\0");
+	size_t	first_comma = str.find_first_of(":");
+	size_t	start_pos = str.find_first_not_of(" :\n\r\t\v\f\0");
 	size_t	end_pos = str.find_last_not_of(" :\n\r\t\v\f\0");
 	std::vector<std::string>	msg_split;
 
-	if(start_pos != std::string::npos)
+	if (start_pos != std::string::npos && first_comma != std::string::npos && first_comma <= start_pos)
+	{
+		str = str.substr((first_comma + 1), (end_pos + 1) - (first_comma + 1));
+		return ;
+	}
+	else if (start_pos != std::string::npos)
 		str = str.substr(start_pos, (end_pos + 1) - start_pos);
 	str = mini_split(str, " :\n\r\t\v\f\0")[0];	
 }

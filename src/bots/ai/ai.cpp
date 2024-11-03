@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/29 08:52:18 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/03 18:56:19 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,14 @@ Ai::~Ai()
 
 bool	Ai::is_name_incorrect()
 {
-	return (msg == ":42chan 432 guest " + bot_name + " :Invalid nickname: Nickname contains invalid characters : #:,*?!@.\\t\\r\\n \r\n"
+	return (msg == ":42chan 432 guest " + bot_name + " :Invalid nickname: Nickname contains invalid characters: #%:,*?!@. \\t\\r\\n\r\n"
 		|| msg == ":42chan 432 guest " + bot_name + " :Invalid nickname: First character of nickname must be a-z or A-Z\r\n"
 		|| msg  == ":42chan 433 guest " + bot_name + " :Nickname is already taken\r\n"
 		|| msg == ":42chan 431 guest :No nickname was given\r\n"
-		|| msg == ":42chan 461 " + bot_name + " USER :Not enough prameters\r\n"
-		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username contains invalid characters: #:,*?!@.\\t\\r\\n \r\n"
+		|| msg == ":42chan 461 " + bot_name + " USER :Not enough parameters\r\n"
+		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username contains invalid characters: #%:,*?!@. \\t\\r\\n\r\n"
 		|| msg == ":42chan 417 guest :Message is too long\r\n"
+		|| msg == ":42chan 417 " + bot_name + " :Message is too long\r\n"
 		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username is too long\r\n");
 }
 
@@ -81,7 +82,8 @@ int	Ai::get_sender_name()
 bool	Ai::is_password_incorrect()
 {
 	return (msg == ((":42chan 464 ") + bot_name + (" :Password is incorrect or was not provided\r\n")) 
-	|| msg == ":42chan 461 guest PASS :Not enough prameters\r\n:42chan 464 guest :Password is incorrect or was not provided\r\n");
+	|| msg == ":42chan 461 guest PASS :Not enough parameters\r\n:42chan 464 guest :Password is incorrect or was not provided\r\n"
+	|| msg == ":42chan 417 guest :Message is too long\r\n:42chan 417 guest :Message is too long\r\n");
 }
 
 int	Ai::parse_connection_errors()
@@ -252,7 +254,7 @@ int	Ai::run()
 
 				//===parse connection errors===
 
-				str_trim_space(bot_name);
+				bot_name_trim(bot_name);
 				if (parse_connection_errors() == ERROR)
 					return (close(socket_fd), ERROR);
 				
