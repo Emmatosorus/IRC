@@ -118,6 +118,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     if (client.buf.length() > MESSAGE_SIZE)
     {
         client.send_417();
+        client.buf.clear();
         return;
     }
 
