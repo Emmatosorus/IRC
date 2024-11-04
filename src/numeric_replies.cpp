@@ -134,7 +134,7 @@ void Client::send_372()
 {
     std::string reply =
         ":42chan 372 " + _resolve_nickname() + " :Welcome to the 42Chan! :3\n" + ":42chan 372 " +
-        _resolve_nickname() + " : _  _ ___   _____ _                    \n" + ":42chan 372 " +
+        _resolve_nickname() + " :  _  _ ___   _____ _                    \n" + ":42chan 372 " +
         _resolve_nickname() + " : | || |__ \\ / ____| |                 \n" + ":42chan 372 " +
         _resolve_nickname() + " : | || |_ ) | |    | |__   __ _ _ __    \n" + ":42chan 372 " +
         _resolve_nickname() + " : |__   _/ /| |    | '_ \\ / _` | '_ \\ \n" + ":42chan 372 " +
