@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 13:10:39 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/03 18:42:42 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/03 22:35:32 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	bot_name_trim(std::string &str)
 
 	if (start_pos != std::string::npos && first_comma != std::string::npos && first_comma <= start_pos)
 	{
-		str = str.substr((first_comma + 1), (end_pos + 1) - (first_comma + 1));
+		str = str.substr((first_comma + 1), (str.length()) - (first_comma + 1));
 		return ;
 	}
 	else if (start_pos != std::string::npos)
