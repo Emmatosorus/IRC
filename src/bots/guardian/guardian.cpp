@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   guardian.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eandre <eandre@student.42.fr>              +#+  +:+       +#+        */
+/*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/04 12:09:32 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/04 15:20:47 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,7 +296,7 @@ int	Guardian::does_msg_contain_badword()
 		for (std::vector<std::string>::iterator it_word = (*it_bw).words.begin(); it_word != (*it_bw).words.end(); it_word++)
 			if ((*it_msg).find(*it_word, 0) != std::string::npos)
 				if ((*it_msg).length() == (*it_word).length())
-					return (msg = "PRIVMSG @%" + channel + ": BADWORD SAID BY " + sender_name + "\r\n", TRUE);
+					return (msg = "PRIVMSG @" + channel + ": BADWORD SAID BY " + sender_name + "\r\n", TRUE);
 	
 	return (FALSE);
 }
