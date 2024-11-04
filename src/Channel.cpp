@@ -155,7 +155,7 @@ void Channel::remove_client(Client& client)
 
 std::string Channel::get_modestring() const
 {
-    std::string modestring = "+";
+    std::string modestring = "";
     if (is_no_external_messages_mode)
         modestring += "n";
     if (is_invite_only_mode)
@@ -166,7 +166,8 @@ std::string Channel::get_modestring() const
         modestring += "l";
     if (is_const_topic_mode)
         modestring += "t";
-
+    if (!modestring.empty())
+        modestring = "+" + modestring;
     if (is_password_mode)
         modestring += " " + password;
     if (is_user_limit_mode)
