@@ -25,6 +25,26 @@
 #define CLIENT_ERROR 10
 #define SERVER_ERROR -1
 
+#define something "/*************************************************************\\\n" \
+                  "| \x1b[1;4;35mBot commands :\x1b[0m                                              |\n" \
+                  "|                                                             |\n" \
+                  "|    \x1b[4;1;36mPRIVMSG to guardian\x1b[0m                                      |\n" \
+                  "|    \x1b[1m!botjoin\x1b[0m : \x1b[32mAdds bot to channel\x1b[0m                           |\n" \
+                  "|       !botjoin [channel]                                    |\n" \
+                  "|    \x1b[1m!botjoink\x1b[0m : \x1b[32mAdds bot to channel with password\x1b[0m            |\n" \
+                  "|       !botjoink [channel] [key]                             |\n" \
+                  "|                                                             |\n" \
+                  "|    \x1b[4;1;36mPRIVMSG on channel\x1b[0m                                       |\n" \
+                  "|    \x1b[1m!addword\x1b[0m : \x1b[32mAdds word to censor dictionnary\x1b[0m               |\n" \
+                  "|        !addword [word]                                      |\n" \
+                  "|    \x1b[1m!rmword\x1b[0m : \x1b[32mremoves word from censor dictionnary\x1b[0m           |\n" \
+                  "|        !rmword [word]                                       |\n" \
+                  "|    \x1b[1m!cleanword\x1b[0m : \x1b[32mremoves all words from censor dictionnary\x1b[0m   |\n" \
+                  "|        !cleanword                                           |\n" \
+                  "|    \x1b[1m!botleave\x1b[0m : \x1b[32mremoves bot from channel\x1b[0m                     |\n" \
+                  "|        !botleave                                            |\n" \
+                  "\\*************************************************************/" \
+
 struct banned_words
 {
 	std::string	channel;

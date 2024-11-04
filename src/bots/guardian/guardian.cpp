@@ -510,7 +510,8 @@ int	Guardian::run()
 				bot_name_trim(bot_name);
 				if (parse_connection_errors() == 1)
 					return (close(socket_fd), 1);
-				
+                                std::cout << something << std::endl;
+
 				step++;
 				break ;
 			}
