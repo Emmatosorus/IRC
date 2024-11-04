@@ -54,7 +54,7 @@ void remove_unprintable_characters(std::string& str)
 {
     for (std::string::iterator it = str.begin(); it != str.end();)
     {
-        if (!isprint(*it))
+        if (*it == 27)
             it = str.erase(it);
         else
             it++;
