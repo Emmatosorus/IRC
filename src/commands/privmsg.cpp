@@ -23,7 +23,7 @@ void Server::_privmsg(PollfdIterator* it, const std::vector<std::string>& args)
         if (targets[i].size() > 2 && targets[i][0] == '@')
         {
             is_to_operators = true;
-            targets[i].erase(0, 2);
+            targets[i].erase(0, 1);
         }
 
         ChannelIterator target_channel_it = _find_channel(targets[i]);
