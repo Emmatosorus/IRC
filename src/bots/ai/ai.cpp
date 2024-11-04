@@ -6,11 +6,14 @@
 /*   By: eandre <eandre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/10 18:19:04 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/04 12:10:52 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/04 13:23:45 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/ai.hpp"
+#include <fstream>
+#include <cstdlib>
+#include <stdio.h>
 
 bool Ai::should_run = true;
 
