@@ -26,6 +26,11 @@ int main(int argc, char** argv)
             std::cerr << "Forbidden characters in password: #%:,*?!@. \\t\\r\\n\n";
             return EXIT_FAILURE;
         }
+        if (password.size() > 16)
+        {
+            std::cerr << "Password must be less than 16 characters\n";
+            return EXIT_FAILURE;
+        }
 
         Server s(password.c_str(), port.c_str());
         s.start();

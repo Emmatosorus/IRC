@@ -20,7 +20,7 @@ void Server::_privmsg(PollfdIterator* it, const std::vector<std::string>& args)
     for (size_t i = 0; i < targets.size(); i++)
     {
         bool is_to_operators = false;
-        if (targets[i].size() > 2 && targets[i][0] == '@' && targets[i][1] == '%')
+        if (targets[i].size() > 2 && targets[i][0] == '@')
         {
             is_to_operators = true;
             targets[i].erase(0, 2);
