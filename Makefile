@@ -7,13 +7,18 @@ CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 DEBUGFLAGS =
 
 OBJS_DIR = .obj/
-OBJS_AI_DIR = $(OBJS_DIR)bots/ai/
-OBJS_GUARDIAN_DIR = $(OBJS_DIR)bots/guardian/
+OBJS_BOT_DIR = $(OBJS_DIR)bots/
+OBJS_AI_DIR = $(OBJS_BOT_DIR)ai/
+OBJS_GUARDIAN_DIR = $(OBJS_BOT_DIR)guardian/
 SRC_DIR = src/
-SRC_AI_DIR = $(SRC_DIR)bots/ai/
-SRC_GUARDIAN_DIR = $(SRC_DIR)bots/guardian/
+SRC_BOT_DIR = src/bots/
+SRC_AI_DIR = $(SRC_BOT_DIR)ai/
+SRC_GUARDIAN_DIR = $(SRC_BOT_DIR)guardian/
 
-HEADERS = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp include/bot.hpp include/ai.hpp include/guardian.hpp
+HEADERS_SERVER = include/Channel.hpp include/Client.hpp include/Server.hpp include/client_msg_parse.hpp
+HEADERS_BOT = include/bot.hpp
+HEADERS_AI = include/ai.hpp
+HEADERS_GUARDIAN= include/guardian.hpp
 
 SRCS_BOT = $(addprefix bots/, bot_connect.cpp bot_utils.cpp)
 SRCS_GUARDIAN = $(addprefix bots/guardian/, guardian.cpp) $(SRCS_BOT)
@@ -21,6 +26,7 @@ SRCS_AI = $(addprefix bots/ai/, ai.cpp) $(SRCS_BOT)
 SRCS_COMMANDS = $(addprefix commands/, away.cpp join.cpp kick.cpp list.cpp mode.cpp motd.cpp names.cpp nick.cpp notice.cpp part.cpp pass.cpp ping.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp utils.cpp numeric_replies.cpp $(SRCS_COMMANDS)
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
+OBJS_BOTS = $(addprefix $(OBJS_DIR), $(SRCS_BOT:.cpp=.o)) 
 OBJS_AI = $(addprefix $(OBJS_DIR), $(SRCS_AI:.cpp=.o))
 OBJS_GUARDIAN = $(addprefix $(OBJS_DIR), $(SRCS_GUARDIAN:.cpp=.o))
 
@@ -53,25 +59,28 @@ $(NAME) : $(OBJS)
 	$(CXX) $^ $(CPPFLAGS) $(DEBUGFLAGS) -o $(NAME) && sleep 0.1
 	@echo "$(Green)\r------COMPILATION COMPLETE-------${NC}"
 
-$(GUARDIAN) : $(OBJS_GUARDIAN)
+$(GUARDIAN) : $(OBJS_GUARDIAN) $(OBJS_BOT)
 	@echo -n "$(Red)Compiling guardian bot ..${NC}" && sleep 0.2
 	@echo -n "$(Red)\rCompiling guardian bot ...${NC}"
 	$(CXX) $^ $(CPPFLAGS) -o $(GUARDIAN) && sleep 0.1
 	@echo "$(Green)\r------Compiling COMPLETE!-------${NC}"
 
-$(AI) : $(OBJS_AI)
+$(AI) : $(OBJS_AI) $(OBJS_BOT)
 	@echo -n "$(Red)Compiling ai bot ..${NC}" && sleep 0.2
 	@echo -n "$(Red)\rCompiling ai bot ...${NC}"
 	$(CXX) $^ $(CPPFLAGS) -o $(AI) && sleep 0.1
 	@echo "$(Green)\r------COMPILATION COMPLETE!-------${NC}"
 
-$(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS)
+$(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS_SERVER)
 	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) -c $< -o $@
 
-$(OBJS_AI_DIR)%.o : $(SRC_AI_DIR)%.cpp Makefile $(HEADERS)
+$(OBJS_BOT_DIR)%.o : $(SRC_BOT_DIR)%.cpp Makefile $(HEADERS_BOT)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-$(OBJS_GUARDIAN_DIR)%.o : $(SRC_GUARDIAN_DIR)%.cpp Makefile $(HEADERS)
+$(OBJS_AI_DIR)%.o : $(SRC_AI_DIR)%.cpp Makefile $(HEADERS_AI)
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+$(OBJS_GUARDIAN_DIR)%.o : $(SRC_GUARDIAN_DIR)%.cpp Makefile $(HEADERS_GUARDIAN)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 clean :
