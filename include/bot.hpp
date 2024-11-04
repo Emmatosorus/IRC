@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bot.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
+/*   By: eandre <eandre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 15:34:01 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/03 18:32:41 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/04 12:09:42 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <vector>
 #include <csignal>
 
+#define MAXDATASIZE 500
 #define SUCCESS 0
 
 //===bot utils===

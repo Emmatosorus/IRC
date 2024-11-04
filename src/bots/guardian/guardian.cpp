@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   guardian.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
+/*   By: eandre <eandre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/03 18:56:22 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/04 12:09:32 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/guardian.hpp"
-
-#define MAXDATASIZE 500
 
 bool Guardian::should_run = true;
 
