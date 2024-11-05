@@ -5,7 +5,7 @@
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
-      "args": ["172.27.43.126", "6667", "hey"],
+      "args": ["172.27.43.126", "6667", "123"],
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/celia/IRC/",

@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:39:36 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/27 00:10:50 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:10:48 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 #include "bot.hpp"
 #include <unistd.h>
+#include <fstream>
+#include <cstdlib>
+#include <stdio.h>
 #include <poll.h>
 
 #define ERROR 1
@@ -61,6 +64,7 @@ class Ai
 
 		//===log in and parsing===
 
+		int					split_and_manage_msg();
 		int					log_into_server();
 		int					parse_connection_errors();
 		bool				is_name_incorrect();
@@ -79,6 +83,7 @@ class Ai
 		static void 		handle_signal(int signum);
 };
 
+int	launch_ai(std::string bot_name, std::string password, int socket_fd);
 
 
 #endif

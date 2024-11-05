@@ -21,8 +21,8 @@ HEADERS_AI = include/ai.hpp
 HEADERS_GUARDIAN= include/guardian.hpp
 
 SRCS_BOT = $(addprefix bots/, bot_connect.cpp bot_utils.cpp)
-SRCS_GUARDIAN = $(addprefix bots/guardian/, guardian.cpp) $(SRCS_BOT)
-SRCS_AI = $(addprefix bots/ai/, ai.cpp) $(SRCS_BOT)
+SRCS_GUARDIAN = $(addprefix bots/guardian/, guardian_class_mandatory.cpp guardian_channel_cmd.cpp guardian_pm_cmd.cpp guardian_cmd_parsing.cpp guardian_login.cpp guardian_main.cpp guardian_run.cpp guardian_utils.cpp) $(SRCS_BOT)
+SRCS_AI = $(addprefix bots/ai/, ai_class_mandatory.cpp ai_curl_management.cpp ai_login.cpp ai_main.cpp ai_run.cpp ai_utils.cpp) $(SRCS_BOT)
 SRCS_COMMANDS = $(addprefix commands/, away.cpp join.cpp kick.cpp list.cpp mode.cpp motd.cpp names.cpp nick.cpp notice.cpp part.cpp pass.cpp ping.cpp privmsg.cpp quit.cpp user.cpp invite.cpp topic.cpp)
 SRCS = main.cpp client_msg_parse.cpp Channel.cpp Client.cpp Server.cpp utils.cpp numeric_replies.cpp $(SRCS_COMMANDS)
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
@@ -62,7 +62,7 @@ $(NAME) : $(OBJS)
 $(GUARDIAN) : $(OBJS_GUARDIAN) $(OBJS_BOT)
 	@echo -n "$(Red)Compiling guardian bot ..${NC}" && sleep 0.2
 	@echo -n "$(Red)\rCompiling guardian bot ...${NC}"
-	$(CXX) $^ $(CPPFLAGS) -o $(GUARDIAN) && sleep 0.1
+	$(CXX) $^ $(CPPFLAGS) $(DEBUGFLAGS) -o $(GUARDIAN) && sleep 0.1
 	@echo "$(Green)\r------Compiling COMPLETE!-------${NC}"
 
 $(AI) : $(OBJS_AI) $(OBJS_BOT)
@@ -75,13 +75,13 @@ $(OBJS_DIR)%.o : $(SRC_DIR)%.cpp Makefile $(HEADERS_SERVER)
 	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) -c $< -o $@
 
 $(OBJS_BOT_DIR)%.o : $(SRC_BOT_DIR)%.cpp Makefile $(HEADERS_BOT)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) -c $< -o $@
 
 $(OBJS_AI_DIR)%.o : $(SRC_AI_DIR)%.cpp Makefile $(HEADERS_AI)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 $(OBJS_GUARDIAN_DIR)%.o : $(SRC_GUARDIAN_DIR)%.cpp Makefile $(HEADERS_GUARDIAN)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(DEBUGFLAGS) -c $< -o $@
 
 clean :
 	@rm -rf $(OBJS_DIR)

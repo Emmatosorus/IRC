@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 17:11:51 by eandre            #+#    #+#             */
-/*   Updated: 2024/10/27 22:35:40 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:05:51 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 #define CLIENT_ERROR 10
 #define SERVER_ERROR -1
 
-#define something "/*************************************************************\\\n" \
+#define bot_cmd_ "/*************************************************************\\\n" \
                   "| \x1b[1;4;35mBot commands :\x1b[0m                                              |\n" \
                   "|                                                             |\n" \
                   "|    \x1b[4;1;36mPRIVMSG to guardian\x1b[0m                                      |\n" \
@@ -85,6 +85,7 @@ class Guardian
 
 		//===log in and parsing===
 
+		int							split_and_manage_msg();
 		int							log_into_server();
 		int							pm_is_in_channel();
 		int							parse_connection_errors();
@@ -117,5 +118,8 @@ class Guardian
 		static void 				handle_signal(int signum);
 
 };
+
+bool	is_str_spaces(std::string str);
+int		launch_guardian(std::string bot_name, std::string password, int socket_fd);
 
 #endif
