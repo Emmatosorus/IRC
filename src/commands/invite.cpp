@@ -32,7 +32,7 @@ void Server::_invite(PollfdIterator* it, const std::vector<std::string>& args)
 
     target_channel.invited_users_fd.push_back(target_client.fd);
     std::string msg =
-        client.nickname + " INVITE " + target_client.nickname + " :" + target_channel.name;
+        ":" + client.nickname + " INVITE " + target_client.nickname + " :" + target_channel.name;
     client.send_341(target_channel, client.nickname);
     client.send_msg(msg);
     target_client.send_msg(msg);
