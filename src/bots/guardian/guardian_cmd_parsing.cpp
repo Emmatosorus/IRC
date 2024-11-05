@@ -6,11 +6,16 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:33:31 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 12:34:06 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:57:02 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/guardian.hpp"
+
+/*
+This is a part of the command parsing, since it receive the answer of the server to the join request,
+and parse it to send the correct error msg to the client that sent the botjoin command.
+*/
 
 int	Guardian::parse_error()
 {

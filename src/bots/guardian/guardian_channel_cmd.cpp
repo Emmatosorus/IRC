@@ -6,11 +6,26 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:01:08 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 13:40:37 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:45:08 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/guardian.hpp"
+
+/*
+This bot has a lot of little commands, but on this file, we will focus on the channel commands only.
+
+The channel commands are only available in channels, which means the bot won't answer in private message to any of theses :
+ addword,
+ rmword,
+ cleanword,
+ botleave.
+
+That also means that this bot doesnt need to have the channel name as an argument,
+since he will automaticly find from where the message was sent.
+*/
+
+//This function is the channel command hub, where every channel command is executed and also where every error message are sent.
 
 int	Guardian::manage_channel_cmd_request()
 {
@@ -75,6 +90,19 @@ int	Guardian::manage_channel_cmd_request()
 	return (NO_REQUEST);
 }
 
+/*
+Addword is core of the commands of this bot.
+
+The function is simple:
+You add a word that is banned, which is stored in a vector of struct,
+containing the channel name and the banned words from this channel, stored in a vector of string.
+
+If somebody tries to say a banned word, the bot will send a warning to operators of this channel with the name of the sender.
+Operators will kill you if they see it, so please don't do it.
+
+To call this function, you just need to put the word you want added from the list as the argument.
+*/
+
 int	Guardian::addword()
 {
 	std::vector<banned_words>::iterator	it_bw = bw.begin();
@@ -113,6 +141,16 @@ int	Guardian::addword()
 
 	return (SUCCESS);
 }
+
+/*
+Remove word is the exact oposite of addword.
+If you can add something, you should be able to remove it !
+
+Now, if somebody tries to say a banned word, the bot will send nothing.
+Amazing, isn't it?
+
+To call this function, you just need to put the word you want removed from the list as the argument.
+*/
 
 int	Guardian::rmword()
 {
@@ -154,6 +192,13 @@ int	Guardian::rmword()
 	return (SUCCESS);
 }
 
+/*
+Cleanword is basicly rmword but on steroids.
+
+If you want to remove everything from the banned word list of a channel, use this instead of rmword.
+This function takes no arguments.
+*/
+
 int	Guardian::cleanword()
 {
 	std::vector<banned_words>::iterator it_bw = bw.begin();
@@ -178,6 +223,12 @@ int	Guardian::cleanword()
 	return (SUCCESS);
 }
 
+/*
+And finaly, botleave.
+If you want the bot to part a channel and leave nothing behind, use this command, if not, simply kick him ! (ouch)
+This function takes no arguments.
+*/
+
 int	Guardian::botleave()
 {
 	std::vector<banned_words>::iterator it;
@@ -198,6 +249,11 @@ int	Guardian::botleave()
 
 	return (0);
 }
+
+/*
+If addword is the core of the commands, this is the core of the core of the commands.
+This isnt a function, its utility is simply to send the message to operators in case of someone sending a bad word.
+*/
 
 int	Guardian::does_msg_contain_badword()
 {

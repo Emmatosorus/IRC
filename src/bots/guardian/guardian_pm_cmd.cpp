@@ -6,11 +6,22 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:01:13 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 12:26:35 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:53:57 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/guardian.hpp"
+
+/*
+This bot has a lot of little commands, but on this file, we will focus on the pm commands only.
+
+The pm commands are only available in pm, which means the bot won't answer in channel message to any of theses :
+ botjoin,
+ botjoink.
+
+*/
+
+//This function is the pm command hub, where every pm command is executed and also where every error message are sent.
 
 int	Guardian::manage_pm_request()
 {
@@ -57,6 +68,47 @@ int	Guardian::manage_pm_request()
 	return (0);
 }
 
+/*
+This is botjoin, the little brother of botjoink.
+This function allows you to ask (preferably gently) the bot to join a channel.
+To do so, you just need to put as the argument the channel name.
+Don't forget to put the # before the name !
+This bot doesnt allow for multiple join at a time so if you put a comma somewhere, an error will be sent to you
+*/
+
+int	Guardian::botjoin()
+{
+	size_t	pos = command.find("!botjoin", 0);
+
+	if (pos != 0)
+		return (NO_REQUEST);
+	if (command[8] == '\r')
+		return (PARAM_ERROR);
+	if (command[8] != ' ')
+		return (NO_REQUEST);
+	
+	if (command.find_first_of(",") != std::string::npos)
+		return (CLIENT_ERROR);
+	if (get_word(9, channel, command, " :\r") == -1)
+		return (SERVER_ERROR);
+	if (is_str_spaces(channel) == true)
+		return (PARAM_ERROR);
+	
+	msg = "JOIN " + channel + "\r\n";
+	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
+	return (SUCCESS);
+}
+
+/*
+This is botjoink, the big brother of botjoin.
+Basicly, this command is botjoin but with a key.
+To be honnest, thoses two could be in one function but the name botjoink is funny.
+This function also allows you to ask (preferably gently) the bot to join a channel locked with a key.
+To do so, you just need to put in the first argument the channel name, and the second the key to this channel.
+Don't forget to put the # before the name !
+This bot doesnt allow for multiple join at a time so if you put a comma somewhere, an error will be sent to you
+*/
+
 int	Guardian::botjoink()
 {
 	size_t		pos = command.find("!botjoink", 0);
@@ -79,29 +131,6 @@ int	Guardian::botjoink()
 		return (PARAM_ERROR);
 	
 	msg = "JOIN " + channel + " " + channel_password + "\r\n";
-	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
-	return (SUCCESS);
-}
-
-int	Guardian::botjoin()
-{
-	size_t	pos = command.find("!botjoin", 0);
-
-	if (pos != 0)
-		return (NO_REQUEST);
-	if (command[8] == '\r')
-		return (PARAM_ERROR);
-	if (command[8] != ' ')
-		return (NO_REQUEST);
-	
-	if (command.find_first_of(",") != std::string::npos)
-		return (CLIENT_ERROR);
-	if (get_word(9, channel, command, " :\r") == -1)
-		return (SERVER_ERROR);
-	if (is_str_spaces(channel) == true)
-		return (PARAM_ERROR);
-	
-	msg = "JOIN " + channel + "\r\n";
 	bw.push_back((banned_words){.channel = channel, .words = std::vector<std::string>()});
 	return (SUCCESS);
 }

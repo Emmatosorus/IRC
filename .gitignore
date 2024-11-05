@@ -5,6 +5,6 @@ ircserv
 .envrc
 .obj
 .env
-./ai
+ai
 bot
-./guardian
+guardian

@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 17:34:22 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 15:07:04 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:59:41 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,12 @@ int	Guardian::run()
 	close(socket_fd);
 	return (SUCCESS);
 }
+
+/*
+This is where everything gets interesting.
+There is 3 steps for going through the server: first connection, then parsing of log in error, then msg management.
+Here you will find the root of all the calls of any command.
+*/
 
 int	Guardian::split_and_manage_msg()
 {
@@ -72,7 +78,7 @@ int	Guardian::split_and_manage_msg()
 		*it_msg += "\r\n";
 		msg = *it_msg;
 
-		// 3 steps for going through the server: first connection, then parsing of log in error, then msg management 
+		
 		switch (step)
 		{
 			case 0:

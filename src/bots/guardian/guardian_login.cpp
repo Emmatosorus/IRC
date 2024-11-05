@@ -6,11 +6,20 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:01:11 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 15:00:25 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:23:42 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/guardian.hpp"
+
+/*
+To log into an irc server, a lot of parsing needs to be done.
+There is a lot of server answers to break down.
+To avoid the bot being stuck in the first step forever, we need to take account of theses answers.
+Like always, my work is divided into step, to make it easier to read.
+*/
+
+//First, login into the server. This part is pretty easy, because you just need to send the informations given in the irc norm.
 
 int	Guardian::log_into_server()
 {
@@ -29,6 +38,8 @@ int	Guardian::log_into_server()
 		return (error_msg("\033[0;31mError! Send error\033[0m", 1));
 	return (SUCCESS);
 }
+
+//And second is trying to find EVERY errors possible, but with added security, with the last if being a full stop to everything outside of the greating of the server
 
 int	Guardian::parse_connection_errors()
 {

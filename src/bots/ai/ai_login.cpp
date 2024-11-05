@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:01:02 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 13:06:10 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/05 15:45:37 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 To log into an irc server, a lot of parsing needs to be done.
 There is a lot of server answers to break down.
 To avoid the bot being stuck in the first step forever, we need to take account of theses answers.
-Like always, my work is divided into step, to make it easier to read.
+Like always, my work is divided into step, to make it easier to read (you will thank me later)
 */
 
 //First, login into the server. This part is pretty easy, because you just need to send the informations given in the irc norm.
@@ -39,7 +39,7 @@ int	Ai::log_into_server()
 	return (SUCCESS);
 }
 
-//Second is trying to find EVERY errors possible, but with added security, with the last if being 
+//And second is trying to find EVERY errors possible, but with added security, with the last if being a full stop to everything outside of the greating of the server
 
 int	Ai::parse_connection_errors()
 {
