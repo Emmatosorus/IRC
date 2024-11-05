@@ -41,6 +41,7 @@ class Client
     void send_333(const Channel& channel);
     void send_341(const Channel& channel, const std::string& client_nick);
     void send_353(const Channel& channel, const std::string& list_of_clients);
+    void send_353(const std::string& list_of_clients);
     void send_366(const std::string& channel_name);
     void send_372();
     void send_375();

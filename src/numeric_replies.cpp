@@ -123,6 +123,13 @@ void Client::send_353(const Channel& channel, const std::string& list_of_clients
     send_msg(reply);
 }
 
+void Client::send_353(const std::string& list_of_clients)
+{
+    std::string reply =
+        ":42Chan 353 " + _resolve_nickname() + " * * :" + list_of_clients;
+    send_msg(reply);
+}
+
 void Client::send_366(const std::string& channel_name)
 {
     std::string reply =
