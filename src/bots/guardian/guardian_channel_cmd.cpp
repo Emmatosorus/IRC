@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:01:08 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 15:45:08 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/06 11:06:32 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,11 @@ int	Guardian::manage_channel_cmd_request()
 	status = cleanword();
 	if (status == -1)
 		return (error_msg("\033[0;31mError! Server error on cleanword!\033[0m", -1));
+	else if (status == PARAM_ERROR)
+	{
+		msg = "PRIVMSG " + channel + ":Usage :!cleanword\r\n";
+		return (0);
+	}
 	else if (status == CLIENT_ERROR)
 	{
 		msg = "PRIVMSG " + channel + ": Error! Nothing to clean yet!\r\n";
@@ -85,6 +90,11 @@ int	Guardian::manage_channel_cmd_request()
 	status = botleave();
 	if (status == -1)
 		return (error_msg("\033[0;31mError! Server error on botleave!\033[0m", -1));
+	else if (status == PARAM_ERROR)
+	{
+		msg = "PRIVMSG " + channel + ":Usage :!botleave\r\n";
+		return (0);
+	}
 	else if (status == 0)
 		return (SUCCESS_BOTLEAVE);
 	return (NO_REQUEST);
@@ -117,6 +127,7 @@ int	Guardian::addword()
 		return (PARAM_ERROR);
 	if (command[8] != ' ')
 		return (NO_REQUEST);
+
 	for (; it_bw != bw.end(); it_bw++)
 	{
 		if ((*it_bw).channel == channel)
@@ -203,10 +214,14 @@ int	Guardian::cleanword()
 {
 	std::vector<banned_words>::iterator it_bw = bw.begin();
 	std::string							word_to_rm;
-	size_t								pos = command.find("!cleanword\r", 0);
+	size_t								pos = command.find("!cleanword", 0);
 
 
 	if (pos != 0)
+		return (NO_REQUEST);
+	if (command[10] == ' ' && !is_str_spaces(&command[10]))
+		return (PARAM_ERROR);
+	if (command[10] != '\r')
 		return (NO_REQUEST);
 	
 	for (; it_bw != bw.end(); it_bw++)
@@ -232,11 +247,15 @@ This function takes no arguments.
 int	Guardian::botleave()
 {
 	std::vector<banned_words>::iterator it;
-	size_t								pos = command.find("!botleave\r", 0);
+	size_t								pos = command.find("!botleave", 0);
 
 	if (pos != 0)
 		return (1);
-
+	if (command[9] == ' ' && !is_str_spaces(&command[9]))
+		return (PARAM_ERROR);
+	if (command[9] != '\r')
+		return (NO_REQUEST);
+	
 	if (cleanword() == -1)
 		return (-1);
 	for (it = bw.begin(); it != bw.end(); it++)
@@ -260,7 +279,6 @@ int	Guardian::does_msg_contain_badword()
 	std::vector<banned_words>::iterator it_bw = bw.begin();
 	std::vector<std::string>			msg_split;
 
-	std::cout << channel << std::endl;
 	for (; it_bw != bw.end(); it_bw++)
 	{
 		if ((*it_bw).channel == channel)

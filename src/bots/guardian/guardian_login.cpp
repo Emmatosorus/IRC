@@ -6,7 +6,7 @@
 /*   By: eandre <eandre@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 12:01:11 by eandre            #+#    #+#             */
-/*   Updated: 2024/11/05 15:23:42 by eandre           ###   ########.fr       */
+/*   Updated: 2024/11/06 10:19:44 by eandre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ int	Guardian::log_into_server()
 
 int	Guardian::parse_connection_errors()
 {
+	if (msg == ":42chan 417 guest :Message is too long\r\n")
+		return (error_msg("\033[0;31mError! The password/name is too long\033[0m", 1));
 	if (is_password_incorrect())
 		return (error_msg("\033[0;31mError! Incorrect password\033[0m", 1));
 	if (is_name_incorrect())
@@ -61,7 +63,6 @@ bool	Guardian::is_name_incorrect()
 		|| msg == ":42chan 431 guest :No nickname was given\r\n"
 		|| msg == ":42chan 461 " + bot_name + " USER :Not enough parameters\r\n"
 		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username contains invalid characters: #%:,*?!@. \\t\\r\\n\r\n"
-		|| msg == ":42chan 417 guest :Message is too long\r\n"
 		|| msg == ":42chan 417 " + bot_name + " :Message is too long\r\n"
 		|| msg == ":42chan 468 " + bot_name + " :Invalid username: username is too long\r\n");
 }
@@ -69,6 +70,5 @@ bool	Guardian::is_name_incorrect()
 bool	Guardian::is_password_incorrect()
 {
 	return (msg == ((":42chan 464 ") + bot_name + (" :Password is incorrect or was not provided\r\n")) 
-	|| msg == ":42chan 461 guest PASS :Not enough parameters\r\n"
-	|| msg == ":42chan 417 guest :Message is too long\r\n");
+	|| msg == ":42chan 461 guest PASS :Not enough parameters\r\n");
 }
