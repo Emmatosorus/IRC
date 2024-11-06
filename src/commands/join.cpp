@@ -30,11 +30,6 @@ void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
             client.send_448(channel_name, channel_name_error);
             continue;
         }
-        else if (client.channels.size() > MAX_CHANNELS)
-        {
-            client.send_448(channel_name, "Client joined too many channels");
-            continue;
-        }
 
         ChannelIterator target_channel = _find_channel(channel_name);
         if (target_channel == m_channels.end())
@@ -48,6 +43,11 @@ void Server::_join(PollfdIterator* it, const std::vector<std::string>& args)
         Channel& channel = target_channel->second;
         if (channel.is_subscribed(client.fd))
             continue;
+        if (client.channels.size() > MAX_CHANNELS)
+        {
+            client.send_448(channel_name, "Client joined too many channels");
+            continue;
+        }
         else if (channel.is_invite_only_mode && !channel.is_invited(client.fd))
         {
             client.send_473(channel);
