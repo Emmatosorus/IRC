@@ -128,7 +128,7 @@ void Server::_handle_client_message(PollfdIterator* it)
     {
         raw_message = client.buf.substr(0, end_of_msg);
         remove_unprintable_characters(raw_message);
-        std::cout << raw_message << "\n";
+        std::cout << client.fd << ": " << raw_message << "\n";
         client.buf.erase(0, end_of_msg + 2);
         if (raw_message == "")
             return;
