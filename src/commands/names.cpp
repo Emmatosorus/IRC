@@ -10,13 +10,13 @@ void Server::_names(PollfdIterator* it, const std::vector<std::string>& args)
     {
         ChannelIterator channel_it = m_channels.begin();
         while (channel_it != m_channels.end())
-        {    
+        {
             Channel& channel = channel_it->second;
             client.send_353(channel, channel.get_list_of_clients(m_clients));
             channel_it++;
         }
         ClientIterator client_it = m_clients.begin();
-        std::string    list_of_clients;
+        std::string list_of_clients;
         while (client_it != m_clients.end())
         {
             Client& client = client_it->second;

@@ -12,8 +12,8 @@ void Client::send_001()
 
 void Client::send_002()
 {
-    std::string reply = ":42Chan 002 " + _resolve_nickname() +
-                        " :Your host is 42Chan, running version 1.0";
+    std::string reply =
+        ":42Chan 002 " + _resolve_nickname() + " :Your host is 42Chan, running version 1.0";
     send_msg(reply);
 }
 
@@ -125,8 +125,7 @@ void Client::send_353(const Channel& channel, const std::string& list_of_clients
 
 void Client::send_353(const std::string& list_of_clients)
 {
-    std::string reply =
-        ":42Chan 353 " + _resolve_nickname() + " * * :" + list_of_clients;
+    std::string reply = ":42Chan 353 " + _resolve_nickname() + " * * :" + list_of_clients;
     send_msg(reply);
 }
 

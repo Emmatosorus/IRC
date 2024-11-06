@@ -14,15 +14,16 @@
 #define AI_HPP
 
 #include "bot.hpp"
-#include <unistd.h>
-#include <fstream>
 #include <cstdlib>
-#include <stdio.h>
+#include <fstream>
 #include <poll.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #define ERROR 1
 
-#define CURL_CMD "curl \"https://api.openai.com/v1/chat/completions\" \
+#define CURL_CMD                                                                                   \
+    "curl \"https://api.openai.com/v1/chat/completions\" \
 			-H \"Content-Type: application/json\" \
 			-H \"Authorization: Bearer $OPENAI_API_KEY\" \
 			-d '{ \
@@ -41,49 +42,46 @@
 
 class Ai
 {
-	public:
+  public:
+    Ai(std::string& bot_name, const std::string& password, const int socket_fd);
+    ~Ai();
 
-		Ai(std::string &bot_name, const std::string &password, const int socket_fd);
-		~Ai();
-	
-		int	run();
-	
-	private:
-	
-		std::string			&bot_name;
-		const std::string 	&password;
-	
-		std::string			sender_name;
-		std::string			curl_cmd;
-		std::string			ai_msg;
-		std::string			msg;
-	
-		static bool			should_run;
-		struct pollfd		pollfds[1];
-		const int			socket_fd;
+    int run();
 
-		//===log in and parsing===
+  private:
+    std::string& bot_name;
+    const std::string& password;
 
-		int					split_and_manage_msg();
-		int					log_into_server();
-		int					parse_connection_errors();
-		bool				is_name_incorrect();
-		bool				is_password_incorrect();
+    std::string sender_name;
+    std::string curl_cmd;
+    std::string ai_msg;
+    std::string msg;
 
-		//===setup and exec curl===
+    static bool should_run;
+    struct pollfd pollfds[1];
+    const int socket_fd;
 
-		int					cleanup_msg();
-		int					setup_curl_cmd();
-		int					find_and_prep_ai_msg_for_send();
-		int					execute_curl_cmd_and_parse_result();
+    //===log in and parsing===
 
-		//===utils===
+    int split_and_manage_msg();
+    int log_into_server();
+    int parse_connection_errors();
+    bool is_name_incorrect();
+    bool is_password_incorrect();
 
-		int					get_sender_name();
-		static void 		handle_signal(int signum);
+    //===setup and exec curl===
+
+    int cleanup_msg();
+    int setup_curl_cmd();
+    int find_and_prep_ai_msg_for_send();
+    int execute_curl_cmd_and_parse_result();
+
+    //===utils===
+
+    int get_sender_name();
+    static void handle_signal(int signum);
 };
 
-int	launch_ai(std::string bot_name, std::string password, int socket_fd);
-
+int launch_ai(std::string bot_name, std::string password, int socket_fd);
 
 #endif

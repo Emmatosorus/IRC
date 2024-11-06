@@ -14,20 +14,20 @@
 
 void Ai::handle_signal(int signum)
 {
-	if (signum == SIGINT)
-		should_run = false;
+    if (signum == SIGINT)
+        should_run = false;
 }
 
-int	Ai::get_sender_name()
+int Ai::get_sender_name()
 {
-	std::string tmp;
-	size_t		pos = msg.find(" PRIVMSG", 1);
+    std::string tmp;
+    size_t pos = msg.find(" PRIVMSG", 1);
 
-	if (pos == std::string::npos)
-		return (ERROR);
-	tmp = msg;
-	tmp[pos] = '\0';
-	tmp = &tmp[1];
-	sender_name = tmp;
-	return (SUCCESS);
+    if (pos == std::string::npos)
+        return (ERROR);
+    tmp = msg;
+    tmp[pos] = '\0';
+    tmp = &tmp[1];
+    sender_name = tmp;
+    return (SUCCESS);
 }

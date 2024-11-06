@@ -1,8 +1,8 @@
 #include "../../include/Server.hpp"
 #include "../../include/utils.hpp"
 #include <algorithm>
-#include <climits>
 #include <cerrno>
+#include <climits>
 
 /* https://modern.ircdocs.horse/#mode-message
  * Parameters: <target> [<modestring> [<mode arguments>...]] */
@@ -154,15 +154,16 @@ void Server::_mode_l(std::string& added_modes, std::string& added_modes_args,
 {
     if (is_add_mode)
     {
-		long res = strtol(user_limit.c_str(), NULL, 10);
-		if (res < 1 || res > INT_MAX)
-			return client.send_696(channel.name, 'l', user_limit, "User limit must be greater than 0 and lower than 2147483647");
+        long res = strtol(user_limit.c_str(), NULL, 10);
+        if (res < 1 || res > INT_MAX)
+            return client.send_696(channel.name, 'l', user_limit,
+                                   "User limit must be greater than 0 and lower than 2147483647");
 
         channel.is_user_limit_mode = true;
-		added_modes += 'l';
-		added_modes_args += " " + user_limit;
-		channel.user_limit = res;
-		return;
+        added_modes += 'l';
+        added_modes_args += " " + user_limit;
+        channel.user_limit = res;
+        return;
     }
     removed_modes += 'l';
     channel.is_user_limit_mode = false;
