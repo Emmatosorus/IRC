@@ -51,15 +51,28 @@ Simply run:
 ## Usage 📡
 ### The Server
 To connect to the server, use an IRC client (e.g., HexChat or NetCat).
-#### Commands
-  # WIP
 
+### Syntax
+ - `:` Everything after will be considered one argument (including spaces)
+ - `,` If words are spaced only with commas it will be considered one list argument
+
+#### Commands
+  - `NICK <nickname>` : Sets your nickname (must be entered on connection)
+  - `USER <username> 0 * <realname>` : Sets up your user profile (must be entered on connection)
+  - `PASS <password>` : Enters password to enter the server (must be entered after the two commands above)
+  - `PRIVMSG <target>{,<target>} <text to be sent>` : Will send a message to the recepiente.s
+  - `LIST` : Will show you the list of channels with some information about them
+  - `JOIN <channel>{,<channel>} [<key>{,<key>}]` : Let's you join a channel, key is necessary only if the the channel has a password
+  - `PART <channel>{,<channel>} [<reason>]` : Lest's you leave a channel, reason is optional
+  - **WIP**
 
 ### The AI Bot
 You can talk with the AI bot through private messages.
+## WIP
 
 ### The Guardian Bot
-5. The moderation bot will keep an eye on inappropriate language.
+The moderation bot will keep an eye on inappropriate language.
+## WIP
 
 ## Contributors 🤝
 This project was made by [emuminov](https://github.com/emuminov), [Celiastral](https://github.com/Celiastral) 
