@@ -52,7 +52,7 @@ Simply run:
 ### The Server
 Server is compatible with [HexChat](https://hexchat.github.io/), which is a proper GUI IRC client.
 
-Another way to connect is from the command line: use `nc`: `sed -u 's/$/\r/g' | nc localhost 6667`. This is the most useful during testing.
+Another way to connect is from the command line: use `nc`: `sed -u 's/$/\r/g' | nc <Server IP> <Server Port>`. This is the most useful during testing.
 Not all `nc` implementations support automatic `\r\n` insertion at the end of the message, but one can use `sed` to circumvent that.
 
 ### Syntax
