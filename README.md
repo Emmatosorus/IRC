@@ -50,21 +50,48 @@ Simply run:
 
 ## Usage 📡
 ### The Server
-To connect to the server, use an IRC client (e.g., HexChat or NetCat).
+Server is compatible with [HexChat](https://hexchat.github.io/), which is a proper GUI IRC client.
+
+Another way to connect is from the command line: use `nc`: `sed -u 's/$/\r/g' | nc localhost 6667`. This is the most useful during testing.
+Not all `nc` implementations support automatic `\r\n` insertion at the end of the message, but one can use `sed` to circumvent that.
 
 ### Syntax
  - `:` Everything after will be considered one argument (including spaces)
  - `,` If words are spaced only with commas it will be considered one list argument
 
 #### Commands
-  - `NICK <nickname>` : Sets your nickname (must be entered on connection)
-  - `USER <username> 0 * <realname>` : Sets up your user profile (must be entered on connection)
-  - `PASS <password>` : Enters password to enter the server (must be entered after the two commands above)
-  - `PRIVMSG <target>{,<target>} <text to be sent>` : Will send a message to the recepiente.s
-  - `LIST` : Will show you the list of channels with some information about them
-  - `JOIN <channel>{,<channel>} [<key>{,<key>}]` : Let's you join a channel, key is necessary only if the the channel has a password
-  - `PART <channel>{,<channel>} [<reason>]` : Lest's you leave a channel, reason is optional
-  - **WIP**
+##### Connection & Authentication
+- `PASS <password>` : Authenticates with the server (must be entered first on connection)
+- `NICK <nickname>` : Sets your nickname (required on connection)
+- `USER <username> 0 * <realname>` : Sets up your user profile (required on connection)
+- `PING <token>` : Server keep-alive, responds with PONG
+- `QUIT [<reason>]` : Disconnects from the server with optional reason
+- `AWAY [<message>]` : Sets or removes your away status
+
+##### Channel Operations
+- `JOIN <channel>{,<channel>} [<key>{,<key>}]` : Joins one or more channels, key is required if the channel has a password
+- `PART <channel>{,<channel>} [<reason>]` : Leaves one or more channels with optional reason
+- `LIST` : Shows the list of channels with information about them
+- `NAMES [<channel>]` : Shows the list of users in a channel
+- `TOPIC <channel> [<topic>]` : Views or sets the channel topic
+- `KICK <channel> <user> [<reason>]` : Removes a user from a channel (operator only)
+- `INVITE <nickname> <channel>` : Invites a user to a channel
+
+##### Messaging
+- `PRIVMSG <target>{,<target>} :<message>` : Sends a message to one or more users or channels
+- `NOTICE <target>{,<target>} :<message>` : Sends a notice message (non-auto-reply)
+
+##### User Commands
+- `MOTD` : Displays the message of the day
+
+##### Channel Modes (MODE command)
+- `MODE <channel> [<modes> [<arguments>]]` : Views or changes channel modes (operator only for changes)
+  - `+i/-i` : Invite-only mode (users must be invited to join)
+  - `+t/-t` : Topic restriction (only operators can change the topic)
+  - `+n/-n` : No external messages (must be in channel to send messages)
+  - `+k/-k <password>` : Set/remove channel password
+  - `+l/-l <limit>` : Set/remove user limit on channel
+  - `+o/-o <nickname>` : Grant/remove operator privileges to a user
 
 ### The AI Bot
 You can talk with the AI bot through private messages.
