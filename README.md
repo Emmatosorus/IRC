@@ -94,12 +94,26 @@ Not all `nc` implementations support automatic `\r\n` insertion at the end of th
   - `+o/-o <nickname>` : Grant/remove operator privileges to a user
 
 ### The AI Bot
-You can talk with the AI bot through private messages.
-## WIP
+You can talk with the AI bot through private messages. To do so, you can just [chat](#messaging) with them like a regular user via the `PRIVMSG` command. 
+The AI will have the name assigned at launch, or `NyanBot` if the name argument was left empty.
+Don't forget to [launch](#chatgpt-bot) the AI bot !
 
 ### The Guardian Bot
-The moderation bot will keep an eye on inappropriate language.
-## WIP
+The moderation bot will keep an eye on inappropriate language. 
+This bot will be available in channels, after making them join by sending them [commands](#guardian-private-message-commands) in private message via `PRIVMSG`.
+After joining a channel, GuardianBot will add and remove words to his censor dictionnary via [commands](#guardian-channel-commands). If a banned word is sent by a user, the GuardianBot will warn the opperators of that channel by sending a message to the opperator only conversation of the channel in question.
+The moderation bot will have the name assigned at launch, or `GuardianBot` if the name argument was left empty.
+Don't forget to [launch](#moderation-bot) the moderation bot !
+
+#### Guardian Private Message Commands
+- `PRIVMSG <GuardianBot name> :!botjoin <channel>` : Invites the GuardianBot to a channel
+- `PRIVMSG <GuardianBot name> :!botjoink <channel> <key>` : Invites the GuardianBot to a channel that needs a key to access
+
+#### Guardian Channel Commands
+- `PRIVMSG <channel> :!addword <word>` : Adds a banned word to the censor dictionnary
+- `PRIVMSG <channel> :!rmword <word>` : Removes a banned word from the censor dictionnary
+- `PRIVMSG <channel> :!cleanword` : Removes all words from the censor dictionnary
+- `PRIVMSG <channel> :!botleave` : Removes the bot from the channel
 
 ## Contributors 🤝
 This project was made by [emuminov](https://github.com/emuminov), [Celiastral](https://github.com/Celiastral) 
