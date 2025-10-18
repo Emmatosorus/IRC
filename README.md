@@ -95,14 +95,14 @@ Not all `nc` implementations support automatic `\r\n` insertion at the end of th
 
 ### The AI Bot
 You can talk with the AI bot through private messages. To do so, you can just [chat](#messaging) with them like a regular user via the `PRIVMSG` command. 
-The AI will have the name assigned at launch, or `NyanBot` if the name argument was left empty.
+The AI will have the name assigned at launch, or NyanBot if the name argument was left empty.
 Don't forget to [launch](#chatgpt-bot) the AI bot !
 
 ### The Guardian Bot
 The moderation bot will keep an eye on inappropriate language. 
 This bot will be available in channels, after making them join by sending them [commands](#guardian-private-message-commands) in private message via `PRIVMSG`.
 After joining a channel, GuardianBot will add and remove words to his censor dictionnary via [commands](#guardian-channel-commands). If a banned word is sent by a user, the GuardianBot will warn the opperators of that channel by sending a message to the opperator only conversation of the channel in question.
-The moderation bot will have the name assigned at launch, or `GuardianBot` if the name argument was left empty.
+The moderation bot will have the name assigned at launch, or GuardianBot if the name argument was left empty.
 Don't forget to [launch](#moderation-bot) the moderation bot !
 
 #### Guardian Private Message Commands
